@@ -10,6 +10,10 @@
   --line: #e4e2dc;
   --panel: #ffffff;
   --accent: #f0531c;
+  /* Text set on the accent, such as a numbered badge: dark in both themes for contrast. */
+  --on-accent: #111110;
+  /* The floating cards' lift: a soft drop in light, a deeper one plus a top highlight in dark. */
+  --card-shadow: 0 1px 2px rgb(17 17 16 / 0.04), 0 24px 48px -30px rgb(17 17 16 / 0.28);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,5 +24,7 @@
     --line: #262624;
     --panel: #151514;
     --accent: #ff6a33;
+    --on-accent: #111110;
+    --card-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 28px 56px -24px rgb(0 0 0 / 0.85);
   }
 }

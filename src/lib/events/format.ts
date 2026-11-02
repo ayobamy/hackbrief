@@ -34,3 +34,15 @@ export function formatLocation(city: string | null, country: string | null): str
   }
   return city ?? country;
 }
+
+const TILE = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+
+/** The month and day of a start date, as a calendar tile shows them ("Nov" over "14"). */
+export function dateTile(startsOn: string | null): { month: string; day: string } | null {
+  if (!startsOn) {
+    return null;
+  }
+  const parts = TILE.formatToParts(new Date(`${startsOn}T00:00:00Z`));
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? "";
+  return { month: part("month"), day: part("day") };
+}

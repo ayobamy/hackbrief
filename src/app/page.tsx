@@ -7,6 +7,7 @@ import {
   UpcomingPreview,
   UpcomingSkeleton,
 } from "@/components/landing-panels";
+import { CARD } from "@/components/canvas";
 import { CountUp } from "@/components/motion/count-up";
 import { Reveal } from "@/components/motion/reveal";
 import { PlatformMarquee } from "@/components/platform-marquee";
@@ -201,12 +202,12 @@ export default function Home() {
                 From ten pages of rules to one page of plan.
               </h2>
             </Reveal>
-            <div className="grid gap-16 lg:grid-cols-[180px_1fr]">
+            <div className="grid grid-cols-1 gap-16 lg:grid-cols-[180px_minmax(0,1fr)]">
               <StepRail steps={STEPS} />
               <div className="flex flex-col gap-28">
                 <article
                   id="find"
-                  className="grid scroll-mt-28 items-start gap-8 md:grid-cols-[0.8fr_1.2fr]"
+                  className="grid scroll-mt-28 grid-cols-1 items-start gap-8 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]"
                 >
                   <Reveal className="flex flex-col gap-3">
                     <span className="font-mono text-sm text-muted">01</span>
@@ -234,7 +235,7 @@ export default function Home() {
                 </article>
                 <article
                   id="read"
-                  className="grid scroll-mt-28 items-start gap-8 md:grid-cols-[0.8fr_1.2fr]"
+                  className="grid scroll-mt-28 grid-cols-1 items-start gap-8 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]"
                 >
                   <Reveal className="flex flex-col gap-3">
                     <span className="font-mono text-sm text-muted">02</span>
@@ -253,7 +254,7 @@ export default function Home() {
                 </article>
                 <article
                   id="plan"
-                  className="grid scroll-mt-28 items-start gap-8 md:grid-cols-[0.8fr_1.2fr]"
+                  className="grid scroll-mt-28 grid-cols-1 items-start gap-8 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]"
                 >
                   <Reveal className="flex flex-col gap-3">
                     <span className="font-mono text-sm text-muted">03</span>
@@ -307,7 +308,7 @@ export default function Home() {
             <h2 id="numbers-heading" className="sr-only">
               hackr in numbers
             </h2>
-            <ul className="grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {[
                 {
                   value: PLATFORMS.length,
@@ -319,8 +320,12 @@ export default function Home() {
               ].map((figure) => (
                 <li
                   key={figure.label}
-                  className="flex flex-col gap-2 bg-paper p-7"
+                  className={`${CARD} relative flex flex-col gap-3 p-7`}
                 >
+                  <span
+                    className="absolute top-6 right-6 size-2 rounded-full bg-accent"
+                    aria-hidden="true"
+                  />
                   <CountUp
                     value={figure.value}
                     className="text-5xl font-semibold tracking-[-0.04em]"
@@ -364,7 +369,7 @@ export default function Home() {
 
         {/* Questions. */}
         <section aria-labelledby="faq-heading" className="border-b border-line">
-          <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[0.8fr_1.2fr]">
+          <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
             <Reveal className="flex flex-col gap-4">
               <p className={LABEL}>Questions</p>
               <h2 id="faq-heading" className={H2}>
