@@ -57,7 +57,6 @@ user agent. A site that objects can disallow `hackbrief` in its robots.txt, and 
 | Source | What hackbrief gets | Channel | Conditions | Status |
 | --- | --- | --- | --- | --- |
 | [Hack Club Hackathons](https://hackathons.hackclub.com/data) | High-school hackathons worldwide: name, start, end, city, country, virtual or hybrid, website (14 upcoming on 2 November) | JSON API: `/api/events/upcoming`, `/api/events/all` | "If you use it, you must credit “Hack Club Hackathons” with a link". Use the documented API only: the backend host's robots.txt is `Disallow: /`. Site code is MIT. | Re-checked |
-| [Kaggle](https://www.kaggle.com/docs/api) | Data-science and ML competitions: title, deadline, category, reward, team count | Official API and CLI, free account token; client is Apache-2.0 ([kaggle-cli](https://github.com/Kaggle/kaggle-cli)) | The website terms ban crawling "through use of manual or automated means", so never read the site itself. The terms page renders only in a browser and was read once through a text renderer: re-read it in a browser. | Client licence re-checked |
 | [Hackster.io contests](https://www.hackster.io/contests.atom) | Hardware and IoT contests run by sponsors (3 entries on 2 November) | Atom feed `/contests.atom` | The terms say nothing about automated access; the feed is published for readers. Use the feed's title, link and dates only, and ask Hackster before showing more. Contest pages returned 403 to an automated read. | Feed re-checked |
 | [NASA Space Apps](https://www.spaceappschallenge.org/legal/) | Past challenges, winners and their projects: the best licensed source for past-winner patterns | Public pages, slowly; robots.txt allows `/` and blocks `/private/` and `/api/` | Entrants' original content must be "freely available without restriction or ... licensed as open source"; "If you do not specify a specific OSI compliant license, NASA will distribute your original content under an Apache 2.0 license." Ask NASA for a bulk export before crawling. | Re-checked |
 | [DrivenData winners](https://github.com/drivendataorg/competition-winners) | Code and write-ups of prize-winning solutions to social-impact ML competitions | GitHub repository (MIT index of winners' repositories) | Use GitHub only: the DrivenData site's terms ban "any robot, spider or other automatic device". Check each winner's own licence. | Licence re-checked |
@@ -123,8 +122,10 @@ hackathon was listed twice and merged):
   entries are write-ups of past events with no date fields, and its calendar feed lists weekly
   open labs rather than hackathons and names individual authors. Revisit when its 2027 events are
   announced.
-- **Kaggle** joins once there is an API token; **NASA Space Apps** and **DrivenData** winners join
-  with the past-winner patterns (M6 in [implementation-plan.md](implementation-plan.md)).
+- **Kaggle** is not imported: its terms limit even the official API to personal, non-commercial
+  use, so it waits on Kaggle's permission (see "Ask permission" below, issue #47).
+- **NASA Space Apps** and **DrivenData** winners join with the past-winner patterns (M6 in
+  [implementation-plan.md](implementation-plan.md)).
 
 ## Usable with care
 
@@ -151,6 +152,7 @@ about it, or put their API behind a paid plan. hackbrief links to them and asks 
 | ETHGlobal | No website terms; "All rights reserved"; 14,000+ showcase projects with prize badges | `hello@ethglobal.com` |
 | lablab.ai | Terms ban scripts that capture data; judging criteria and submissions are public | `support@lablab.ai` |
 | Zindi | African data-science competitions; terms ban copying site material | `zindi@zindi.africa` |
+| [Kaggle](https://www.kaggle.com/terms) | Terms of Use (effective 22 June 2025, read in a browser on 2 November 2026) allow only "your own internal, personal, non-commercial use, and not on behalf of or for the benefit of any third party", and bar use that "Copies or stores any significant portion of the Content" or "Crawls," "scrapes," or "spiders" it. That covers the official API, although its client ([kaggle-cli](https://github.com/Kaggle/kaggle-cli)) is Apache-2.0 | `support@kaggle.com`, the support address in the terms; draft in [outreach/kaggle.md](outreach/kaggle.md) |
 | Colosseum | Terms ban automated collection; Copilot API needs an account | `hello@colosseum.com` |
 | HackQuest (with BuidlBox) | Licence is personal and non-commercial; bans automated scraping | `founder@hackquest.io` |
 | TAIKAI | Terms (s.10.C) ban extracting "a substantial part of the data" with robots, despite a public GraphQL API | `hello@taikai.network` |
@@ -197,7 +199,6 @@ Techpoint Africa and Layer3 blocked automated reads.
 
 ## Still to check
 
-- Kaggle's website terms, in a browser.
 - Terms pages that need a browser: Unstop, Hack2skill, Allevents, Junction, Meetup, AKINDO.
 - Thin coverage of Latin America and Asia, and no single African calendar: African hackathons are
   announced one event at a time, so the organiser-submission route (D in START-HERE) matters there.

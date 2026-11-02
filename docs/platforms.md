@@ -57,7 +57,7 @@ past winning projects, which feed hackbrief's past-winner patterns.
 
 | Platform | Focus | Rules | Winners | Verdict |
 | --- | --- | --- | --- | --- |
-| [Kaggle](https://www.kaggle.com/competitions) | Data-science and ML competitions | Rules, metric, prizes | Leaderboards, write-ups | **Use now** (API only) |
+| [Kaggle](https://www.kaggle.com/competitions) | Data-science and ML competitions | Rules, metric, prizes | Leaderboards, write-ups | Ask (its terms cover the API) |
 | [lablab.ai](https://lablab.ai) | AI hackathons, online and hybrid | Judging criteria per event | Public submissions | Ask |
 | [Zindi](https://zindi.africa) | African data-science competitions | Yes | Leaderboards | Ask |
 | [DrivenData](https://www.drivendata.org) | Social-impact ML competitions | Yes | Winners' code on GitHub | **Use now** (winners on GitHub); ask for listings |
@@ -200,8 +200,8 @@ its Hub API is usable with care. Link out to the rest.
 
 ## Gaps
 
-- Terms that need a browser to read: Kaggle, Unstop, Hack2skill, Allevents, Junction, Meetup,
-  AKINDO, ProtoPedia, Devnovate.
+- Terms that need a browser to read: Unstop, Hack2skill, Allevents, Junction, Meetup, AKINDO,
+  ProtoPedia, Devnovate.
 - Not reached: Hackathonat (Saudi Arabia; a Telegram channel only), Ingressive for Good (site did
   not respond), T-Brain (Taiwan; now redirects to a company site).
 - None of the platforms read publishes judging weights as data; they appear only in each event's

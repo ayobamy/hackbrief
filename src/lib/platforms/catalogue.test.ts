@@ -27,7 +27,7 @@ describe("the platform catalogue", () => {
     const verdict = (name: string) => PLATFORMS.find((platform) => platform.name === name)?.verdict;
 
     expect(verdict("Hack Club Hackathons")).toBe("use");
-    expect(verdict("Kaggle")).toBe("use");
+    expect(verdict("Kaggle")).toBe("ask");
     expect(verdict("Devpost")).toBe("do-not-collect");
     expect(verdict("AngelHack")).toBe("do-not-collect");
     expect(verdict("MLH")).toBe("ask");

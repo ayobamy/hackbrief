@@ -36,7 +36,7 @@ export const PLATFORMS: readonly Platform[] = [
   { name: "Encode Club", group: "Web3", verdict: "ask" },
   { name: "AKINDO", group: "Web3", verdict: "ask" },
   { name: "Gitcoin", group: "Web3", verdict: "do-not-collect" },
-  { name: "Kaggle", group: "AI and data science", verdict: "use" },
+  { name: "Kaggle", group: "AI and data science", verdict: "ask" },
   { name: "lablab.ai", group: "AI and data science", verdict: "ask" },
   { name: "Zindi", group: "AI and data science", verdict: "ask" },
   { name: "DrivenData", group: "AI and data science", verdict: "use" },
