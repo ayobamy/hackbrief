@@ -9,7 +9,7 @@ import type { EventFormat } from "@/lib/sources/types";
 
 import { getEvents } from "./data";
 
-const FOCUS_RING = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600";
+const FOCUS_RING = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
 // Event and source URLs are checked when they are imported; links are drawn only for http(s) as well.
 function isWebUrl(url: string): boolean {
@@ -23,8 +23,8 @@ function Chip({ href, active, children }: { href: string; active: boolean; child
       aria-current={active ? "page" : undefined}
       className={`rounded-full border px-3 py-1 text-sm ${FOCUS_RING} ${
         active
-          ? "border-indigo-600 bg-indigo-600 text-white"
-          : "border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+          ? "border-ink bg-ink text-paper"
+          : "border-line hover:bg-line/60"
       }`}
     >
       {children}
@@ -38,7 +38,7 @@ function Filters({ current }: { current: EventFilters }) {
   return (
     <nav aria-label="Filter hackathons" className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="w-16 text-sm text-zinc-600 dark:text-zinc-400">Format</span>
+        <span className="w-16 text-sm text-muted">Format</span>
         {formats.map((format) => (
           <Chip key={format ?? "all"} href={`/events${filterQuery({ ...current, format })}`} active={current.format === format}>
             {format ? FORMAT_LABELS[format] : "All"}
@@ -46,7 +46,7 @@ function Filters({ current }: { current: EventFilters }) {
         ))}
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="w-16 text-sm text-zinc-600 dark:text-zinc-400">Source</span>
+        <span className="w-16 text-sm text-muted">Source</span>
         {sources.map((slug) => (
           <Chip key={slug ?? "all"} href={`/events${filterQuery({ ...current, source: slug })}`} active={current.source === slug}>
             {slug ? (SOURCES.find((source) => source.slug === slug)?.name ?? slug) : "All"}
@@ -63,7 +63,7 @@ function EventCard({ event }: { event: EventListing }) {
     .filter(Boolean)
     .join(" · ");
   return (
-    <li className="flex flex-col gap-1 border-t border-zinc-200 py-4 dark:border-zinc-800">
+    <li className="flex flex-col gap-1 border-t border-line py-4">
       <h2 className="text-lg font-semibold">
         {isWebUrl(event.url) ? (
           <a href={event.url} className={`underline-offset-4 hover:underline ${FOCUS_RING}`}>
@@ -73,12 +73,12 @@ function EventCard({ event }: { event: EventListing }) {
           event.name
         )}
       </h2>
-      <p className="text-sm text-zinc-700 dark:text-zinc-300">{details}</p>
+      <p className="text-sm text-muted">{details}</p>
       {event.organiser && event.organiser !== event.name ? (
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">By {event.organiser}</p>
+        <p className="text-sm text-muted">By {event.organiser}</p>
       ) : null}
       {event.prizeText ? <p className="text-sm">{event.prizeText}</p> : null}
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="text-sm text-muted">
         Listed by{" "}
         {event.sources.map((source, index) => (
           <span key={source.slug}>
@@ -111,7 +111,7 @@ export async function EventList({
   } catch (error) {
     console.error("Could not load the event list", error);
     return (
-      <p role="alert" className="text-zinc-700 dark:text-zinc-300">
+      <p role="alert" className="text-muted">
         The list of hackathons is not available right now. Please try again in a minute.
       </p>
     );
@@ -120,7 +120,7 @@ export async function EventList({
   return (
     <div className="flex flex-col gap-6">
       <Filters current={filters} />
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="text-sm text-muted">
         {events.length === 1 ? "1 hackathon" : `${events.length} hackathons`}
       </p>
       {events.length === 0 ? (

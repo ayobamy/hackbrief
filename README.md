@@ -1,5 +1,7 @@
 # hackr
 
+![hackr](public/logo-mark.svg)
+
 A hackathon finder and coach for early-career developers and students: which hackathons to join,
 and how to win them, without reading ten pages of rules for each one.
 
@@ -17,6 +19,7 @@ outline in
 - [coach.md](docs/coach.md): how the coach reads rules and computes each number
 - [architecture.md](docs/architecture.md) and [data-model.md](docs/data-model.md): how hackr is built
 - [implementation-plan.md](docs/implementation-plan.md): what comes next
+- [brand.md](docs/brand.md): the logo, colours and type
 - [sources.md](docs/sources.md), [platforms.md](docs/platforms.md) and
   [competitors.md](docs/competitors.md): where hackathon data may come from, and who else is
   in this space

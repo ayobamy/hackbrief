@@ -8,7 +8,7 @@ import { SAMPLES } from "@/lib/coach/samples";
 import type { Emphasis } from "@/lib/coach/strategy";
 
 const FOCUS_RING =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600";
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
 const EMPHASIS_LABEL: Readonly<Record<Emphasis, string>> = {
   focus: "Focus",
@@ -17,9 +17,9 @@ const EMPHASIS_LABEL: Readonly<Record<Emphasis, string>> = {
 };
 
 const EMPHASIS_STYLE: Readonly<Record<Emphasis, string>> = {
-  focus: "bg-indigo-100 text-indigo-900 dark:bg-indigo-950 dark:text-indigo-200",
-  steady: "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200",
-  light: "bg-zinc-50 text-zinc-600 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:ring-zinc-700",
+  focus: "bg-accent/15 text-ink",
+  steady: "bg-line text-ink",
+  light: "bg-paper text-muted ring-1 ring-line",
 };
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -36,10 +36,10 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 function Fact({ label, value, detail }: { label: string; value: string; detail?: string | null }) {
   return (
-    <div className="flex flex-col gap-1 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-      <dt className="text-sm text-zinc-600 dark:text-zinc-400">{label}</dt>
+    <div className="flex flex-col gap-1 rounded-lg border border-line p-4">
+      <dt className="text-sm text-muted">{label}</dt>
       <dd className="text-lg font-semibold">{value}</dd>
-      {detail ? <dd className="text-sm text-zinc-600 dark:text-zinc-400">{detail}</dd> : null}
+      {detail ? <dd className="text-sm text-muted">{detail}</dd> : null}
     </div>
   );
 }
@@ -64,7 +64,7 @@ function Summary({ brief }: { brief: Brief }) {
 
 function Judging({ brief }: { brief: Brief }) {
   if (brief.strategy.length === 0) {
-    return <p className="text-zinc-600 dark:text-zinc-400">No judging criteria found in the text.</p>;
+    return <p className="text-muted">No judging criteria found in the text.</p>;
   }
   return (
     <ol className="flex flex-col gap-4">
@@ -79,10 +79,10 @@ function Judging({ brief }: { brief: Brief }) {
               <span className="font-semibold tabular-nums">{note.weight}%</span>
             </span>
           </div>
-          <div className="h-2 w-full rounded-full bg-zinc-100 dark:bg-zinc-800" aria-hidden="true">
-            <div className="h-2 rounded-full bg-indigo-600" style={{ width: `${note.weight}%` }} />
+          <div className="h-2 w-full rounded-full bg-line" aria-hidden="true">
+            <div className="h-2 rounded-full bg-accent" style={{ width: `${note.weight}%` }} />
           </div>
-          <p className="text-sm text-zinc-700 dark:text-zinc-300">{note.text}</p>
+          <p className="text-sm text-muted">{note.text}</p>
         </li>
       ))}
     </ol>
@@ -91,17 +91,17 @@ function Judging({ brief }: { brief: Brief }) {
 
 function Checklist({ brief }: { brief: Brief }) {
   if (brief.checklist.length === 0) {
-    return <p className="text-zinc-600 dark:text-zinc-400">The text does not list what to submit.</p>;
+    return <p className="text-muted">The text does not list what to submit.</p>;
   }
   return (
     <ul className="flex flex-col gap-3">
       {brief.checklist.map((item) => (
         <li key={item.id}>
           <label className="flex items-start gap-3">
-            <input type="checkbox" className={`mt-1 size-4 accent-indigo-600 ${FOCUS_RING}`} />
+            <input type="checkbox" className={`mt-1 size-4 accent-accent ${FOCUS_RING}`} />
             <span className="flex flex-col">
               <span className="font-medium">{item.label}</span>
-              <span className="text-sm text-zinc-600 dark:text-zinc-400">From the rules: “{item.source}”</span>
+              <span className="text-sm text-muted">From the rules: “{item.source}”</span>
             </span>
           </label>
         </li>
@@ -112,12 +112,12 @@ function Checklist({ brief }: { brief: Brief }) {
 
 function Dates({ brief }: { brief: Brief }) {
   if (brief.dates.length === 0) {
-    return <p className="text-zinc-600 dark:text-zinc-400">No dates found in the text.</p>;
+    return <p className="text-muted">No dates found in the text.</p>;
   }
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left text-sm">
-        <thead className="text-zinc-600 dark:text-zinc-400">
+        <thead className="text-muted">
           <tr>
             <th scope="col" className="py-2 pr-4 font-medium">What</th>
             <th scope="col" className="py-2 pr-4 font-medium">Date</th>
@@ -126,11 +126,11 @@ function Dates({ brief }: { brief: Brief }) {
         </thead>
         <tbody>
           {brief.dates.map((date, index) => (
-            <tr key={`${date.date}-${index}`} className="border-t border-zinc-200 dark:border-zinc-800">
+            <tr key={`${date.date}-${index}`} className="border-t border-line">
               <td className="py-2 pr-4">{date.label}</td>
               <td className="py-2 pr-4 whitespace-nowrap tabular-nums">
                 {formatDate(date.date)}
-                {date.yearAssumed ? <span className="text-zinc-600 dark:text-zinc-400"> (year assumed)</span> : null}
+                {date.yearAssumed ? <span className="text-muted"> (year assumed)</span> : null}
               </td>
               <td className="py-2 whitespace-nowrap">{date.time ?? "—"}</td>
             </tr>
@@ -143,20 +143,20 @@ function Dates({ brief }: { brief: Brief }) {
 
 function Plan({ brief }: { brief: Brief }) {
   if (brief.plan.length === 0) {
-    return <p className="text-zinc-600 dark:text-zinc-400">A prep plan needs a submission deadline.</p>;
+    return <p className="text-muted">A prep plan needs a submission deadline.</p>;
   }
   return (
     <ol className="flex flex-col gap-3">
       {brief.plan.map((step) => {
         const passed = step.daysFromToday < 0;
         return (
-          <li key={step.title} className={`flex flex-col gap-1 border-l-2 pl-4 ${passed ? "border-zinc-200 opacity-60 dark:border-zinc-800" : "border-indigo-600"}`}>
-            <span className="text-sm text-zinc-600 tabular-nums dark:text-zinc-400">
+          <li key={step.title} className={`flex flex-col gap-1 border-l-2 pl-4 ${passed ? "border-line opacity-60" : "border-accent"}`}>
+            <span className="text-sm text-muted tabular-nums">
               {formatDate(step.date)} · {formatDaysLeft(step.daysFromToday)}
               {passed ? " (passed)" : ""}
             </span>
             <span className="font-medium">{step.title}</span>
-            <span className="text-sm text-zinc-700 dark:text-zinc-300">{step.detail}</span>
+            <span className="text-sm text-muted">{step.detail}</span>
           </li>
         );
       })}
@@ -166,7 +166,7 @@ function Plan({ brief }: { brief: Brief }) {
 
 function SimpleList({ items, empty }: { items: readonly string[]; empty: string }) {
   if (items.length === 0) {
-    return <p className="text-zinc-600 dark:text-zinc-400">{empty}</p>;
+    return <p className="text-muted">{empty}</p>;
   }
   return (
     <ul className="flex list-disc flex-col gap-2 pl-5">
@@ -264,9 +264,9 @@ export function Coach() {
           rows={12}
           spellCheck={false}
           placeholder="Paste the rules page here: dates, eligibility, what to submit and the judging criteria."
-          className={`w-full rounded-lg border border-zinc-300 bg-white p-3 font-mono text-sm dark:border-zinc-700 dark:bg-zinc-950 ${FOCUS_RING}`}
+          className={`w-full rounded-lg border border-line bg-panel p-3 font-mono text-sm ${FOCUS_RING}`}
         />
-        <p id={hintId} className="text-sm text-zinc-600 dark:text-zinc-400">
+        <p id={hintId} className="text-sm text-muted">
           Your text stays in your browser: hackr reads it on this page and does not send or store
           it.
         </p>
@@ -274,7 +274,7 @@ export function Coach() {
           <button
             type="submit"
             disabled={!text.trim()}
-            className={`rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING}`}
+            className={`rounded-lg bg-ink px-4 py-2 font-medium text-paper hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING}`}
           >
             Build my brief
           </button>
@@ -285,20 +285,20 @@ export function Coach() {
                 setText("");
                 setBrief(null);
               }}
-              className={`rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 ${FOCUS_RING}`}
+              className={`rounded-lg px-3 py-2 text-sm font-medium text-muted hover:bg-line/60 ${FOCUS_RING}`}
             >
               Clear
             </button>
           ) : null}
         </div>
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <span className="text-zinc-600 dark:text-zinc-400">No rules to hand? Try a made-up one:</span>
+          <span className="text-muted">No rules to hand? Try a made-up one:</span>
           {SAMPLES.map((sample) => (
             <button
               key={sample.id}
               type="button"
               onClick={() => trySample(sample.text)}
-              className={`rounded-full border border-zinc-300 px-3 py-1 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800 ${FOCUS_RING}`}
+              className={`rounded-full border border-line px-3 py-1 hover:bg-line/60 ${FOCUS_RING}`}
             >
               {sample.name}
             </button>
