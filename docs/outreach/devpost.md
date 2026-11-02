@@ -15,7 +15,7 @@ Hello Devpost team,
 I maintain hackbrief (<https://github.com/ayobamy/hackbrief>), a free, open-source (MIT) tool that helps
 students and early-career developers choose hackathons and prepare for them. Its first feature
 reads a hackathon's rules and turns the judging criteria into a plan; you can try it at
-<https://hackr-mauve.vercel.app/coach>. It is non-commercial.
+<https://hackbrief.dev/coach>. It is non-commercial.
 
 Many of the hackathons our users want are on Devpost, and your Terms of Service rule out
 collecting them without written consent, so I am asking first. We would like to show, for public
