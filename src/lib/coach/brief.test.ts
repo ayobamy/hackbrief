@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildBrief, localToday, MAX_INPUT_LENGTH } from "./brief";
+import { buildBrief, hasFindings, localToday, MAX_INPUT_LENGTH } from "./brief";
 import type { KeyDate } from "./dates";
 import { buildPlan } from "./plan";
 import { SAMPLES } from "./samples";
@@ -194,5 +194,17 @@ describe("buildBrief warnings", () => {
 describe("localToday", () => {
   it("formats the viewer's calendar date", () => {
     expect(localToday(new Date(2027, 0, 5, 23, 30))).toBe("2027-01-05");
+  });
+});
+
+describe("hasFindings", () => {
+  it("is true when the text gave the brief anything to show", () => {
+    expect(hasFindings(buildBrief("Submission deadline: 2027-03-14", "2026-11-02"))).toBe(true);
+    expect(hasFindings(buildBrief("Teams of up to 4 people.", "2026-11-02"))).toBe(true);
+    expect(hasFindings(buildBrief("Judging\n- Impact (60%)\n- Design (40%)", "2026-11-02"))).toBe(true);
+  });
+
+  it("is false for a page with nothing the coach reads", () => {
+    expect(hasFindings(buildBrief("Welcome! Join our community and follow us for updates.", "2026-11-02"))).toBe(false);
   });
 });

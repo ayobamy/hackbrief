@@ -1,13 +1,14 @@
 "use client";
 
-import { Suspense, use, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { Suspense, use, useCallback, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 
-import { buildBrief, localToday, type Brief } from "@/lib/coach/brief";
+import { buildBrief, hasFindings, localToday, type Brief } from "@/lib/coach/brief";
 import { formatAmount, formatDate, formatDaysLeft, formatSolo, formatTeamSize } from "@/lib/coach/format";
 import { SAMPLES } from "@/lib/coach/samples";
 import type { Emphasis } from "@/lib/coach/strategy";
 import { Footnote, LABEL, SHEET } from "@/components/sheet";
 import { pageLink, type EventContext } from "@/lib/events/context";
+import type { ReadResult, SkipReason } from "@/lib/rules/read";
 
 const FOCUS_RING =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
@@ -231,7 +232,68 @@ function ExternalArrow() {
 }
 
 /** A hackathon from the list: what hackbrief knows about it, and how to get its rules in the box. */
-function EventPanel({ event }: { event: EventContext }) {
+// Any day will do here: whether a page gave the brief anything does not depend on today's date.
+const FINDINGS_DAY = "2026-01-01";
+
+function pageLabel(url: string): string {
+  const page = new URL(url);
+  return `${page.hostname.replace(/^www\./, "")}${page.pathname === "/" ? "" : page.pathname}`;
+}
+
+const SKIPPED: Readonly<Record<Exclude<SkipReason, "off">, (host: string) => string>> = {
+  restricted: (host) => `Its rules are on ${host}, which asks to be asked first, so hackbrief does not read it.`,
+  robots: (host) => `${host} asks automated readers to leave this page alone, so hackbrief does.`,
+  unreachable: (host) => `hackbrief could not reach ${host} just now.`,
+  "not-html": (host) => `${host} gives its rules in a form hackbrief cannot read yet.`,
+  empty: (host) => `${host} draws its page with JavaScript or keeps its rules elsewhere, so hackbrief found nothing to read.`,
+};
+
+/**
+ * What came of reading the event's own page. When it held something for the brief, the text goes to
+ * the coach, which builds the brief at once; otherwise this says why, and the steps below still apply.
+ */
+function RulesStatus({
+  result,
+  host,
+  onRead,
+}: {
+  result: ReadResult | null;
+  host: string;
+  onRead: (text: string) => void;
+}) {
+  const found = result?.status === "read" && hasFindings(buildBrief(result.text, FINDINGS_DAY));
+  useEffect(() => {
+    if (found && result?.status === "read") {
+      onRead(result.text);
+    }
+  }, [found, result, onRead]);
+
+  if (!result) {
+    return null;
+  }
+  if (result.status === "skipped") {
+    return result.reason === "off" ? null : (
+      <p className="text-sm text-muted">{SKIPPED[result.reason](host)} Paste its rules below instead.</p>
+    );
+  }
+  const [first] = result.pages;
+  const more = result.pages.length - 1;
+  if (!found || !first) {
+    return <p className="text-sm text-muted">hackbrief read its page on {host} but found no rules there. Paste them below.</p>;
+  }
+  return (
+    <p className="border-l-2 border-accent pl-3 text-sm">
+      Read its rules from{" "}
+      <a href={first} className={`underline underline-offset-4 ${FOCUS_RING}`}>
+        {pageLabel(first)}
+      </a>
+      {more > 0 ? ` and ${more} more ${more === 1 ? "page" : "pages"}` : ""}. Your brief is below; anything it
+      misses was not on {more > 0 ? "those pages" : "that page"}, so paste it here to fill it in.
+    </p>
+  );
+}
+
+function EventPanel({ event, reading }: { event: EventContext; reading: ReactNode }) {
   const steps: ReactNode[] = [
     event.rulesUrl ? (
       <>
@@ -263,7 +325,10 @@ function EventPanel({ event }: { event: EventContext }) {
         {event.details ? <p className="text-sm text-muted">{event.details}</p> : null}
         {event.organiser ? <p className="text-sm text-muted">By {event.organiser}</p> : null}
       </div>
-      <ol className="flex flex-col gap-2.5 border-t border-line pt-4 text-sm">
+      <div role="status" className="border-t border-line pt-4">
+        {reading}
+      </div>
+      <ol className="flex flex-col gap-2.5 text-sm">
         {steps.map((step, position) => (
           <li key={position} className="flex items-start gap-3">
             <Footnote n={position + 1} className="mt-[1px]" />
@@ -276,6 +341,17 @@ function EventPanel({ event }: { event: EventContext }) {
       ) : null}
     </section>
   );
+}
+
+/** Waits for the reading of the event's own page, inside its own Suspense boundary. */
+function WithRules({
+  rules,
+  children,
+}: {
+  rules: Promise<ReadResult | null>;
+  children: (result: ReadResult | null) => ReactNode;
+}) {
+  return children(use(rules));
 }
 
 /**
@@ -292,7 +368,13 @@ function WithEvent({
   return children(use(event));
 }
 
-export function Coach({ event: eventLookup }: { event: Promise<EventContext | null> }) {
+export function Coach({
+  event: eventLookup,
+  rules: rulesLookup,
+}: {
+  event: Promise<EventContext | null>;
+  rules: Promise<ReadResult | null>;
+}) {
   const [text, setText] = useState("");
   const [page, setPage] = useState("");
   const [brief, setBrief] = useState<Brief | null>(null);
@@ -301,6 +383,22 @@ export function Coach({ event: eventLookup }: { event: Promise<EventContext | nu
   const hintId = useId();
   const pageId = useId();
   const pageHintId = useId();
+
+  // What has been typed, for the page read to check without re-rendering on every keystroke.
+  const typed = useRef("");
+  useEffect(() => {
+    typed.current = text;
+  }, [text]);
+
+  // The event's own page held its rules: fill the box and build the brief at once, unless the visitor
+  // has already started typing their own.
+  const acceptRules = useCallback((rules: string) => {
+    if (typed.current.trim()) {
+      return;
+    }
+    setText(rules);
+    setBrief(buildBrief(rules, localToday()));
+  }, []);
 
   // After each new brief renders, move focus to it so keyboard and screen-reader users land on it.
   useEffect(() => {
@@ -328,7 +426,28 @@ export function Coach({ event: eventLookup }: { event: Promise<EventContext | nu
   return (
     <div className="flex flex-col gap-10">
       <Suspense fallback={null}>
-        <WithEvent event={eventLookup}>{(event) => (event ? <EventPanel event={event} /> : null)}</WithEvent>
+        <WithEvent event={eventLookup}>
+          {(event) =>
+            event ? (
+              <EventPanel
+                event={event}
+                reading={
+                  <Suspense
+                    fallback={
+                      <p className="text-sm text-muted motion-safe:animate-pulse">
+                        Reading its rules on {event.host ?? "its site"}…
+                      </p>
+                    }
+                  >
+                    <WithRules rules={rulesLookup}>
+                      {(result) => <RulesStatus result={result} host={event.host ?? "its site"} onRead={acceptRules} />}
+                    </WithRules>
+                  </Suspense>
+                }
+              />
+            ) : null
+          }
+        </WithEvent>
       </Suspense>
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
         <Suspense fallback={null}>

@@ -47,3 +47,12 @@ export function isRestrictedUrl(url: string): boolean {
   }
   return EVENTBRITE.test(host) || RESTRICTED_DOMAINS.some((domain) => host === domain || host.endsWith(`.${domain}`));
 }
+
+// Sources hackbrief may read only through their feed (docs/sources.md): their pages are left alone.
+const FEED_ONLY_DOMAINS = ["hackster.io"] as const;
+
+/** Whether a URL is on a source whose feed hackbrief uses but whose pages it does not read. */
+export function isFeedOnlyUrl(url: string): boolean {
+  const host = hostOf(url);
+  return host !== null && FEED_ONLY_DOMAINS.some((domain) => host === domain || host.endsWith(`.${domain}`));
+}

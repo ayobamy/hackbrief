@@ -3,6 +3,8 @@ import { cacheLife, cacheTag } from "next/cache";
 import { getDatabase } from "@/lib/db";
 import type { EventFilters } from "@/lib/events/filters";
 import { findEvent, listUpcomingEvents, type EventListing } from "@/lib/events/query";
+import { guardedFetch } from "@/lib/rules/fetcher";
+import { readEventPage, type ReadResult } from "@/lib/rules/read";
 
 /** The tag the import revalidates after each run. */
 export const EVENTS_TAG = "events";
@@ -24,4 +26,20 @@ export async function getEvent(id: string): Promise<EventListing | null> {
   cacheLife("hours");
   cacheTag(EVENTS_TAG);
   return findEvent(getDatabase(), id);
+}
+
+/**
+ * A listed event's own page, read for the coach (decision D11). Cached for hours, so an organiser's
+ * site sees a few requests a day at most; `READ_EVENT_PAGES=off` turns reading off (the end-to-end
+ * tests use it, so they never reach the internet).
+ */
+export async function getEventRules(id: string): Promise<ReadResult> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag(EVENTS_TAG);
+  if (process.env.READ_EVENT_PAGES === "off") {
+    return { status: "skipped", reason: "off" };
+  }
+  const event = await findEvent(getDatabase(), id);
+  return event ? readEventPage(event.url, { fetch: guardedFetch }) : { status: "skipped", reason: "unreachable" };
 }

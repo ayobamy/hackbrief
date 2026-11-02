@@ -94,6 +94,12 @@ that name the event (the event panel, the optional page field, the brief's title
 `use()` inside their own Suspense boundaries. The coach is therefore rendered once, in the static
 shell, and nothing typed before the lookup lands is lost to a remount (issue #31).
 
+The coach page also passes a second promise, the read of the event's own page (`getEventRules`,
+cached for hours; `src/lib/rules/`). The event panel shows "Reading its rules on…" until it lands,
+then either builds the brief from the page or says why it could not (issue #41, decision D11). The
+fetch uses `undici` with a lookup that refuses non-public addresses at connection time. The
+end-to-end tests run with `READ_EVENT_PAGES=off`, so they never reach the internet.
+
 ### The fit score (later)
 
 A pure function in `src/lib/fit/` scores an event against a profile (skills, stack, interests, time

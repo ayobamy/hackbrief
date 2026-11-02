@@ -3,8 +3,9 @@ import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
-import { getEvent } from "@/app/events/data";
+import { getEvent, getEventRules } from "@/app/events/data";
 import { eventContext, parseEventId, type EventContext } from "@/lib/events/context";
+import type { ReadResult } from "@/lib/rules/read";
 
 import { Coach } from "./coach";
 
@@ -30,6 +31,20 @@ async function lookUpEvent(searchParams: PageProps<"/coach">["searchParams"]): P
   }
 }
 
+// The event's own page, read so the brief can be built at once (decision D11); null without an event.
+async function lookUpRules(searchParams: PageProps<"/coach">["searchParams"]): Promise<ReadResult | null> {
+  const id = parseEventId(await searchParams);
+  if (!id) {
+    return null;
+  }
+  try {
+    return await getEventRules(id);
+  } catch (error) {
+    console.error("Could not read the event's page for the coach", error);
+    return { status: "skipped", reason: "unreachable" };
+  }
+}
+
 export default function CoachPage({ searchParams }: PageProps<"/coach">) {
   return (
     <>
@@ -45,7 +60,7 @@ export default function CoachPage({ searchParams }: PageProps<"/coach">) {
         </header>
         {/* Not awaited: the coach renders at once, and only the parts that name the event wait for
             it, so nothing typed before the lookup lands is lost to a remount. */}
-        <Coach event={lookUpEvent(searchParams)} />
+        <Coach event={lookUpEvent(searchParams)} rules={lookUpRules(searchParams)} />
       </main>
       <SiteFooter />
     </>
