@@ -5,8 +5,7 @@ import { useId, useMemo, useState } from "react";
 import { CRITERIA, rubricFrom, START } from "@/lib/coach/rubric";
 import { buildStrategy } from "@/lib/coach/strategy";
 
-// Square cards that lift off a dotted surface, as Ahmed asked to keep for this part (issue #32).
-const CARD = "border border-line bg-panel shadow-card";
+import { CARD, Surface } from "./sheet";
 
 // Shades of the one accent, heaviest criterion first.
 const SHADES = [1, 0.7, 0.45, 0.28];
@@ -20,13 +19,9 @@ export function RubricPlayground() {
   const total = rubric.statedTotal ?? 0;
 
   return (
-    <div className="relative overflow-hidden border border-line bg-panel/40 p-3 sm:p-5">
-      <div className="dot-grid pointer-events-none absolute inset-0 opacity-80" aria-hidden="true" />
-      <div
-        className="pointer-events-none absolute -top-40 -right-32 h-80 w-[28rem] rounded-full bg-accent/[0.07] blur-3xl"
-        aria-hidden="true"
-      />
-      <div className="relative grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-5">
+    // Square cards that lift off the dotted surface, as Ahmed asked to keep for this part (issue #32).
+    <Surface className="p-3 sm:p-5">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-5">
         <div className={`${CARD} flex flex-col gap-5 p-5 sm:p-6`}>
           <div className="flex items-baseline justify-between">
             <span className="text-sm text-muted">The rubric says</span>
@@ -99,6 +94,6 @@ export function RubricPlayground() {
           </ol>
         </div>
       </div>
-    </div>
+    </Surface>
   );
 }

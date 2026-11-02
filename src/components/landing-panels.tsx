@@ -3,13 +3,16 @@ import { connection } from "next/server";
 
 import { getEvents } from "@/app/events/data";
 import { buildBrief } from "@/lib/coach/brief";
+import { eventStart } from "@/lib/coach/dates";
 import { formatDate, formatTeamSize } from "@/lib/coach/format";
 import { SAMPLES } from "@/lib/coach/samples";
+import { planTimeline } from "@/lib/coach/timeline";
 import { FORMAT_LABELS } from "@/lib/events/filters";
 import { formatDateRange, isWebUrl } from "@/lib/events/format";
 
 import { DateTile } from "./date-tile";
 import { CountUp } from "./motion/count-up";
+import { PlanTimeline } from "./plan-timeline";
 import { Footnote, LABEL, Sheet } from "./sheet";
 
 // The Lagoon sample, read by the coach at build time; the panels below show its real output.
@@ -148,28 +151,22 @@ export function ReadPanel() {
   );
 }
 
-/** The prep plan the coach counts back from the Lagoon sample's dates, set as a dated schedule. */
+/** The prep plan the coach counts back from the Lagoon sample's dates, as a calendar and a timeline. */
 export function PlanPanel() {
-  if (!LAGOON_BRIEF) {
+  if (!LAGOON || !LAGOON_BRIEF) {
+    return null;
+  }
+  const { plan, dates, deadline } = LAGOON_BRIEF;
+  const timeline = planTimeline(plan, eventStart(dates)?.date ?? null, deadline?.date ?? null);
+  if (!timeline) {
     return null;
   }
   return (
-    <Sheet>
-      <div className="flex items-baseline justify-between border-b border-line px-5 py-3">
-        <span className={LABEL}>Prep plan</span>
-        <span className="text-sm text-muted">{LAGOON?.name}</span>
-      </div>
-      <ol className="divide-y divide-line">
-        {LAGOON_BRIEF.plan.map((step) => (
-          <li key={step.title} className="grid gap-x-5 gap-y-1 px-5 py-3.5 sm:grid-cols-[132px_1fr]">
-            <span className="font-mono text-xs text-muted tabular-nums sm:pt-1">{formatDate(step.date)}</span>
-            <span className="flex flex-col gap-0.5">
-              <span className="text-sm font-medium">{step.title}</span>
-              <span className="text-[13px] leading-5 text-muted">{step.detail}</span>
-            </span>
-          </li>
-        ))}
-      </ol>
-    </Sheet>
+    <PlanTimeline
+      name={LAGOON.name}
+      steps={plan.map(({ date, title, detail }) => ({ date, title, detail }))}
+      timeline={timeline}
+      deadline={deadline ? { date: deadline.date, time: deadline.time } : null}
+    />
   );
 }

@@ -54,9 +54,15 @@ Lists use dotted leaders between a name and its figure, and bars are two pixels 
 used only as highlighter ink (marked lines of the rules, the tab underline, the selected time label),
 never for text. Footnote numbers tie each highlighted line of the rules to its part of the brief.
 
-The rubric playground keeps its earlier look, at Ahmed's request (issue #32): two square cards with
-a soft shadow on a dotted surface, a segmented weights bar in shades of the accent, and each piece of
-advice in its own card.
+The interactive pieces sit on a dotted surface (`Surface` in `src/components/sheet.tsx`): the rubric
+playground keeps its earlier look at Ahmed's request (issue #32), two square cards with a soft shadow,
+a segmented weights bar in shades of the accent and each piece of advice in its own card; and the
+coach demo in the hero lifts off the same surface (issue #37).
+
+The prep plan on the landing page is a calendar and a timeline (issue #37,
+`src/components/plan-timeline.tsx`): a strip of every day from the first step to the deadline with the
+hacking days shaded, and the steps on a line that fills with the accent as the page scrolls, with the
+gap between steps. Its days and gaps come from `planTimeline` in `src/lib/coach/timeline.ts`.
 
 The hero has one warm light (issue #35): the accent rising from the top-right corner and fading into
 the page, with fine grain over that corner (`.hero-glow` and `.hero-grain` in `src/app/globals.css`,

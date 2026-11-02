@@ -202,7 +202,7 @@ export function RulesDemo() {
   ];
 
   return (
-    <div className={SHEET}>
+    <div className={`${SHEET} shadow-card`}>
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b border-line px-4 pt-3 sm:px-6">
         <div
           role="tablist"
