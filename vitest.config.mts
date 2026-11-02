@@ -8,8 +8,8 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/lib/**/*.ts"],
-      // db.ts is exercised by the "db" project, against a real Postgres.
-      exclude: ["src/**/*.test.ts", "src/lib/db.ts"],
+      // These talk to Postgres and are exercised by the "db" project instead.
+      exclude: ["src/**/*.test.ts", "src/lib/db.ts", "src/lib/import/run.ts"],
       thresholds: { lines: 90, branches: 90, functions: 90, statements: 90 },
     },
     projects: [

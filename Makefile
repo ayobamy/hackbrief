@@ -1,4 +1,4 @@
-.PHONY: check install audit lint-docs lint typecheck test test-db build db-up db-down
+.PHONY: check install audit lint-docs lint typecheck test test-db build db-up db-down db-migrate db-generate
 
 MARKDOWNLINT := npx --yes markdownlint-cli2@0.24.0
 
@@ -7,7 +7,7 @@ DATABASE_URL ?= postgres://hackr:hackr@localhost:5433/hackr
 export DATABASE_URL
 
 # Everything CI runs. The database tests need Postgres: run `make db-up` first.
-check: audit lint-docs lint typecheck test test-db build
+check: audit lint-docs lint typecheck test db-migrate test-db build
 
 install:
 	pnpm install --frozen-lockfile
@@ -35,6 +35,16 @@ test-db:
 
 build:
 	pnpm run build
+
+# Apply the migrations in drizzle/ to DATABASE_URL_UNPOOLED, or DATABASE_URL when that is unset,
+# after checking the migration history is consistent.
+db-migrate:
+	pnpm exec drizzle-kit check
+	pnpm exec drizzle-kit migrate
+
+# Write a new migration after changing src/db/schema.ts: make db-generate NAME=add-prizes
+db-generate:
+	pnpm exec drizzle-kit generate --name $(NAME)
 
 db-up:
 	docker compose up --detach --wait db

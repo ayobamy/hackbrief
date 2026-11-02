@@ -29,6 +29,7 @@ You need Node.js 24, pnpm 10 and Docker (for a local Postgres).
 make install                  # dependencies from the lockfile
 cp .env.example .env.local    # local settings; never committed
 make db-up                    # Postgres 18 on localhost:5433
+make db-migrate               # create the tables
 pnpm dev                      # the app on http://localhost:3000
 ```
 
