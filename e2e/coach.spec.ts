@@ -30,7 +30,7 @@ test("the landing page runs the coach: samples switch, the rubric playground rew
     page.getByRole("tab", { name: "Harbour Light Climate Hack" }),
   ).toHaveAttribute("aria-selected", "true");
   const topCriterion = page
-    .getByRole("tabpanel")
+    .getByRole("list", { name: "Judging weights" })
     .getByRole("listitem")
     .filter({ hasText: "Impact on emissions" });
   await expect(topCriterion).toContainText("Focus");
@@ -38,6 +38,18 @@ test("the landing page runs the coach: samples switch, the rubric playground rew
   await expect(
     page.getByText(/^Read 1,063 characters in [\d.]+ ms$/),
   ).toBeVisible();
+
+  // Each card can point at the lines of the rules it came from.
+  const showDeadline = page.getByRole("button", {
+    name: "Show in the rules: Deadline",
+  });
+  await showDeadline.click();
+  await expect(showDeadline).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page
+      .getByRole("region", { name: "The rules of Harbour Light Climate Hack" })
+      .locator('[data-card="0"]'),
+  ).toContainText("Submissions are due March 7, 2027");
 
   // Moving a weight rescales the rubric and rewrites the advice, with the coach's own code.
   const slider = page.getByLabel("Technical quality");

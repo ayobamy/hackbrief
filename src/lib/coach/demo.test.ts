@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { buildBrief } from "./brief";
-import { tagLines } from "./highlight";
+import { CARDS, cardOf, tagLines } from "./highlight";
 import { rubricFrom, START } from "./rubric";
 import { SAMPLES } from "./samples";
 
@@ -12,7 +12,9 @@ function sample(id: string): string {
 describe("tagLines", () => {
   it("tags each line of the Harbour Light rules with what the coach read from it", () => {
     const text = sample("harbour");
-    const tagged = tagLines(text, buildBrief(text, "2026-11-02")).filter(({ tag }) => tag);
+    const tagged = tagLines(text, buildBrief(text, "2026-11-02")).filter(
+      ({ tag }) => tag,
+    );
 
     expect(tagged.map(({ line, tag }) => [tag, line.slice(0, 32)])).toEqual([
       ["who can enter", "Participants must be at least 18"],
@@ -23,6 +25,20 @@ describe("tagLines", () => {
       ["criterion", "| Use of the Harbour Light API |"],
       ["criterion", "| Design and usability | 5 point"],
       ["to hand in", "Each team must provide a project"],
+      ["prize", "Grand prize: USD 8,000. Runner-u"],
+    ]);
+  });
+
+  it("tags every prize line of a list", () => {
+    const text = sample("lagoon");
+    const prizes = tagLines(text, buildBrief(text, "2026-11-02"))
+      .filter(({ tag }) => tag === "prize")
+      .map(({ line }) => line);
+
+    expect(prizes).toEqual([
+      "- First place: $3,000",
+      "- Second place: $1,500",
+      "- Best use of open data: $500",
     ]);
   });
 
@@ -37,7 +53,31 @@ describe("tagLines", () => {
       "deadline",
       "criterion",
       "to hand in",
+      "prize",
     ]);
+  });
+});
+
+describe("cardOf", () => {
+  it("files every tag under one of the demo's four cards, in reading order", () => {
+    expect(CARDS.map(({ title }) => title)).toEqual([
+      "Deadline",
+      "Team and prize",
+      "Where the points are",
+      "To hand in",
+    ]);
+    expect(
+      (
+        [
+          "deadline",
+          "team",
+          "who can enter",
+          "prize",
+          "criterion",
+          "to hand in",
+        ] as const
+      ).map((tag) => cardOf(tag)),
+    ).toEqual([0, 1, 1, 1, 2, 3]);
   });
 });
 
@@ -46,7 +86,13 @@ describe("rubricFrom", () => {
     const rubric = rubricFrom(START);
 
     expect(rubric.statedTotal).toBe(100);
-    expect(rubric.criteria.map(({ name, weight, category }) => [name, weight, category])).toEqual([
+    expect(
+      rubric.criteria.map(({ name, weight, category }) => [
+        name,
+        weight,
+        category,
+      ]),
+    ).toEqual([
       ["Technical quality", 30, "technical"],
       ["Innovation", 20, "innovation"],
       ["Impact", 25, "impact"],
@@ -58,7 +104,11 @@ describe("rubricFrom", () => {
     const rubric = rubricFrom([50, 20, 25, 25]);
 
     expect(rubric.statedTotal).toBe(120);
-    expect(rubric.criteria.map(({ weight }) => weight)).toEqual([42, 16, 21, 21]);
-    expect(rubric.criteria.map(({ stated }) => stated)).toEqual([50, 20, 25, 25]);
+    expect(rubric.criteria.map(({ weight }) => weight)).toEqual([
+      42, 16, 21, 21,
+    ]);
+    expect(rubric.criteria.map(({ stated }) => stated)).toEqual([
+      50, 20, 25, 25,
+    ]);
   });
 });

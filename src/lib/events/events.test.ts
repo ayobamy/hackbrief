@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { filterQuery, parseFilters } from "./filters";
-import { formatDateRange, formatLocation } from "./format";
+import { dateTile, formatDateRange, formatLocation } from "./format";
 
 const SLUGS = ["hackclub", "hackster", "hackhq"];
 
@@ -48,5 +48,16 @@ describe("formatLocation", () => {
     [null, null, null],
   ])("%s and %s read %s", (city, country, text) => {
     expect(formatLocation(city, country)).toBe(text);
+  });
+});
+
+describe("dateTile", () => {
+  it("splits a start date into the month and day a calendar tile shows", () => {
+    expect(dateTile("2026-11-14")).toEqual({ month: "Nov", day: "14" });
+    expect(dateTile("2027-01-03")).toEqual({ month: "Jan", day: "3" });
+  });
+
+  it("has nothing to show without a start date", () => {
+    expect(dateTile(null)).toBeNull();
   });
 });

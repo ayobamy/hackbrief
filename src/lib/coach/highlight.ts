@@ -1,6 +1,25 @@
 import type { Brief } from "./brief";
 
-export type Tag = "deadline" | "criterion" | "to hand in" | "team" | "who can enter";
+export type Tag =
+  | "deadline"
+  | "criterion"
+  | "to hand in"
+  | "team"
+  | "who can enter"
+  | "prize";
+
+/** The landing page demo's four cards, in reading order, and the tags each one explains. */
+export const CARDS: ReadonlyArray<{ title: string; tags: readonly Tag[] }> = [
+  { title: "Deadline", tags: ["deadline"] },
+  { title: "Team and prize", tags: ["team", "who can enter", "prize"] },
+  { title: "Where the points are", tags: ["criterion"] },
+  { title: "To hand in", tags: ["to hand in"] },
+];
+
+/** The index in CARDS of the card that explains a tagged line. */
+export function cardOf(tag: Tag): number {
+  return CARDS.findIndex((card) => card.tags.includes(tag));
+}
 
 /** Each line of the pasted rules, tagged with what the coach read from it, if anything. */
 export function tagLines(
@@ -27,6 +46,8 @@ export function tagLines(
       tag = "team";
     } else if (brief.eligibility.some((sentence) => has(sentence))) {
       tag = "who can enter";
+    } else if (brief.prizes.some((prize) => has(prize.text))) {
+      tag = "prize";
     }
     return { line, tag };
   });
