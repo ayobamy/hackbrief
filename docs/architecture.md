@@ -74,11 +74,13 @@ sequenceDiagram
   database, and should take seconds on Vercel in the same region. Batching those queries is the
   next step once sources grow.
 
-### Event list and detail pages (next)
+### Event list (built, issue #11) and event pages (next)
 
-Pages read Postgres through cached functions (`use cache` with a lifetime of hours, tagged
-`events`), and the import revalidates the tag when it finishes. Most visits are then served from
-the cache without waking the database, which matters on Neon's Free plan (below).
+`/events` reads Postgres through a cached function (`use cache` with a lifetime of hours, tagged
+`events`, keyed by the filters and the day), and the import calls `revalidateTag("events", "max")`
+when it finishes. Most visits are then served from the cache without waking the database, which
+matters on Neon's Free plan (below). The filters come from the query string inside a `<Suspense>`
+boundary, as Cache Components requires, and only known values are accepted.
 
 ### The fit score (later)
 

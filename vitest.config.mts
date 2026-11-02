@@ -9,7 +9,7 @@ export default defineConfig({
       provider: "v8",
       include: ["src/lib/**/*.ts"],
       // These talk to Postgres and are exercised by the "db" project instead.
-      exclude: ["src/**/*.test.ts", "src/lib/db.ts", "src/lib/import/run.ts"],
+      exclude: ["src/**/*.test.ts", "src/lib/db.ts", "src/lib/import/run.ts", "src/lib/events/query.ts"],
       thresholds: { lines: 90, branches: 90, functions: 90, statements: 90 },
     },
     projects: [
@@ -23,7 +23,13 @@ export default defineConfig({
       },
       {
         extends: true,
-        test: { name: "db", include: ["src/**/*.db.test.ts"] },
+        // One file at a time: the database tests share one Postgres and reset its tables.
+        test: {
+          name: "db",
+          include: ["src/**/*.db.test.ts"],
+          fileParallelism: false,
+          setupFiles: ["src/test/db-guard.ts"],
+        },
       },
     ],
   },

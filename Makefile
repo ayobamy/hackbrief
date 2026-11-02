@@ -5,9 +5,11 @@ MARKDOWNLINT := npx --yes markdownlint-cli2@0.24.0
 # The local Postgres from compose.yaml unless DATABASE_URL is already set (CI sets its own).
 DATABASE_URL ?= postgres://hackr:hackr@localhost:5433/hackr
 export DATABASE_URL
+# The database tests reset their tables, so they get a database of their own (src/test/db-guard.ts).
+TEST_DATABASE_URL ?= postgres://hackr:hackr@localhost:5433/hackr_test
 
 # Everything CI runs. The database tests need Postgres: run `make db-up` first.
-check: audit lint-docs lint typecheck test db-migrate test-db build
+check: audit lint-docs lint typecheck test test-db build
 
 install:
 	pnpm install --frozen-lockfile
@@ -30,8 +32,10 @@ typecheck:
 test:
 	pnpm run test
 
+# Migrate the test database, then run the database tests against it, never DATABASE_URL.
 test-db:
-	pnpm run test:db
+	DATABASE_URL=$(TEST_DATABASE_URL) DATABASE_URL_UNPOOLED= pnpm exec drizzle-kit migrate
+	DATABASE_URL=$(TEST_DATABASE_URL) pnpm run test:db
 
 build:
 	pnpm run build
@@ -48,6 +52,8 @@ db-generate:
 
 db-up:
 	docker compose up --detach --wait db
+	docker compose exec -T db psql -U hackr -d hackr -tAc "select 1 from pg_database where datname = 'hackr_test'" | grep -q 1 \
+		|| docker compose exec -T db createdb -U hackr hackr_test
 
 db-down:
 	docker compose down

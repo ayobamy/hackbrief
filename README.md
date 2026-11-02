@@ -28,8 +28,8 @@ You need Node.js 24, pnpm 10 and Docker (for a local Postgres).
 ```bash
 make install                  # dependencies from the lockfile
 cp .env.example .env.local    # local settings; never committed
-make db-up                    # Postgres 18 on localhost:5433
-make db-migrate               # create the tables
+make db-up                    # Postgres 18 on localhost:5433, with hackr and hackr_test
+make db-migrate               # create the tables in hackr (the tests use hackr_test)
 pnpm dev                      # the app on http://localhost:3000
 ```
 

@@ -14,6 +14,12 @@ export default function Home() {
       >
         Paste a hackathon&apos;s rules
       </Link>
+      <Link
+        href="/events"
+        className="w-fit font-medium text-zinc-950 underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:text-zinc-50"
+      >
+        Browse upcoming hackathons
+      </Link>
       <p className="text-zinc-600 dark:text-zinc-400">
         Early work in progress. Follow it on{" "}
         <a

@@ -63,6 +63,12 @@ Kaggle adapter, revalidating cached pages after a run, and batching the import's
 6. Revalidate the cached event pages after each run. Done when a newly imported event appears
    without a deploy.
 
+## M4 so far (issue #11)
+
+`/events` lists upcoming hackathons with format and source filters, credits each source with a
+link, and is cached and refreshed by the import. The database tests now run on their own
+database (`hackr_test`), guarded so they can never reset the development database or Neon.
+
 ## M4. The event list and event pages
 
 1. `/events`: upcoming events with filters for date, format, prize size, theme and source. Done
