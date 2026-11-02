@@ -121,8 +121,10 @@ src/lib/fit/             the fit score (planned)
 - **No accounts and no personal data** in the first version. The coach's text stays in the browser.
 - **Secrets** (`DATABASE_URL`, `CRON_SECRET`, later the OpenRouter key) live in `.env.local` and
   Vercel's environment settings, never in the repository.
-- **Public routes reveal nothing internal:** the health check returns a status and a reason, never
-  the driver's error. Routes that read the database are cached or rate-limited (#7).
+- **Public routes reveal nothing internal and cannot keep the database awake:** the health check
+  answers "app is up" to everyone and checks the database only for requests carrying
+  `CRON_SECRET`, returning a status and a reason, never the driver's error. The event list is
+  cached.
 - **Collection follows each source's terms** ([sources.md](sources.md)), with attribution shown on
   every event.
 - **Dependencies** are audited in `make check` on every pull request.

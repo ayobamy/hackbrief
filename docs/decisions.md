@@ -146,7 +146,11 @@ changes keeps its entry, with a note pointing at the one that replaces it.
 - **Measured** on 2 November 2026 over a link with 240 ms round trips to `aws-us-east-1`: 2.3 s
   for the first query on a new connection, 0.24 s for each query after. The health check
   therefore waits 5 s before reporting the database down.
-- **Risk:** the public `/api/health` queries the database on every request. The compute pauses
-  after 5 idle minutes; anything that calls it more often keeps it awake, and 0.25 CU for a whole
-  month is about 180 CU-hours, over the Free plan's 100. The deploy issue caches the result or
-  rate-limits the route before hackr is announced.
+- **Risk, and its fix:** a public `/api/health` that queried the database on every request would
+  let anything calling it more often than every 5 minutes keep the compute awake; 0.25 CU for a
+  whole month is about 180 CU-hours, over the Free plan's 100. Since issue #7, public calls get
+  "app is up" without touching the database, and only requests carrying `CRON_SECRET` check it.
+- **Preview branches:** a workflow deletes `preview/<git branch>` when its pull request closes
+  (`.github/workflows/neon-preview-cleanup.yml`), once the repository has the `NEON_API_KEY`
+  secret and the `NEON_PROJECT_ID` variable. The six left by earlier pull requests were deleted
+  by hand on 2 November 2026.

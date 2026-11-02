@@ -79,6 +79,10 @@ hackathon was listed twice and merged):
   not collect" below (`src/lib/sources/restricted.ts`). Its entries from Devpost, MLH, Luma and
   lablab.ai are never imported.
 - **Hackalist** is not imported: its newest file is from March 2025, so it has no current events.
+- **Jugend hackt** is not imported yet. Checked on 2 November 2026: its `wp-json/wp/v2/event`
+  entries are write-ups of past events with no date fields, and its calendar feed lists weekly
+  open labs rather than hackathons and names individual authors. Revisit when its 2027 events are
+  announced.
 - **Kaggle** joins once there is an API token; **NASA Space Apps** and **DrivenData** winners join
   with the past-winner patterns (M6 in [implementation-plan.md](implementation-plan.md)).
 

@@ -3,7 +3,7 @@ import { connection } from "next/server";
 
 import { EVENTS_TAG } from "@/app/events/data";
 import { getDatabase } from "@/lib/db";
-import { isAuthorized } from "@/lib/import/auth";
+import { isAuthorized } from "@/lib/auth";
 import { runImport } from "@/lib/import/run";
 import { fetchSource, SOURCES } from "@/lib/sources";
 

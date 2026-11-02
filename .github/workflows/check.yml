@@ -47,5 +47,7 @@ jobs:
           cache: pnpm
       - name: Install dependencies from the lockfile
         run: make install
+      - name: Install Chromium for the end-to-end tests
+        run: pnpm exec playwright install --with-deps chromium
       - name: Run everything make check covers
         run: make check
