@@ -170,8 +170,12 @@ changes keeps its entry, with a note pointing at the one that replaces it.
   and the Vercel project, renamed by Ahmed; the site's name and text, the docs, the package name
   and the crawler's user agent (issue #27).
 - **Kept:** the local database names and Postgres user (`hackr`, `hackr_test`), which no visitor
-  sees and which would make everyone rebuild their database; and the production address
-  `hackr-mauve.vercel.app` until a domain is bought.
+  sees and which would make everyone rebuild their database.
+- **The address:** Ahmed bought **hackbrief.dev** the same day and attached it in Vercel (issue
+  #39). Vercel names the shortest custom domain as the production one, so `metadataBase` in
+  `src/app/layout.tsx` (from `VERCEL_PROJECT_PRODUCTION_URL`) points share cards at it without a
+  code change; it did from the first deploy after the domain was added.
+  `hackr-mauve.vercel.app` still answers.
 
 ## D10. Briefs from listings are guided, not fetched
 
