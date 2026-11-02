@@ -23,16 +23,18 @@ jobs:
         env:
           POSTGRES_USER: hackr
           POSTGRES_PASSWORD: hackr
-          POSTGRES_DB: hackr
+          POSTGRES_DB: hackr_test
         ports:
           - 5433:5432
         options: >-
-          --health-cmd "pg_isready -U hackr -d hackr"
+          --health-cmd "pg_isready -U hackr -d hackr_test"
           --health-interval 2s
           --health-timeout 3s
           --health-retries 15
     env:
-      DATABASE_URL: postgres://hackr:hackr@localhost:5433/hackr
+      # The service's only database is the test one: make check runs no other database work.
+      DATABASE_URL: postgres://hackr:hackr@localhost:5433/hackr_test
+      TEST_DATABASE_URL: postgres://hackr:hackr@localhost:5433/hackr_test
       NEXT_TELEMETRY_DISABLED: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1

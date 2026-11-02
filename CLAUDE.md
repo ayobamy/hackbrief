@@ -53,16 +53,19 @@ blocker on data sources, the open questions and the first steps.
 ## Layout
 
 ```text
-src/app/                Next.js App Router: pages (/, /coach), layouts, route handlers (api/health)
+src/app/                Next.js App Router: pages (/, /coach, /events), route handlers (api/health,
+                        api/cron/import)
 src/lib/                logic with unit tests beside it (*.test.ts); *.db.test.ts need Postgres
 src/lib/coach/          the coach: parsers for pasted rules, strategy, plan (docs/coach.md)
 src/lib/sources/        one adapter per allowed source (docs/sources.md), pure and tested
 src/lib/import/         the daily import (/api/cron/import, vercel.json) and its auth check
+src/lib/events/         the event list: query, filters, formatting
+src/test/db-guard.ts    keeps the database tests on a database named *_test (make test-db)
 src/db/schema.ts        the Drizzle schema; migrations in drizzle/ (make db-generate, db-migrate)
 docs/                   START-HERE, the MVP outline, decisions and sources
 compose.yaml            Postgres 18 for local work (make db-up), host port 5433
 .github/workflows/      CI: make check against a Postgres service, on pull requests and main
-Makefile                check = audit, lint-docs, lint, typecheck, test, db-migrate, test-db, build
+Makefile                check = audit, lint-docs, lint, typecheck, test, test-db, build
 ```
 
 The stack and the reasons for each choice are in [docs/decisions.md](docs/decisions.md).

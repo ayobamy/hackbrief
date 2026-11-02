@@ -56,6 +56,12 @@ function cityOf(listing: HackHqListing): string | null {
   return location && !/^(?:online|virtual|remote|global)$/i.test(location) ? location : null;
 }
 
+// "TBA", "N/A" and the like say nothing about the prize.
+function prizeOf(listing: HackHqListing): string | null {
+  const prize = textOrNull(listing.prize);
+  return prize && !/^(?:tba|tbd|n\/?a|none|unknown|-+)$/i.test(prize) ? prize : null;
+}
+
 function toEvent(listing: HackHqListing): SourceEvent {
   return {
     externalId: listing.id,
@@ -69,7 +75,7 @@ function toEvent(listing: HackHqListing): SourceEvent {
     countryCode: null,
     startsOn: dateOnly(listing.startDate),
     endsOn: dateOnly(listing.endDate),
-    prizeText: textOrNull(listing.prize),
+    prizeText: prizeOf(listing),
   };
 }
 

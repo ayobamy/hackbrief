@@ -1,5 +1,7 @@
+import { revalidateTag } from "next/cache";
 import { connection } from "next/server";
 
+import { EVENTS_TAG } from "@/app/events/data";
 import { getDatabase } from "@/lib/db";
 import { isAuthorized } from "@/lib/import/auth";
 import { runImport } from "@/lib/import/run";
@@ -12,6 +14,10 @@ export async function GET(request: Request) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
   const summary = await runImport(getDatabase(), SOURCES, (url) => fetchSource(url));
+  if (summary.status !== "failed") {
+    // The next visit to /events is served the old list while the new one is fetched.
+    revalidateTag(EVENTS_TAG, "max");
+  }
   return Response.json(summary, {
     status: summary.status === "failed" ? 502 : 200,
     headers: { "Cache-Control": "no-store" },
