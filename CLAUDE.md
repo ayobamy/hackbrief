@@ -61,11 +61,13 @@ src/lib/sources/        one adapter per allowed source (docs/sources.md), pure a
 src/lib/import/         the daily import (/api/cron/import, vercel.json) and its auth check
 src/lib/events/         the event list: query, filters, formatting
 src/test/db-guard.ts    keeps the database tests on a database named *_test (make test-db)
+src/lib/auth.ts         the CRON_SECRET check for the import route and the health check's database part
+e2e/                    Playwright end-to-end tests against the production build (make e2e)
 src/db/schema.ts        the Drizzle schema; migrations in drizzle/ (make db-generate, db-migrate)
 docs/                   START-HERE, the MVP outline, decisions and sources
 compose.yaml            Postgres 18 for local work (make db-up), host port 5433
 .github/workflows/      CI: make check against a Postgres service, on pull requests and main
-Makefile                check = audit, lint-docs, lint, typecheck, test, test-db, build
+Makefile                check = audit, lint-docs, lint, typecheck, test, test-db, build, e2e
 ```
 
 The stack and the reasons for each choice are in [docs/decisions.md](docs/decisions.md).

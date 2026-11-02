@@ -33,7 +33,9 @@ make db-migrate               # create the tables in hackr (the tests use hackr_
 pnpm dev                      # the app on http://localhost:3000
 ```
 
-`http://localhost:3000/api/health` reports whether the database answers.
+`http://localhost:3000/api/health` reports that the app is up; sent with
+`Authorization: Bearer <CRON_SECRET>`, it also checks the database. Run `make e2e-install` once
+to download the Chromium that the end-to-end tests use.
 
 ```bash
 make check     # everything CI runs: Markdown lint, ESLint, types, tests, build

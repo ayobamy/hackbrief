@@ -1,4 +1,4 @@
-.PHONY: check install audit lint-docs lint typecheck test test-db build db-up db-down db-migrate db-generate
+.PHONY: check install audit lint-docs lint typecheck test test-db build e2e e2e-install db-up db-down db-migrate db-generate
 
 MARKDOWNLINT := npx --yes markdownlint-cli2@0.24.0
 
@@ -9,7 +9,7 @@ export DATABASE_URL
 TEST_DATABASE_URL ?= postgres://hackr:hackr@localhost:5433/hackr_test
 
 # Everything CI runs. The database tests need Postgres: run `make db-up` first.
-check: audit lint-docs lint typecheck test test-db build
+check: audit lint-docs lint typecheck test test-db build e2e
 
 install:
 	pnpm install --frozen-lockfile
@@ -39,6 +39,13 @@ test-db:
 
 build:
 	pnpm run build
+
+# End-to-end tests in Chromium against the production build; run `make e2e-install` once first.
+e2e:
+	pnpm exec playwright test
+
+e2e-install:
+	pnpm exec playwright install chromium
 
 # Apply the migrations in drizzle/ to DATABASE_URL_UNPOOLED, or DATABASE_URL when that is unset,
 # after checking the migration history is consistent.

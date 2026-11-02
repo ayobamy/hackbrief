@@ -14,6 +14,13 @@ the sources in [sources.md](sources.md). House rules for every change are in
 | #4 | The coach from pasted rules (PR #8), live at `/coach` |
 | #5 | Sources, platforms, competitors, this plan, the architecture and the data model |
 
+## M1 so far (issue #7)
+
+Node.js pinned to `24.x`; `/api/health` no longer touches the database for public calls; a
+workflow deletes a pull request's Neon preview branch when it closes (it needs the `NEON_API_KEY`
+secret and `NEON_PROJECT_ID` variable in GitHub); the six stale preview branches were deleted;
+Playwright end-to-end tests of the home page and the coach run in `make check` and CI.
+
 ## M1. Deploy hygiene (issue #7)
 
 1. Pin Node.js to `24.x` in `package.json`. Done when the Vercel build log shows no Node version

@@ -1,0 +1,47 @@
+name: neon-preview-cleanup
+
+# Vercel's Neon integration makes a branch named preview/<git branch> for each pull request's preview
+# deployment and keeps it as long as Vercel keeps the deployment (up to 6 months). The Free plan
+# allows 10 branches per project, so this deletes the branch when the pull request closes, as Neon's
+# guide (neon.com/docs/guides/vercel-branch-cleanup) suggests.
+on:
+  pull_request:
+    types: [closed]
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  delete-preview-branch:
+    # Only branches of this repository get preview deployments, and forks never receive secrets.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Delete the pull request's Neon preview branch
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+          # Passed through the environment, never pasted into the script, so a branch name cannot
+          # inject commands.
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          if [ -z "$NEON_API_KEY" ] || [ -z "$NEON_PROJECT_ID" ]; then
+            echo "::notice::NEON_API_KEY or NEON_PROJECT_ID is not set; skipping the cleanup."
+            exit 0
+          fi
+          if ! printf '%s' "$HEAD_REF" | grep -Eq '^[A-Za-z0-9._/-]+$'; then
+            echo "::error::Unexpected characters in the branch name; nothing deleted."
+            exit 1
+          fi
+          branch="preview/$HEAD_REF"
+          names=$(npx --yes neon@8.8.0 branches list --project-id "$NEON_PROJECT_ID" --output json \
+            | node -e 'let s="";process.stdin.on("data",(c)=>(s+=c)).on("end",()=>{const d=JSON.parse(s);console.log((Array.isArray(d)?d:d.branches).map((b)=>b.name).join("\n"))})')
+          if ! printf '%s\n' "$names" | grep -Fxq "$branch"; then
+            echo "::notice::No Neon branch named $branch; nothing to delete."
+            exit 0
+          fi
+          npx --yes neon@8.8.0 branches delete "$branch" --project-id "$NEON_PROJECT_ID"
