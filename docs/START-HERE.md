@@ -91,7 +91,8 @@ first coach), and no sign-in yet. The reasons and the plan limits are in
 3. Scaffold the app, extend `make check` with the linters and tests, and run it in CI: issue #3.
 4. The data model, with fixtures of fictional events, rubrics and winners.
 5. The coach from pasted rules: extract dates, eligibility, deliverables and judging criteria
-   with weights; build the brief, the checklist and rubric-weighted strategy notes, with tests.
+   with weights; build the brief, the checklist and rubric-weighted strategy notes, with tests:
+   issue #4 ([coach.md](coach.md)).
 6. Profiles and the fit score, then the event list with filters.
 7. Past-winner patterns, from sources that allow it.
 8. Summaries from a language model, with every figure taken from the computed data.

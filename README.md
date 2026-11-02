@@ -3,7 +3,10 @@
 A hackathon finder and coach for early-career developers and students: which hackathons to join,
 and how to win them, without reading ten pages of rules for each one.
 
-Early work in progress. The plan is in [docs/START-HERE.md](docs/START-HERE.md), the outline in
+Early work in progress. The first feature is the coach: paste a hackathon's rules at `/coach` and
+get the deadline, a submission checklist and a strategy weighted by the judging criteria
+([docs/coach.md](docs/coach.md)). The plan is in [docs/START-HERE.md](docs/START-HERE.md), the
+outline in
 [docs/mvp-outline.md](docs/mvp-outline.md) and what has been decided in
 [docs/decisions.md](docs/decisions.md).
 
