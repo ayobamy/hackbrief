@@ -172,3 +172,19 @@ changes keeps its entry, with a note pointing at the one that replaces it.
 - **Kept:** the local database names and Postgres user (`hackr`, `hackr_test`), which no visitor
   sees and which would make everyone rebuild their database; and the production address
   `hackr-mauve.vercel.app` until a domain is bought.
+
+## D10. Briefs from listings are guided, not fetched
+
+- **Decided:** 2 November 2026, by Ahmed.
+- **Decision:** "Build my brief" on a listing opens the coach for that event with its facts filled
+  in and a link to its own page; the visitor copies the rules in. hackbrief does not fetch
+  organisers' pages or links that visitors type.
+- **Why:** all 49 organiser pages listed that day were fetched once, the way the feature would
+  (robots.txt checked first, hackbrief's user agent), and run through the coach. It found a
+  deadline on 4, judging criteria on 2 (after following same-site rules pages too) and a team size
+  on 16. 7 pages were drawn by JavaScript, and 12 keep their rules on Devpost, which hackbrief may
+  not read (`docs/sources.md`). Fetching would hand most visitors an empty brief, and it would mean
+  reading sites whose terms nobody checked first, plus guarding a server that fetches any address
+  a visitor types.
+- **Revisit when:** Devpost grants permission (`docs/outreach/devpost.md`), or a source offers
+  rules in a form hackbrief may read.

@@ -11,7 +11,7 @@ test("the hackathon list turns its pages with the pager and the arrow keys", asy
   await expect(page.getByRole("heading", { level: 2, name: "Happening now" })).toBeVisible();
   const underway = page.getByRole("listitem").filter({ hasText: "Fictional Hack 00" });
   await expect(underway).toContainText("Happening now");
-  await expect(underway.getByRole("link", { name: "Fictional Hack 00" })).toHaveAttribute(
+  await expect(underway.getByRole("link", { name: "Fictional Hack 00", exact: true })).toHaveAttribute(
     "href",
     "https://example.org/fictional-hack-00",
   );
@@ -48,4 +48,39 @@ test("a filter shows its count, narrows the list and starts again at page 1", as
 
   // Source counts now count online hackathons only.
   await expect(page.getByRole("link", { name: "Hack Club Hackathons 3 hackathons" })).toBeVisible();
+});
+
+const RULES = "Judging\n- Innovation (60%)\n- Design (40%)\nSubmission deadline: 2027-03-14\nTeams of up to 3.";
+
+test("a listing opens the coach for that hackathon, and the brief carries its name", async ({ page }) => {
+  await page.goto("/events");
+  await page.getByRole("link", { name: "Build my brief for Fictional Hack 01" }).click();
+
+  await expect(page).toHaveURL(/\/coach\?event=[0-9a-f-]{36}$/);
+  await expect(page.getByRole("heading", { level: 2, name: "Fictional Hack 01" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Open its rules/ })).toHaveAttribute(
+    "href",
+    "https://example.org/fictional-hack-01",
+  );
+  // A listed event needs no page link of its own.
+  await expect(page.getByLabel(/The hackathon's page/)).toHaveCount(0);
+
+  await page.getByLabel("Hackathon rules and judging text").fill(RULES);
+  await page.getByRole("button", { name: "Build my brief" }).click();
+  await expect(page.getByRole("heading", { level: 2, name: "Brief: Fictional Hack 01" })).toBeFocused();
+});
+
+test("a malformed event id gives the plain coach, where a typed page link labels the brief", async ({ page }) => {
+  await page.goto("/coach?event=not-an-id");
+  await expect(page.getByText("Building a brief for")).toHaveCount(0);
+
+  await page.getByLabel(/The hackathon's page/).fill("lagoon-hack.example/rules");
+  await page.getByLabel("Hackathon rules and judging text").fill(RULES);
+  await page.getByRole("button", { name: "Build my brief" }).click();
+
+  await expect(page.getByRole("heading", { level: 2, name: "Your brief" })).toBeFocused();
+  await expect(page.getByRole("link", { name: "lagoon-hack.example" })).toHaveAttribute(
+    "href",
+    "https://lagoon-hack.example/rules",
+  );
 });

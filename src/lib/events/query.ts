@@ -28,6 +28,19 @@ export interface EventListing {
   sources: ListingSource[];
 }
 
+const EVENT_FIELDS = {
+  id: events.id,
+  name: events.name,
+  url: events.url,
+  organiser: events.organiser,
+  format: events.format,
+  city: events.city,
+  country: events.country,
+  startsOn: events.startsOn,
+  endsOn: events.endsOn,
+  prizeText: events.prizeText,
+};
+
 /**
  * Upcoming hackathons that at least one source still lists, soonest first; events without dates
  * come last. "Upcoming" means not yet ended on `today` (YYYY-MM-DD): an event under way counts.
@@ -55,22 +68,23 @@ export async function listUpcomingEvents(db: Database, filters: EventFilters, to
   );
 
   const rows = await db
-    .select({
-      id: events.id,
-      name: events.name,
-      url: events.url,
-      organiser: events.organiser,
-      format: events.format,
-      city: events.city,
-      country: events.country,
-      startsOn: events.startsOn,
-      endsOn: events.endsOn,
-      prizeText: events.prizeText,
-    })
+    .select(EVENT_FIELDS)
     .from(events)
     .where(and(notEnded, listedBy(filters.source), filters.format ? eq(events.format, filters.format) : undefined))
     .orderBy(sql`${events.startsOn} asc nulls last`, asc(events.name));
 
+  return withSources(db, rows);
+}
+
+/** One event by id, with the sources that still list it, or null. An ended event is still found. */
+export async function findEvent(db: Database, id: string): Promise<EventListing | null> {
+  const rows = await db.select(EVENT_FIELDS).from(events).where(eq(events.id, id));
+  const [found] = await withSources(db, rows);
+  return found ?? null;
+}
+
+// The sources that still list each event, each with its own page for that event.
+async function withSources(db: Database, rows: Array<Omit<EventListing, "sources">>): Promise<EventListing[]> {
   if (rows.length === 0) {
     return [];
   }

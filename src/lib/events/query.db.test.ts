@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { eventSources, events, sources } from "@/db/schema";
 import { getDatabase } from "@/lib/db";
 
-import { listUpcomingEvents } from "./query";
+import { findEvent, listUpcomingEvents } from "./query";
 
 // Needs the migrated Postgres in DATABASE_URL: `make db-up db-migrate` locally, CI does the same.
 const db = getDatabase();
@@ -75,5 +75,32 @@ describe("listUpcomingEvents", () => {
 
   it("returns an empty list when nothing matches", async () => {
     expect(await listUpcomingEvents(db, { format: "hybrid", source: null }, TODAY)).toEqual([]);
+  });
+});
+
+describe("findEvent", () => {
+  beforeEach(async () => {
+    await db.execute(sql`truncate table import_results, import_runs, event_sources, events, sources restart identity cascade`);
+    await seed();
+  });
+
+  async function idOf(name: string): Promise<string> {
+    const [row] = await db.select({ id: events.id }).from(events).where(sql`${events.name} = ${name}`);
+    return row?.id ?? "";
+  }
+
+  it("finds one event with the sources that still list it", async () => {
+    const found = await findEvent(db, await idOf("Soon Hack"));
+
+    expect(found).toMatchObject({ name: "Soon Hack", url: "https://soon.example", city: "Lisbon", format: "in_person" });
+    expect(found?.sources.map(({ slug }) => slug)).toEqual(["alpha", "beta"]);
+  });
+
+  it("still finds an event that has ended, for a brief opened from an old link", async () => {
+    expect((await findEvent(db, await idOf("Ended Hack")))?.name).toBe("Ended Hack");
+  });
+
+  it("finds nothing for an id that is not in the table", async () => {
+    expect(await findEvent(db, "00000000-0000-4000-8000-000000000000")).toBeNull();
   });
 });

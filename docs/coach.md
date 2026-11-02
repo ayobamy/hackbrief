@@ -16,6 +16,19 @@ The text is read in the browser, on the page. It is not sent to hackbrief's serv
 and it is not stored. A check in a real browser on 2 November 2026 confirmed that building a brief
 makes no network request carrying the text.
 
+## Opening the coach from a listing
+
+Each card on `/events` has **Build my brief**, which opens `/coach?event=<id>` (issue #31, decision
+D10). The coach then shows what the list knows about that hackathon (its name, dates, format, place
+and who listed it), a link to its own page to copy the rules from, and the paste box; the brief is
+titled with the event. The id is checked to be a well-formed UUID before it reaches the database
+(`src/lib/events/context.ts`), and any other value gives the plain coach.
+
+For a hackathon hackbrief does not list, an optional field takes the link to its page. The link
+only labels the brief and links back; hackbrief never opens or reads it, and it stays in the
+browser like the pasted text. Only the event id of a listed event goes to the server, to look the
+event up.
+
 ## How each number is computed
 
 Every figure comes from code in `src/lib/coach/`, covered by tests in the same folder. No

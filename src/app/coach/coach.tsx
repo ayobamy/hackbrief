@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { Suspense, use, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 
 import { buildBrief, localToday, type Brief } from "@/lib/coach/brief";
 import { formatAmount, formatDate, formatDaysLeft, formatSolo, formatTeamSize } from "@/lib/coach/format";
 import { SAMPLES } from "@/lib/coach/samples";
 import type { Emphasis } from "@/lib/coach/strategy";
+import { Footnote, LABEL, SHEET } from "@/components/sheet";
+import { pageLink, type EventContext } from "@/lib/events/context";
 
 const FOCUS_RING =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
@@ -220,12 +222,85 @@ function statusFor(brief: Brief): string {
   return `Brief ready: ${criteria} judging ${criteria === 1 ? "criterion" : "criteria"}, ${deadline}.`;
 }
 
-export function Coach() {
+function ExternalArrow() {
+  return (
+    <svg viewBox="0 0 16 16" className="ml-1 inline size-3.5 align-[-1px]" aria-hidden="true">
+      <path d="M5.5 4.5h6v6M11.5 4.5 4.5 11.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+/** A hackathon from the list: what hackbrief knows about it, and how to get its rules in the box. */
+function EventPanel({ event }: { event: EventContext }) {
+  const steps: ReactNode[] = [
+    event.rulesUrl ? (
+      <>
+        <a
+          href={event.rulesUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`font-medium underline underline-offset-4 ${FOCUS_RING}`}
+        >
+          Open its rules
+          <ExternalArrow />
+          <span className="sr-only"> (opens in a new tab)</span>
+        </a>{" "}
+        <span className="text-muted">on {event.host}</span>
+      </>
+    ) : (
+      "Find its rules page"
+    ),
+    "Copy the rules, the judging criteria and the dates.",
+    "Paste them below, then build your brief.",
+  ];
+  return (
+    <section aria-labelledby="event-heading" className={`${SHEET} flex flex-col gap-4 p-5 sm:p-6`}>
+      <div className="flex flex-col gap-1.5">
+        <p className={LABEL}>Building a brief for</p>
+        <h2 id="event-heading" className="text-3xl leading-tight">
+          {event.name}
+        </h2>
+        {event.details ? <p className="text-sm text-muted">{event.details}</p> : null}
+        {event.organiser ? <p className="text-sm text-muted">By {event.organiser}</p> : null}
+      </div>
+      <ol className="flex flex-col gap-2.5 border-t border-line pt-4 text-sm">
+        {steps.map((step, position) => (
+          <li key={position} className="flex items-start gap-3">
+            <Footnote n={position + 1} className="mt-[1px]" />
+            <span>{step}</span>
+          </li>
+        ))}
+      </ol>
+      {event.listedBy.length > 0 ? (
+        <p className="text-xs text-muted">Listed by {event.listedBy.join(", ")}.</p>
+      ) : null}
+    </section>
+  );
+}
+
+/**
+ * Waits for the event a brief was opened for. Only the parts that name the event sit inside it, so the
+ * coach itself renders at once and keeps what has been typed when the lookup lands.
+ */
+function WithEvent({
+  event,
+  children,
+}: {
+  event: Promise<EventContext | null>;
+  children: (event: EventContext | null) => ReactNode;
+}) {
+  return children(use(event));
+}
+
+export function Coach({ event: eventLookup }: { event: Promise<EventContext | null> }) {
   const [text, setText] = useState("");
+  const [page, setPage] = useState("");
   const [brief, setBrief] = useState<Brief | null>(null);
   const resultsHeading = useRef<HTMLHeadingElement>(null);
   const textareaId = useId();
   const hintId = useId();
+  const pageId = useId();
+  const pageHintId = useId();
 
   // After each new brief renders, move focus to it so keyboard and screen-reader users land on it.
   useEffect(() => {
@@ -252,7 +327,38 @@ export function Coach() {
 
   return (
     <div className="flex flex-col gap-10">
+      <Suspense fallback={null}>
+        <WithEvent event={eventLookup}>{(event) => (event ? <EventPanel event={event} /> : null)}</WithEvent>
+      </Suspense>
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
+        <Suspense fallback={null}>
+          <WithEvent event={eventLookup}>
+            {(event) =>
+              event ? null : (
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor={pageId} className="font-medium">
+              The hackathon&apos;s page <span className="font-normal text-muted">(optional)</span>
+            </label>
+            <input
+              id={pageId}
+              type="text"
+              inputMode="url"
+              autoComplete="url"
+              aria-describedby={pageHintId}
+              value={page}
+              onChange={(change) => setPage(change.target.value)}
+              placeholder="https://"
+              className={`w-full border border-line bg-panel px-3 py-2 font-mono text-sm ${FOCUS_RING}`}
+            />
+            <p id={pageHintId} className="text-sm text-muted">
+              For a hackathon hackbrief does not list. It only labels your brief and links back to the
+              page; hackbrief does not open or read it.
+            </p>
+          </div>
+              )
+            }
+          </WithEvent>
+        </Suspense>
         <label htmlFor={textareaId} className="font-medium">
           Hackathon rules and judging text
         </label>
@@ -312,9 +418,28 @@ export function Coach() {
 
       {brief ? (
         <section aria-labelledby="brief-heading" className="flex flex-col gap-6">
-          <h2 id="brief-heading" ref={resultsHeading} tabIndex={-1} className="text-3xl focus:outline-none">
-            Your brief
-          </h2>
+          <div className="flex flex-col gap-1">
+            <h2 id="brief-heading" ref={resultsHeading} tabIndex={-1} className="text-3xl focus:outline-none">
+              <Suspense fallback="Your brief">
+                <WithEvent event={eventLookup}>{(event) => (event ? `Brief: ${event.name}` : "Your brief")}</WithEvent>
+              </Suspense>
+            </h2>
+            <Suspense fallback={null}>
+              <WithEvent event={eventLookup}>
+                {(event) => {
+                  const link = event ? null : pageLink(page);
+                  return link ? (
+                    <p className="text-sm text-muted">
+                      Rules from{" "}
+                      <a href={link.url} className={`text-ink underline underline-offset-4 ${FOCUS_RING}`}>
+                        {link.host}
+                      </a>
+                    </p>
+                  ) : null;
+                }}
+              </WithEvent>
+            </Suspense>
+          </div>
           <Results brief={brief} />
         </section>
       ) : null}

@@ -88,6 +88,12 @@ work without JavaScript; the Left and Right arrow keys turn pages too, except wh
 widgets that use arrows, or with a modifier key held, and focus then moves to the line naming the
 page (issue #25).
 
+`/coach?event=<id>` looks one event up through `getEvent`, cached and tagged like the list. The
+coach page does not await it: it passes the lookup to the coach as a promise, and only the parts
+that name the event (the event panel, the optional page field, the brief's title) read it with
+`use()` inside their own Suspense boundaries. The coach is therefore rendered once, in the static
+shell, and nothing typed before the lookup lands is lost to a remount (issue #31).
+
 ### The fit score (later)
 
 A pure function in `src/lib/fit/` scores an event against a profile (skills, stack, interests, time
