@@ -24,7 +24,7 @@ export function RubricPlayground() {
       <div className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-5">
         <div className={`${CARD} flex flex-col gap-5 p-5 sm:p-6`}>
           <div className="flex items-baseline justify-between">
-            <span className="text-sm text-muted">The rubric says</span>
+            <span className="text-sm text-muted">Judging weights</span>
             <button
               type="button"
               onClick={() => setStated(START)}
@@ -59,12 +59,12 @@ export function RubricPlayground() {
           <p className="bg-paper px-3 py-2 text-xs leading-5 text-muted" aria-live="polite">
             {total === 100
               ? "The weights add up to 100%."
-              : `The weights add up to ${total}%; the coach scales them to 100%, as it does with real rules.`}
+              : `The weights add up to ${total}%. The coach scales them to 100%, as it does with real rules.`}
           </p>
         </div>
 
         <div className={`${CARD} flex flex-col gap-5 p-5 sm:p-6`}>
-          <span className="text-sm text-muted">So the coach says</span>
+          <span className="text-sm text-muted">The coach&apos;s advice</span>
           <div className="flex h-2.5 w-full gap-0.5 overflow-hidden" aria-hidden="true">
             {notes.map((note, rank) => (
               <span

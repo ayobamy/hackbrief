@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: { default: "hackbrief: pick the right hackathon, then play to win", template: "%s · hackbrief" },
   description:
-    "A hackathon finder and coach: upcoming hackathons from sources that allow it, and any event's rules turned into a plan. Open source.",
+    "Find upcoming hackathons and turn any event's rules into a one-page plan: the deadline, what to submit and how the judges score. Free and open source.",
   openGraph: { siteName: "hackbrief", type: "website" },
 };
 

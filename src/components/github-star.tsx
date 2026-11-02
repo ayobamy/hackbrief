@@ -12,7 +12,7 @@ const SPECKS: ReadonlyArray<{ x: string; y: string; delay: string }> = [
 ];
 
 /**
- * "Star it on GitHub" as GitHub draws its own button: grey, with a star in front. Pointing at it, or
+ * "Star on GitHub" as GitHub draws its own button: grey, with a star in front. Pointing at it, or
  * focusing it from the keyboard, fills the star with gold, pops it, turns it a point and throws a few
  * specks; nothing moves on its own, and under reduced motion only the colour changes.
  */
@@ -43,7 +43,7 @@ export function GitHubStar({ href }: { href: string }) {
           />
         ))}
       </span>
-      Star it on GitHub
+      Star on GitHub
     </a>
   );
 }

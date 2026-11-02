@@ -13,7 +13,7 @@ export function SiteFooter() {
         <div className="flex max-w-xs flex-col gap-3">
           <Logo />
           <p className="text-sm text-muted">
-            A hackathon finder and coach. Open source and non-commercial, under the MIT licence.
+            A free, non-commercial hackathon finder and coach, open source under the MIT licence.
           </p>
         </div>
         <nav aria-label="Footer" className="grid grid-cols-2 gap-x-12 gap-y-2">

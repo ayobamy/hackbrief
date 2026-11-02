@@ -33,7 +33,7 @@ tokens (`bg-paper`, `text-ink`, `text-muted`, `border-line`, `bg-panel`, `bg-acc
 | `line` | `#e4e2dc` | `#262624` | Borders, dividers, the dot grid |
 | `panel` | `#ffffff` | `#151514` | Cards |
 | `accent` | `#f0531c` | `#ff6a33` | The cursor block, weight bars, scrollbar thumbs and small marks only, never body text: it does not reach 4.5:1 |
-| `gh-button` | `#21262d` | `#f6f8fa` | The "Star it on GitHub" button, in GitHub's own button grey |
+| `gh-button` | `#21262d` | `#f6f8fa` | The "Star on GitHub" button, in GitHub's own button grey |
 | `gh-button-hover` | `#30363d` | `#eaeef2` | That button under the pointer |
 | `gh-button-border` | `#3d444d` | `#d1d9e0` | That button's border |
 | `gh-button-text` | `#f0f6fc` | `#25292e` | That button's label |
