@@ -106,10 +106,103 @@ START-HERE) and links shared by users the main way to cover the region.
 | [Startup Map Hub](https://startupmaphub.com/events) | African startup events; no hackathons seen | Link out |
 | Government and agency challenge pages | Single events, such as national e-government hackathons | Link out, added by hand |
 
+## More of Africa (second pass)
+
+| Source | What it lists | Verdict |
+| --- | --- | --- |
+| [AfriLabs](https://www.afrilabs.com/events/) | Pan-African hub network events | Link out |
+| [MEST](https://meltwater.org/events/) (Ghana) | Startup programme events; iCal feed without a licence | Ask |
+| [iHub](https://ihub.co.ke/events) (Kenya), [CcHub](https://cchub.africa) (Nigeria) | Hub events; no hackathons listed on 2 November 2026 | Link out |
+| [Opportunities for Africans](https://www.opportunitiesforafricans.com), [After School Africa](https://www.afterschoolafrica.com), [Youth Opportunities](https://www.youthop.com) | Opportunity posts, including hackathons | Link out |
+| [Techpoint Africa](https://techpoint.africa) (Nigeria) | Tech news and events | Link out (blocked automated reads) |
+
+## Europe by country (second pass)
+
+| Platform | Country | What it lists | Verdict |
+| --- | --- | --- | --- |
+| [OpenAgenda](https://openagenda.com) | France, EU, Switzerland | Thousands of public agendas, including hackathons | **Use now** (API key, Licence Ouverte 2.0) |
+| [Jugend hackt](https://jugendhackt.org/kalender/) | Germany, Austria, Switzerland | Youth hackathons and labs, ages 12 to 18 | **Use now** (CC BY 4.0) |
+| [CASSINI Hackathons](https://www.cassini.eu/hackathons) | EU | The EU Space Programme's hackathon, one edition at a time | **Use now** (credit "© EUSPA 2026") |
+| [Hackathons UK](https://hackathons.org.uk) | UK | Student hackathon season | Ask |
+| [allhackathons.com](https://uk.allhackathons.com/hackathons) | UK and others | General listings, many stale | Ask |
+| [Create With](https://createwith.com/directory/events) | UK, global | Event directory | Link out |
+| [Garage48](https://garage48.org/events) | Baltics, global | Its own hackathons | Ask |
+| [Crossweb](https://crossweb.pl) | Poland | IT events | Link out (blocked automated reads) |
+| [Hackathon Lovers](https://hackathonlovers.com) | Spain | Its own community hackathons | Link out |
+| [EU Code Week](https://codeweek.eu/hackathons) | EU | National hackathons and finals | Link out |
+
+## Latin America (second pass)
+
+| Platform | Country | What it lists | Verdict |
+| --- | --- | --- | --- |
+| [Eventos de IA](https://andresospina.co/eventos-ia/) | 10 countries | 167 AI events, 29 of them hackathons | Ask |
+| [Get on Board](https://www.getonbrd.com/events) | Latin America | Tech events, few hackathons | Link out |
+| [Shawee](https://shawee.io) | Brazil | Innovation challenges; none open on 2 November 2026 | Link out |
+| [Even3](https://www.even3.com.br) | Brazil | Academic events | Do not collect |
+
+## Asia beyond Japan, and Japan's other sites (second pass)
+
+| Platform | Country | What it lists | Verdict |
+| --- | --- | --- | --- |
+| [ProtoPedia](https://protopedia.net) | Japan | Prototypes and the contests they were made for | With care (API; read the terms first) |
+| [TECH PLAY](https://techplay.jp) | Japan | 60,000+ tech events | Ask |
+| [Wevity](https://www.wevity.com), [Contest Korea](https://www.contestkorea.com) | South Korea | Contests, including hackathons | Ask |
+| [Linkareer](https://linkareer.com) | South Korea | Contests | Link out |
+| [DACON](https://dacon.io) | South Korea | Data and AI competitions | Link out (blocked automated reads) |
+| [Tianchi](https://tianchi.aliyun.com), [Huodongxing](https://www.huodongxing.com) | China | Competitions; events | Do not collect |
+| [Accupass](https://www.accupass.com) | Taiwan | Events | Do not collect |
+| [infolomba.id](https://www.infolomba.id), [Dicoding](https://www.dicoding.com) | Indonesia | Competitions; developer events | Ask; link out |
+| [Eventpop](https://www.eventpop.me) | Thailand | Events, few hackathons | Link out |
+
+## Middle East, North Africa and Turkey (second pass)
+
+| Platform | Country | What it lists | Verdict |
+| --- | --- | --- | --- |
+| [Techcareer.net](https://www.techcareer.net/hackathon), [TEKNOFEST](https://www.teknofest.org) | Turkey | Hackathons; national technology competitions | Ask |
+| [Coderspace](https://coderspace.io), [Youthall](https://www.youthall.com) | Turkey | Hackathons and datathons; youth events | Do not collect; link out |
+| [Wamda](https://www.wamda.com/events) | MENA | Startup events, no hackathons seen | Link out |
+
+## Government prize portals (second pass)
+
+| Portal | Country | Verdict |
+| --- | --- | --- |
+| [USA.gov active challenges](https://www.usa.gov/find-active-challenge) | US (Challenge.gov closed 30 March 2026) | With care (public domain; slow crawl) |
+| [GOV.UK Search API](https://www.gov.uk/api/search.json) | UK | With care (Open Government Licence; low precision) |
+| [Innovate UK](https://apply-for-innovation-funding.service.gov.uk/competition/search), [EIC Prizes](https://eic.ec.europa.eu/eic-prizes_en), [Impact Canada](https://impact.canada.ca/en/challenges), business.gov.au | UK, EU, Canada, Australia | Link out (grants and prizes rather than hackathons) |
+| [GovHack](https://govhack.org) | Australia and New Zealand | Link out |
+| [MyGov Innovate](https://innovateindia.mygov.in) | India | Do not collect |
+
+## Sponsor and ecosystem hubs (second pass)
+
+Cloud and AI vendors (AWS, Google, Microsoft, IBM Call for Code) and blockchain ecosystems
+(Chainlink, Polkadot, NEAR, Base, Hedera, Stellar, Cardano, Sui, Avalanche) mostly run their
+hackathons on Devpost, DoraHacks, Devfolio, Kaggle or their own one-off sites; none offers a feed
+hackr may use. [Hugging Face](https://huggingface.co) hackathon organisations are the exception:
+its Hub API is usable with care. Link out to the rest.
+
+## Contest and bounty platforms (second pass)
+
+| Platform | What it lists | Verdict |
+| --- | --- | --- |
+| [Topcoder](https://www.topcoder.com/challenges) | Paid challenges; a public API without a data licence | Ask |
+| [Reskilll](https://reskilll.com/discover), [WhereUElevate](https://whereuelevate.com/drills) | Indian hackathons | Link out; ask |
+| [CLIST](https://clist.by) | Competitive programming contests (API with a key and attribution) | With care, but not hackathons |
+| HackerRank, CodeChef, Questbook, Replit bounties | Coding contests, grants, bounties | Do not collect |
+
+## Open data (second pass)
+
+| Data | Licence | Use |
+| --- | --- | --- |
+| [Wikidata](https://www.wikidata.org) | CC0 | **Use now** for details of well-known hackathons |
+| [dribdat/awesome-hackathon](https://github.com/dribdat/awesome-hackathon) | CC0 | Leads for new sources |
+| [unicorn-mafia/awesome-hackathon-winners](https://github.com/unicorn-mafia/awesome-hackathon-winners), [Olanetsoft/awesome-hackathon-projects](https://github.com/Olanetsoft/awesome-hackathon-projects) | MIT | With care, for past-winner patterns |
+| Kaggle and Hugging Face datasets of Devpost projects | Built by scraping Devpost | Do not collect |
+
 ## Gaps
 
 - Terms that need a browser to read: Kaggle, Unstop, Hack2skill, Allevents, Junction, Meetup,
-  AKINDO.
-- Thin coverage of Latin America and Asia beyond Japan.
+  AKINDO, ProtoPedia, Devnovate.
+- Not reached: Hackathonat (Saudi Arabia; a Telegram channel only), Ingressive for Good (site did
+  not respond), T-Brain (Taiwan; now redirects to a company site).
 - None of the platforms read publishes judging weights as data; they appear only in each event's
   rules text, which is why the coach reads pasted rules.
