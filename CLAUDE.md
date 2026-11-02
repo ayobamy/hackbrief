@@ -61,10 +61,11 @@ src/lib/                logic with unit tests beside it (*.test.ts); *.db.test.t
 src/lib/coach/          the coach: parsers for pasted rules, strategy, plan (docs/coach.md)
 src/lib/sources/        one adapter per allowed source (docs/sources.md), pure and tested
 src/lib/import/         the daily import (/api/cron/import, vercel.json) and its auth check
-src/lib/events/         the event list: query, filters, formatting
+src/lib/events/         the event list: query, filters, paging, grouping, formatting
 src/test/db-guard.ts    keeps the database tests on a database named *_test (make test-db)
 src/lib/auth.ts         the CRON_SECRET check for the import route and the health check's database part
-e2e/                    Playwright end-to-end tests against the production build (make e2e)
+e2e/                    Playwright end-to-end tests against the production build (make e2e), with
+                        fictional hackathons e2e/seed.ts writes to the test database first
 src/db/schema.ts        the Drizzle schema; migrations in drizzle/ (make db-generate, db-migrate)
 docs/                   START-HERE, the MVP outline, decisions and sources
 compose.yaml            Postgres 18 for local work (make db-up), host port 5433

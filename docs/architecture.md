@@ -77,10 +77,16 @@ sequenceDiagram
 ### Event list (built, issue #11) and event pages (next)
 
 `/events` reads Postgres through a cached function (`use cache` with a lifetime of hours, tagged
-`events`, keyed by the filters and the day), and the import calls `revalidateTag("events", "max")`
-when it finishes. Most visits are then served from the cache without waking the database, which
-matters on Neon's Free plan (below). The filters come from the query string inside a `<Suspense>`
-boundary, as Cache Components requires, and only known values are accepted.
+`events`, keyed by the day), and the import calls `revalidateTag("events", "max")` when it
+finishes. Most visits are then served from the cache without waking the database, which matters on
+Neon's Free plan (below). The cached list is the whole upcoming list: filtering, the counts on the
+filter chips, grouping by month and pages of 12 are worked out from it in tested code
+(`src/lib/events/listing.ts`), so every filter and page shares one cache entry. The filters and the
+page come from the query string (`?format=online&page=2`) inside a `<Suspense>` boundary, as Cache
+Components requires, and only known values are accepted. The pager is a `nav` of real links that
+work without JavaScript; the Left and Right arrow keys turn pages too, except while typing, inside
+widgets that use arrows, or with a modifier key held, and focus then moves to the line naming the
+page (issue #25).
 
 ### The fit score (later)
 

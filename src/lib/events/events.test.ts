@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { filterQuery, parseFilters } from "./filters";
-import { dateTile, formatDateRange, formatLocation } from "./format";
+import { dateTile, formatDateRange, formatLocation, prizeLine } from "./format";
 
 const SLUGS = ["hackclub", "hackster", "hackhq"];
 
@@ -59,5 +59,24 @@ describe("dateTile", () => {
 
   it("has nothing to show without a start date", () => {
     expect(dateTile(null)).toBeNull();
+  });
+});
+
+describe("prizeLine", () => {
+  it.each([
+    ["Gift cards for top teams", "Gift cards for top teams"],
+    ["  $2,000 in prizes ", "$2,000 in prizes"],
+    ["TBA", null],
+    ["tbd", null],
+    ["TBC", null],
+    ["N/A", null],
+    ["None", null],
+    ["—", null],
+    ["–", null],
+    ["--", null],
+    ["", null],
+    [null, null],
+  ])("%j reads as %j", (text, line) => {
+    expect(prizeLine(text)).toBe(line);
   });
 });

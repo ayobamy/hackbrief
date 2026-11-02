@@ -68,7 +68,7 @@ const HACK_HQ_BODY = JSON.stringify([
   { id: "hq-4", title: "Ended", url: "https://ended.example", state: "closed", active: false, source: "organizer-site" },
   { id: "hq-5", title: "Remote Sprint", url: "https://remote.example", format: "Virtual", locations: ["Online"], state: "opens_soon", source: "contributor" },
   { id: "hq-6", title: "Mixed", url: "https://mixed.example", format: "Hybrid", prize: "TBA", active: true },
-  { id: "hq-7", title: "Unknown format", url: "https://unknown.example", format: "TBA", active: true },
+  { id: "hq-7", title: "Unknown format", url: "https://unknown.example", format: "TBA", prize: "—", active: true },
   { title: "No id" },
 ]);
 
@@ -174,6 +174,7 @@ describe("parseHackHq", () => {
     expect(events.map(({ format }) => format)).toEqual(["in_person", "online", "hybrid", null]);
     expect(events[1]?.city).toBeNull();
     expect(events[2]?.prizeText).toBeNull();
+    expect(events[3]?.prizeText).toBeNull();
   });
 
   it("refuses a file that is not a list", () => {

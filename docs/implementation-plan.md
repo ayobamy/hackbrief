@@ -76,6 +76,11 @@ Kaggle adapter, revalidating cached pages after a run, and batching the import's
 link, and is cached and refreshed by the import. The database tests now run on their own
 database (`hackr_test`), guarded so they can never reset the development database or Neon.
 
+Issue #25 made the list paginated (12 to a page, Left and Right arrow keys as well as links), with
+cards grouped by month, counts on the filter chips and a "starts in" label on each event. The
+end-to-end tests now seed fictional hackathons into the test database (`e2e/seed.ts`) and cover
+paging and filtering.
+
 ## M4. The event list and event pages
 
 1. `/events`: upcoming events with filters for date, format, prize size, theme and source. Done
