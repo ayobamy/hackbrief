@@ -1,0 +1,8 @@
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
+
+overrides:
+  # GHSA-g3hv-75wg-m249 (30 October 2026) is fixed only in minimatch 11.0.1; ESLint 9 and
+  # typescript-eslint still ask for 3.x and 10.x. Drop this once they depend on 11.0.1 or later.
+  "minimatch@<11.0.1": "^11.0.1"

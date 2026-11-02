@@ -2,6 +2,8 @@
 .env
 .env.*
 !.env.example
+# Neon CLI link (org, project and branch IDs on this machine)
+.neon
 
 # Dependencies and builds
 node_modules/
@@ -28,3 +30,11 @@ __pycache__/
 .idea/
 .vscode/
 .DS_Store
+
+# Next.js and TypeScript output
+/out/
+next-env.d.ts
+*.tsbuildinfo
+.vercel
+*.pem
+.pnpm-debug.log*

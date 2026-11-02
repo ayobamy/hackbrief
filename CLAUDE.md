@@ -53,16 +53,30 @@ blocker on data sources, the open questions and the first steps.
 ## Layout
 
 ```text
-docs/                   START-HERE, the MVP outline, sources and decisions
-.github/workflows/      CI: make check on pull requests and pushes to main
-Makefile                check (Markdown lint now; tests and linters as code arrives)
+src/app/                Next.js App Router: pages, layouts and route handlers (api/health)
+src/lib/                logic with unit tests beside it (*.test.ts); *.db.test.ts need Postgres
+docs/                   START-HERE, the MVP outline, decisions and sources
+compose.yaml            Postgres 18 for local work (make db-up), host port 5433
+.github/workflows/      CI: make check against a Postgres service, on pull requests and main
+Makefile                check = audit, lint-docs, lint, typecheck, test, test-db, build
 ```
 
-The code layout is decided in the first build issue (see START-HERE, "First steps").
+The stack and the reasons for each choice are in [docs/decisions.md](docs/decisions.md).
+
+## Next.js
+
+This is Next.js 16.4, with breaking changes from older versions: APIs, conventions and file
+structure may differ from what you know. Read the relevant guide in `node_modules/next/dist/docs/`
+before writing Next.js code, and heed deprecation notices. Cache Components is on, so any route
+that reads the database or the request starts with `await connection()` or uses `use cache`.
 
 ## Environment
 
 - `gh` is logged in as `ayobamy` (git protocol: SSH).
 - `origin` is `git@github-personal:ayobamy/hackr.git`: the `github-personal` SSH alias uses
   Ahmed's personal key. Keep that form for any new remote.
-- Node.js and npx are installed (Markdown lint runs through `npx markdownlint-cli2`).
+- Node.js 24, pnpm 10 and Docker are installed (Markdown lint runs through
+  `npx markdownlint-cli2`). `make check` needs the local Postgres: run `make db-up` first.
+- A shell hook blocks starting the dev server outside tmux, and tmux is not installed. To run
+  the app for a real check, build it and start it with `pnpm exec next start -p 3100` as a
+  background task.
