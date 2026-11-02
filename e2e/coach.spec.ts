@@ -15,10 +15,54 @@ test("the home page leads to the coach and the event list", async ({
     "href",
     "/",
   );
-  // The landing page shows a real brief from the coach, not a picture of one.
-  await expect(page.getByText("Impact on emissions", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Paste a hackathon's rules" }).click();
   await expect(page).toHaveURL(/\/coach$/);
+});
+
+test("the landing page runs the coach: samples switch, the rubric playground rewrites advice", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  // The hero demo is the coach itself, not a picture of it.
+  await page.getByRole("tab", { name: "Harbour Light Climate Hack" }).click();
+  await expect(
+    page.getByRole("tab", { name: "Harbour Light Climate Hack" }),
+  ).toHaveAttribute("aria-selected", "true");
+  const topCriterion = page
+    .getByRole("tabpanel")
+    .getByRole("listitem")
+    .filter({ hasText: "Impact on emissions" });
+  await expect(topCriterion).toContainText("Focus");
+  await expect(topCriterion).toContainText("38%");
+  await expect(
+    page.getByText(/^Read 1,063 characters in [\d.]+ ms$/),
+  ).toBeVisible();
+
+  // Moving a weight rescales the rubric and rewrites the advice, with the coach's own code.
+  const slider = page.getByLabel("Technical quality");
+  await slider.focus();
+  for (let step = 0; step < 4; step += 1) {
+    await page.keyboard.press("ArrowRight");
+  }
+  await expect(
+    page.getByText("The weights add up to 120%", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Technical quality is 42%:", { exact: false }),
+  ).toBeVisible();
+
+  // The moving band of platforms can be paused.
+  await page
+    .getByRole("button", { name: "Pause the moving list of platforms" })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Play the moving list of platforms" }),
+  ).toBeVisible();
+  await expect(page.locator(".marquee-track")).toHaveAttribute(
+    "data-paused",
+    "true",
+  );
 });
 
 test("a sample builds a brief and moves focus to it", async ({ page }) => {

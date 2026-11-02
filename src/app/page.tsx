@@ -1,35 +1,29 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
-import { BriefPreview } from "@/components/brief-preview";
+import { PlanPanel, ReadPanel, UpcomingPreview, UpcomingSkeleton } from "@/components/landing-panels";
+import { CountUp } from "@/components/motion/count-up";
+import { Reveal } from "@/components/motion/reveal";
+import { PlatformMarquee } from "@/components/platform-marquee";
+import { RubricPlayground } from "@/components/rubric-playground";
+import { RulesDemo } from "@/components/rules-demo";
 import { SiteFooter } from "@/components/site-footer";
 import { REPOSITORY_URL, SiteHeader } from "@/components/site-header";
+import { StepRail } from "@/components/step-rail";
+import { countByVerdict, PLATFORMS } from "@/lib/platforms/catalogue";
+import { SOURCES } from "@/lib/sources";
 
 const LABEL = "font-mono text-[11px] uppercase tracking-[0.14em] text-muted";
 const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
-const PRIMARY = `inline-flex items-center gap-2 rounded-md bg-ink px-5 py-3 text-sm font-medium text-paper hover:opacity-90 ${FOCUS}`;
-const SECONDARY = `inline-flex items-center gap-2 rounded-md border border-line bg-panel px-5 py-3 text-sm font-medium hover:border-ink ${FOCUS}`;
-
-const SOURCES = [
-  { name: "Hack Club Hackathons", detail: "Public API, credited as Hack Club asks" },
-  { name: "Hackster.io", detail: "Contests feed: title, link and sponsor" },
-  { name: "HackHQ", detail: "Open list, organisers' own sites only" },
-  { name: "Devpost", detail: "Asked for permission, never scraped" },
-];
+const PRIMARY = `inline-flex items-center gap-2 rounded-md bg-ink px-5 py-3 text-sm font-medium text-paper transition-opacity hover:opacity-90 ${FOCUS}`;
+const SECONDARY = `inline-flex items-center gap-2 rounded-md border border-line bg-panel px-5 py-3 text-sm font-medium transition-colors hover:border-ink ${FOCUS}`;
+const H2 = "text-3xl leading-[1.05] font-semibold tracking-[-0.035em] sm:text-5xl";
 
 const STEPS = [
-  {
-    title: "Find",
-    text: "Upcoming hackathons in one list, filtered by format and source, each linked to its own page and to where hackr found it.",
-  },
-  {
-    title: "Read",
-    text: "Paste any hackathon's rules. hackr pulls out the deadline, who can enter, the team size and exactly what to hand in.",
-  },
-  {
-    title: "Plan",
-    text: "The judging weights become where to spend your hours, and the deadline becomes a prep plan counted back day by day.",
-  },
-];
+  { id: "find", label: "Find" },
+  { id: "read", label: "Read" },
+  { id: "plan", label: "Plan" },
+] as const;
 
 const PRINCIPLES = [
   {
@@ -50,6 +44,33 @@ const PRINCIPLES = [
   },
 ];
 
+const QUESTIONS = [
+  {
+    q: "Is hackr free?",
+    a: "Yes. It is free, open source under the MIT licence, non-commercial, and needs no account.",
+  },
+  {
+    q: "Where do the hackathons come from?",
+    a: "From sources whose terms allow it: Hack Club's public API, Hackster's contests feed and HackHQ's open list (organisers' own sites only), imported once a day. More join as their terms allow; every listing links to its own page and credits its source.",
+  },
+  {
+    q: "Why is Devpost not in the list?",
+    a: "Devpost's terms forbid scraping and reuse without written consent, so hackr has asked for permission instead. Until it says yes, you can paste any Devpost hackathon's rules into the coach yourself.",
+  },
+  {
+    q: "Does hackr keep the rules I paste?",
+    a: "No. The coach reads them in your browser, on the page. Nothing is sent to a server or stored, and the code that does it is public.",
+  },
+  {
+    q: "Is the advice written by AI?",
+    a: "No. Today every part of the brief, from the weights to the plan, comes from tested code. If a language model is added later, it will only word facts the code has already worked out, and it will be labelled.",
+  },
+  {
+    q: "What rules can it read?",
+    a: "English rules as Markdown, tables or plain prose, with dates such as 2027-03-14, March 14, 2027 or 14th March 2027. Times are shown as written, not converted between time zones, and anything it could not find is listed for you to check.",
+  },
+];
+
 function Arrow() {
   return (
     <svg viewBox="0 0 16 16" className="size-4" aria-hidden="true">
@@ -59,27 +80,36 @@ function Arrow() {
 }
 
 export default function Home() {
+  const counts = countByVerdict();
+  const count = (verdict: (typeof counts)[number]["verdict"]) =>
+    counts.find((entry) => entry.verdict === verdict)?.count ?? 0;
+
   return (
     <>
       <SiteHeader />
       <main id="main" className="flex flex-1 flex-col">
+        {/* Hero: the promise, then the coach itself, running. */}
         <section className="relative overflow-hidden border-b border-line">
           <div
-            className="dot-grid pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,black_30%,transparent)]"
+            className="dot-grid pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,black_20%,transparent_75%)]"
             aria-hidden="true"
           />
-          <div className="relative mx-auto grid w-full max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-[1.05fr_0.95fr]">
-            <div className="flex flex-col gap-7">
-              <p className={LABEL}>Open source · for students and early-career developers</p>
-              <h1 className="text-5xl leading-[0.95] font-semibold tracking-[-0.045em] sm:text-6xl lg:text-7xl">
+          <div
+            className="glow-drift pointer-events-none absolute top-[38%] left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-accent/[0.08] blur-3xl"
+            aria-hidden="true"
+          />
+          <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 pt-16 pb-20 sm:px-6 sm:pt-24">
+            <div className="flex max-w-3xl flex-col gap-7">
+              <p className={`${LABEL} rise-in`}>Open source · for students and early-career developers</p>
+              <h1 className="rise-in text-5xl leading-[0.95] font-semibold tracking-[-0.05em] [animation-delay:80ms] sm:text-7xl lg:text-[5.5rem]">
                 Pick the right hackathon.
                 <span className="block text-muted">Then play to win.</span>
               </h1>
-              <p className="max-w-xl text-lg leading-8 text-muted">
+              <p className="rise-in max-w-xl text-lg leading-8 text-muted [animation-delay:160ms]">
                 hackr lists hackathons from the sources that allow it, and turns any event&apos;s rules
                 into a plan: when it closes, what to hand in, and where the judges&apos; points are.
               </p>
-              <div className="flex flex-wrap gap-3">
+              <div className="rise-in flex flex-wrap gap-3 [animation-delay:240ms]">
                 <Link href="/coach" className={PRIMARY}>
                   Paste a hackathon&apos;s rules
                   <Arrow />
@@ -88,86 +118,241 @@ export default function Home() {
                   Browse upcoming hackathons
                 </Link>
               </div>
-              <p className={LABEL}>No account · your text stays in your browser</p>
             </div>
-            <BriefPreview />
+            <div className="rise-in [animation-delay:320ms]">
+              <RulesDemo />
+            </div>
           </div>
         </section>
 
-        <section aria-labelledby="sources-heading" className="border-b border-line">
-          <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
-            <h2 id="sources-heading" className={`${LABEL} pt-10 pb-6`}>
-              Listings only from sources whose terms allow it
+        {/* Every platform read, scrolling by. */}
+        <section aria-labelledby="platforms-heading" className="border-b border-line py-14">
+          <div className="mx-auto mb-8 flex w-full max-w-6xl flex-col gap-2 px-4 sm:flex-row sm:items-end sm:justify-between sm:px-6">
+            <h2 id="platforms-heading" className={LABEL}>
+              {PLATFORMS.length} platforms&apos; terms read before a single listing was collected
             </h2>
-            <ul className="mb-10 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
-              {SOURCES.map((source) => (
-                <li key={source.name} className="flex flex-col gap-1 bg-paper p-6">
-                  <span className="font-medium">{source.name}</span>
-                  <span className="text-sm text-muted">{source.detail}</span>
-                </li>
-              ))}
-            </ul>
+            <a
+              href={`${REPOSITORY_URL}/blob/main/docs/platforms.md`}
+              className={`${LABEL} underline underline-offset-4 hover:text-ink ${FOCUS}`}
+            >
+              See the full list
+            </a>
+          </div>
+          <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+            <PlatformMarquee />
           </div>
         </section>
 
+        {/* The problem, and the promise. */}
+        <section aria-labelledby="problem-heading" className="border-b border-line">
+          <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-24 sm:px-6 lg:grid-cols-2 lg:gap-16">
+            <Reveal className="flex flex-col gap-4">
+              <p className={LABEL}>
+                The problem <span aria-hidden="true">→</span> the promise
+              </p>
+              <h2 id="problem-heading" className={H2}>
+                The rubric is in paragraph nine. The deadline is in another time zone.
+              </h2>
+            </Reveal>
+            <Reveal delay={120} className="flex flex-col gap-6 self-end text-lg leading-8 text-muted">
+              <p>
+                Every hackathon hides what matters in its own rules page: who can enter, how big a team
+                can be, what to hand in, and how the judges will score it. Most people skim, build the
+                wrong thing well, and miss a required video.
+              </p>
+              <p className="text-ink">
+                hackr reads the rules for you and hands back one page: the deadline counted down, the
+                checklist, and the judging weights turned into where to spend your hours.
+              </p>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* How it works, as a story with a sticky rail. */}
         <section aria-labelledby="how-heading" className="border-b border-line">
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 py-20 sm:px-6">
-            <div className="flex max-w-2xl flex-col gap-4">
+          <div className="mx-auto w-full max-w-6xl px-4 py-24 sm:px-6">
+            <Reveal className="mb-16 flex max-w-2xl flex-col gap-4">
               <p className={LABEL}>How it works</p>
-              <h2 id="how-heading" className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
+              <h2 id="how-heading" className={H2}>
                 From ten pages of rules to one page of plan.
               </h2>
+            </Reveal>
+            <div className="grid gap-16 lg:grid-cols-[180px_1fr]">
+              <StepRail steps={STEPS} />
+              <div className="flex flex-col gap-28">
+                <article id="find" className="grid scroll-mt-28 items-start gap-8 md:grid-cols-[0.8fr_1.2fr]">
+                  <Reveal className="flex flex-col gap-3">
+                    <span className="font-mono text-sm text-muted">01</span>
+                    <h3 className="text-2xl font-semibold tracking-[-0.02em]">Find</h3>
+                    <p className="leading-7 text-muted">
+                      Upcoming hackathons in one list, filtered by format and source, each linked to its
+                      own page and to where hackr found it. Imported daily from {SOURCES.length} sources
+                      whose terms allow it.
+                    </p>
+                    <Link href="/events" className={`${LABEL} mt-2 w-fit underline underline-offset-4 hover:text-ink ${FOCUS}`}>
+                      Browse the list
+                    </Link>
+                  </Reveal>
+                  <Reveal delay={120}>
+                    <Suspense fallback={<UpcomingSkeleton />}>
+                      <UpcomingPreview />
+                    </Suspense>
+                  </Reveal>
+                </article>
+                <article id="read" className="grid scroll-mt-28 items-start gap-8 md:grid-cols-[0.8fr_1.2fr]">
+                  <Reveal className="flex flex-col gap-3">
+                    <span className="font-mono text-sm text-muted">02</span>
+                    <h3 className="text-2xl font-semibold tracking-[-0.02em]">Read</h3>
+                    <p className="leading-7 text-muted">
+                      Paste any hackathon&apos;s rules. hackr pulls out the deadline, who can enter, the
+                      team size and exactly what to hand in, and quotes the line each one came from.
+                    </p>
+                  </Reveal>
+                  <Reveal delay={120}>
+                    <ReadPanel />
+                  </Reveal>
+                </article>
+                <article id="plan" className="grid scroll-mt-28 items-start gap-8 md:grid-cols-[0.8fr_1.2fr]">
+                  <Reveal className="flex flex-col gap-3">
+                    <span className="font-mono text-sm text-muted">03</span>
+                    <h3 className="text-2xl font-semibold tracking-[-0.02em]">Plan</h3>
+                    <p className="leading-7 text-muted">
+                      The deadline becomes a prep plan, counted back from the day the hacking starts to
+                      the hour you submit, with the finishing work your checklist asks for.
+                    </p>
+                  </Reveal>
+                  <Reveal delay={120}>
+                    <PlanPanel />
+                  </Reveal>
+                </article>
+              </div>
             </div>
-            <ol className="grid gap-px overflow-hidden rounded-xl border border-line bg-line md:grid-cols-3">
-              {STEPS.map((step, index) => (
-                <li key={step.title} className="flex flex-col gap-4 bg-panel p-7">
-                  <span className="flex items-center gap-2 font-mono text-sm text-muted">
-                    <span className="size-2 bg-accent" aria-hidden="true" />
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <h3 className="text-xl font-semibold tracking-[-0.02em]">{step.title}</h3>
-                  <p className="leading-7 text-muted">{step.text}</p>
-                </li>
-              ))}
-            </ol>
           </div>
         </section>
 
-        <section aria-labelledby="principles-heading" className="border-b border-line">
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 py-20 sm:px-6">
-            <div className="flex max-w-2xl flex-col gap-4">
-              <p className={LABEL}>What hackr promises</p>
-              <h2 id="principles-heading" className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
-                Honest numbers, respected sources, your data left alone.
+        {/* The rubric playground. */}
+        <section aria-labelledby="playground-heading" className="border-b border-line">
+          <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 py-24 sm:px-6">
+            <Reveal className="flex max-w-2xl flex-col gap-4">
+              <p className={LABEL}>Try the strategy</p>
+              <h2 id="playground-heading" className={H2}>
+                Move the judging weights. Watch the advice change.
               </h2>
-            </div>
-            <ul className="grid gap-x-10 gap-y-10 sm:grid-cols-2">
-              {PRINCIPLES.map((principle) => (
-                <li key={principle.title} className="flex flex-col gap-3 border-t border-ink pt-5">
-                  <h3 className="text-lg font-semibold tracking-[-0.02em]">{principle.title}</h3>
-                  <p className="leading-7 text-muted">{principle.text}</p>
+              <p className="text-lg leading-8 text-muted">
+                This is the coach&apos;s own code: weights are scaled to whole percentages that add up
+                to 100, and each criterion gets its focus.
+              </p>
+            </Reveal>
+            <Reveal delay={120}>
+              <RubricPlayground />
+            </Reveal>
+          </div>
+        </section>
+
+        {/* The figures behind the promises. */}
+        <section aria-labelledby="numbers-heading" className="border-b border-line">
+          <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
+            <h2 id="numbers-heading" className="sr-only">
+              hackr in numbers
+            </h2>
+            <ul className="grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { value: PLATFORMS.length, label: "platforms whose terms were read" },
+                { value: count("use"), label: "allow it, so hackr uses them" },
+                { value: count("ask"), label: "asked for permission first" },
+                { value: SOURCES.length, label: "sources imported every day" },
+              ].map((figure) => (
+                <li key={figure.label} className="flex flex-col gap-2 bg-paper p-7">
+                  <CountUp value={figure.value} className="text-5xl font-semibold tracking-[-0.04em]" />
+                  <span className="text-sm text-muted">{figure.label}</span>
                 </li>
               ))}
             </ul>
           </div>
         </section>
 
-        <section aria-labelledby="cta-heading" className="bg-ink text-paper">
-          <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-8 px-4 py-20 sm:px-6 lg:flex-row lg:items-end lg:justify-between">
-            <h2 id="cta-heading" className="max-w-2xl text-4xl leading-[1.05] font-semibold tracking-[-0.04em] sm:text-5xl">
+        {/* What hackr promises. */}
+        <section aria-labelledby="principles-heading" className="border-b border-line">
+          <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 py-24 sm:px-6">
+            <Reveal className="flex max-w-2xl flex-col gap-4">
+              <p className={LABEL}>What hackr promises</p>
+              <h2 id="principles-heading" className={H2}>
+                Honest numbers, respected sources, your data left alone.
+              </h2>
+            </Reveal>
+            <ul className="grid gap-x-10 gap-y-10 sm:grid-cols-2">
+              {PRINCIPLES.map((principle, index) => (
+                <li key={principle.title}>
+                  <Reveal delay={index * 80} className="flex flex-col gap-3 border-t border-ink pt-5">
+                    <h3 className="text-lg font-semibold tracking-[-0.02em]">{principle.title}</h3>
+                    <p className="leading-7 text-muted">{principle.text}</p>
+                  </Reveal>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* Questions. */}
+        <section aria-labelledby="faq-heading" className="border-b border-line">
+          <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[0.8fr_1.2fr]">
+            <Reveal className="flex flex-col gap-4">
+              <p className={LABEL}>Questions</p>
+              <h2 id="faq-heading" className={H2}>
+                Asked, and answered plainly.
+              </h2>
+            </Reveal>
+            <div className="flex flex-col">
+              {QUESTIONS.map((item) => (
+                <details key={item.q} className="group border-b border-line py-5 first:border-t">
+                  <summary
+                    className={`flex cursor-pointer list-none items-center justify-between gap-6 rounded-sm text-lg font-medium ${FOCUS}`}
+                  >
+                    {item.q}
+                    <span
+                      className="text-xl text-muted transition-transform duration-300 group-open:rotate-45 motion-reduce:transition-none"
+                      aria-hidden="true"
+                    >
+                      +
+                    </span>
+                  </summary>
+                  <p className="pt-3 pr-10 leading-7 text-muted">{item.a}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* The close. */}
+        <section aria-labelledby="cta-heading" className="relative overflow-hidden bg-ink text-paper">
+          <div
+            className="glow-drift pointer-events-none absolute -right-40 -bottom-40 h-[420px] w-[620px] rounded-full bg-accent/25 blur-3xl"
+            aria-hidden="true"
+          />
+          <div className="relative mx-auto flex w-full max-w-6xl flex-col items-start gap-10 px-4 py-28 sm:px-6">
+            <h2
+              id="cta-heading"
+              className="max-w-4xl text-5xl leading-[0.98] font-semibold tracking-[-0.05em] sm:text-7xl"
+            >
               Your next hackathon starts with the rules.
             </h2>
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/coach"
-                className={`inline-flex items-center gap-2 rounded-md bg-paper px-5 py-3 text-sm font-medium text-ink hover:opacity-90 ${FOCUS}`}
+                className={`inline-flex items-center gap-2 rounded-md bg-paper px-5 py-3 text-sm font-medium text-ink transition-opacity hover:opacity-90 ${FOCUS}`}
               >
                 Open the coach
                 <Arrow />
               </Link>
+              <Link
+                href="/events"
+                className={`inline-flex items-center gap-2 rounded-md border border-paper/30 px-5 py-3 text-sm font-medium transition-colors hover:border-paper ${FOCUS}`}
+              >
+                Browse hackathons
+              </Link>
               <a
                 href={REPOSITORY_URL}
-                className={`inline-flex items-center gap-2 rounded-md border border-paper/30 px-5 py-3 text-sm font-medium hover:border-paper ${FOCUS}`}
+                className={`inline-flex items-center gap-2 rounded-md px-5 py-3 text-sm font-medium text-paper transition-opacity hover:opacity-80 ${FOCUS}`}
               >
                 Star it on GitHub
               </a>

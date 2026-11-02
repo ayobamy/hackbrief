@@ -87,6 +87,12 @@ Best student team: USD 1,000.`),
     ).toEqual(["University students in their final year can join."]);
   });
 
+  it("reads two-digit ages", () => {
+    expect(extractEligibility("Anyone aged 16 or older may enter, from any country.")).toEqual([
+      "Anyone aged 16 or older may enter, from any country.",
+    ]);
+  });
+
   it("does not read 'open tools' as 'open to'", () => {
     expect(extractEligibility("We invite students to build open tools for clinics.")).toEqual([]);
   });
