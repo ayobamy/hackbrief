@@ -68,7 +68,7 @@ user agent. A site that objects can disallow `hackbrief` in its robots.txt, and 
 
 | Source | What hackbrief gets | Channel | Conditions | Status |
 | --- | --- | --- | --- | --- |
-| [OpenAgenda](https://developers.openagenda.com/en/) | Event agendas across France, the EU and Switzerland, including hackathons | Free REST API, needs a key | Terms (updated 14 October 2026): events on a public agenda "sont diffusées sous la Licence Ouverte 2.0 (Etalab)" and reusable "y compris à des fins commerciales, à la condition d'en mentionner la source". Credit each agenda's organisation. | Re-checked |
+| [OpenAgenda](https://developers.openagenda.com/en/) | Event agendas across France, the EU and Switzerland, including hackathons | Free REST API, needs a key | Terms (updated 14 October 2026): events on a public agenda "sont diffusées sous la Licence Ouverte 2.0 (Etalab)" and reusable "y compris à des fins commerciales, à la condition d'en mentionner la source". Credit each agenda's organisation. | Imported (issue #45) |
 | [Jugend hackt](https://jugendhackt.org/kalender/) | Youth hackathons and labs in Germany, Austria and Switzerland | WordPress feeds | "Die Inhalte dieser Webseite sind, sofern nicht anders angegeben, nach Creative Commons 4.0 Attribution lizenziert" (CC BY 4.0, unless stated otherwise). Events are for ages 12 to 18: label them. | Re-checked |
 | [CASSINI Hackathons](https://www.cassini.eu/hackathons) | The EU Space Programme's hackathons, one edition at a time across about ten cities | Public pages | "downloading, reproduction and use of all the materials and documents published on the Website are authorised provided the source is acknowledged as follow: © EUSPA 2026", except third-party material. | Re-checked |
 | [Wikidata](https://www.wikidata.org/wiki/Wikidata:Licensing) | Facts about well-known hackathons (dates, organisers, websites): 262 items, few upcoming, so for filling in details rather than discovery | SPARQL endpoint `query.wikidata.org` | Structured data is CC0. Send a User-Agent naming hackbrief with a contact, and keep within the query service's limits. | Licence re-checked |
@@ -105,6 +105,19 @@ hackathon was listed twice and merged):
   HackHQ's contributors, and their link is not on a platform listed under "Ask permission" or "Do
   not collect" below (`src/lib/sources/restricted.ts`). Its entries from Devpost, MLH, Luma and
   lablab.ai are never imported.
+- **OpenAgenda** (issue #45) cannot search events across agendas, so the import reads, one request
+  at a time, the agendas whose name or description matches "hackathon" (26 on 2 November 2026) and
+  a watch list of four that carried hackathons (Université Paris-Saclay, its research and schools
+  agendas, and Cergy-Pontoise's business agenda: `WATCHED_AGENDAS` in
+  `src/lib/sources/openagenda.ts`), and in each the current and upcoming events matching
+  "hackathon". The key travels in the `key` header from `OPENAGENDA_API_KEY`, and a request that
+  carries a key follows no redirect. Only published events whose `rights.license.id` is
+  `etalab-2.0` are kept, and cancelled ones are left out. Each listing credits its licensor
+  (`rights.licensor`, linked) and the event's last update (`updatedAt`), as the
+  [licence notes](https://developers.openagenda.com/licence.md) ask. Expect few events: probes on
+  2 November found two upcoming hackathons across about 110 agendas, and the roughly 2,500 agendas
+  that match tech, university or student terms are too many to read daily, so an agenda that
+  carries hackathons joins the watch list instead.
 - **Hackalist** is not imported: its newest file is from March 2025, so it has no current events.
 - **Jugend hackt** is not imported yet. Checked on 2 November 2026: its `wp-json/wp/v2/event`
   entries are write-ups of past events with no date fields, and its calendar feed lists weekly

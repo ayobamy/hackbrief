@@ -73,6 +73,8 @@ Which source listed which event, so one event found in two places stays one even
 | `source_url` | text | Linked from the event, as attribution |
 | `first_seen_at`, `last_seen_at` | timestamptz | |
 | `listed` | boolean | False once the source stops listing it |
+| `credit_name`, `credit_url` | text, nullable | Who else to credit for this listing, where the source's licence names each listing's licensor (OpenAgenda) |
+| `credit_updated_on` | date, nullable | When that licensor last updated the listing, which the licence asks to show |
 
 ### Rules and judging
 

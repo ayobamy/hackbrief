@@ -2,7 +2,7 @@ import { and, eq, lt } from "drizzle-orm";
 
 import { eventSources, events, importResults, importRuns, sources } from "@/db/schema";
 import type { Database } from "@/lib/db";
-import type { ParseResult, Source, SourceEvent } from "@/lib/sources/types";
+import type { FetchBody, ParseResult, Source, SourceEvent } from "@/lib/sources/types";
 import { canonicalUrl } from "@/lib/sources/url";
 
 export interface SourceResult {
@@ -83,22 +83,28 @@ async function saveEvent(tx: Transaction, source: number, event: SourceEvent, no
   if (!eventId) {
     return false;
   }
+  // Written every time, so a credit the source drops is cleared rather than kept stale.
+  const credit = {
+    creditName: event.credit?.name ?? null,
+    creditUrl: event.credit?.url ?? null,
+    creditUpdatedOn: event.credit?.updatedOn ?? null,
+  };
   await tx
     .insert(eventSources)
-    .values({ eventId, sourceId: source, externalId: event.externalId, sourceUrl: event.sourceUrl, lastSeenAt: now })
+    .values({ eventId, sourceId: source, externalId: event.externalId, sourceUrl: event.sourceUrl, lastSeenAt: now, ...credit })
     .onConflictDoUpdate({
       target: [eventSources.sourceId, eventSources.externalId],
-      set: { eventId, sourceUrl: event.sourceUrl, lastSeenAt: now, listed: true },
+      set: { eventId, sourceUrl: event.sourceUrl, lastSeenAt: now, listed: true, ...credit },
     });
   return true;
 }
 
-async function importSource(db: Database, source: Source, fetchBody: (url: string) => Promise<string>): Promise<SourceResult> {
+async function importSource(db: Database, source: Source, fetchBody: FetchBody): Promise<SourceResult> {
   const now = new Date();
   const id = await sourceId(db, source);
   let parsed: ParseResult;
   try {
-    parsed = source.parse(await fetchBody(source.feedUrl));
+    parsed = await source.load(fetchBody);
   } catch (error) {
     // A failed fetch keeps yesterday's events: nothing is marked unlisted.
     return { source: source.slug, fetched: 0, saved: 0, skipped: 0, error: error instanceof Error ? error.message : String(error) };
@@ -127,7 +133,7 @@ async function importSource(db: Database, source: Source, fetchBody: (url: strin
 export async function runImport(
   db: Database,
   list: readonly Source[],
-  fetchBody: (url: string) => Promise<string>,
+  fetchBody: FetchBody,
 ): Promise<ImportSummary> {
   const [run] = await db.insert(importRuns).values({}).returning({ id: importRuns.id });
   if (!run) {

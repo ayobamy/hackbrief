@@ -1,5 +1,16 @@
 export type EventFormat = "online" | "in_person" | "hybrid";
 
+/**
+ * Who to credit for one listing, where a source's licence asks for more than the source's own name:
+ * OpenAgenda's Licence Ouverte names each event's licensor and the date it was last updated.
+ */
+export interface ListingCredit {
+  name: string;
+  url: string | null;
+  /** YYYY-MM-DD. */
+  updatedOn: string | null;
+}
+
 /** One hackathon as a source lists it, in hackbrief's shape. Dates are YYYY-MM-DD. */
 export interface SourceEvent {
   /** The source's own ID for the event; with the source, it makes imports idempotent. */
@@ -17,6 +28,8 @@ export interface SourceEvent {
   startsOn: string | null;
   endsOn: string | null;
   prizeText: string | null;
+  /** Only for sources whose licence asks for a credit on each listing. */
+  credit?: ListingCredit;
 }
 
 export interface ParseResult {
@@ -25,14 +38,16 @@ export interface ParseResult {
   skipped: number;
 }
 
-/** A source from docs/sources.md: where to fetch it and how to read what comes back. */
+/** Fetches a URL and returns the body; an API source passes its key in `headers`. Tests pass a fake. */
+export type FetchBody = (url: string, headers?: Record<string, string>) => Promise<string>;
+
+/** A source from docs/sources.md: what to credit, and how to fetch and read its events. */
 export interface Source {
   slug: string;
   name: string;
   url: string;
   /** The credit the source asks for, shown with its events. */
   attribution: string;
-  feedUrl: string;
-  /** A pure function from the response body to events; it never fetches. */
-  parse(body: string): ParseResult;
+  /** Fetches the source through `fetchBody` (once for a feed, page by page for an API) and reads it. */
+  load(fetchBody: FetchBody): Promise<ParseResult>;
 }

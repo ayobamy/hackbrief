@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 import { DateTile } from "@/components/date-tile";
 import { filterQuery, FORMAT_LABELS, parseFilters, type EventFilters } from "@/lib/events/filters";
-import { formatDateRange, formatLocation, isWebUrl, prizeLine } from "@/lib/events/format";
+import { formatDateRange, formatLocation, formatUpdated, isWebUrl, prizeLine } from "@/lib/events/format";
 import {
   applyFilters,
   facetCounts,
@@ -26,6 +26,17 @@ import { PageKeys } from "./page-keys";
 const FOCUS_RING = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 const CARD = "border border-line bg-panel";
 const TAG = "font-mono text-[10.5px] tracking-[0.1em] uppercase";
+
+// A credited name or source, linked when its address is a web page.
+function CreditLink({ href, children }: { href: string | null; children: ReactNode }) {
+  return href && isWebUrl(href) ? (
+    <a href={href} className={`underline underline-offset-4 hover:text-ink ${FOCUS_RING}`}>
+      {children}
+    </a>
+  ) : (
+    children
+  );
+}
 
 function hackathons(count: number): string {
   return count === 1 ? "1 hackathon" : `${count} hackathons`;
@@ -159,13 +170,13 @@ function EventCard({ event, today }: { event: EventListing; today: string }) {
             {event.sources.map((source, index) => (
               <span key={source.slug}>
                 {index > 0 ? ", " : ""}
-                {isWebUrl(source.url) ? (
-                  <a href={source.url} className={`underline underline-offset-4 hover:text-ink ${FOCUS_RING}`}>
-                    {source.attribution}
-                  </a>
-                ) : (
-                  source.attribution
-                )}
+                {source.credit ? (
+                  <>
+                    <CreditLink href={source.credit.url}>{source.credit.name}</CreditLink> on{" "}
+                  </>
+                ) : null}
+                <CreditLink href={source.url}>{source.attribution}</CreditLink>
+                {source.credit?.updatedOn ? `, updated ${formatUpdated(source.credit.updatedOn)}` : null}
               </span>
             ))}
           </p>

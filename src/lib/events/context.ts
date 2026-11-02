@@ -1,5 +1,5 @@
 import { FORMAT_LABELS } from "./filters";
-import { formatDateRange, formatLocation } from "./format";
+import { creditText, formatDateRange, formatLocation } from "./format";
 import type { EventListing } from "./query";
 
 // Event ids are Postgres UUIDs; anything else never reaches the database, which would reject it.
@@ -50,7 +50,7 @@ export function eventContext(event: EventListing): EventContext {
       .filter(Boolean)
       .join(" · "),
     organiser: event.organiser && event.organiser !== event.name ? event.organiser : null,
-    listedBy: event.sources.map((source) => source.attribution),
+    listedBy: event.sources.map(creditText),
   };
 }
 

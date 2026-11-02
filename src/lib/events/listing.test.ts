@@ -33,6 +33,7 @@ function listing(overrides: Partial<EventListing> = {}): EventListing {
         name: "Hack Club Hackathons",
         attribution: "Hack Club Hackathons",
         url: "https://example.org/list",
+        credit: null,
       },
     ],
     ...overrides,
@@ -44,6 +45,7 @@ const hackhq = {
   name: "HackHQ",
   attribution: "HackHQ",
   url: "https://example.org/hq",
+  credit: null,
 };
 
 describe("parsePage", () => {

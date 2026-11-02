@@ -14,8 +14,17 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-export const eventFormat = pgEnum("event_format", ["online", "in_person", "hybrid"]);
-export const importStatus = pgEnum("import_status", ["running", "succeeded", "partial", "failed"]);
+export const eventFormat = pgEnum("event_format", [
+  "online",
+  "in_person",
+  "hybrid",
+]);
+export const importStatus = pgEnum("import_status", [
+  "running",
+  "succeeded",
+  "partial",
+  "failed",
+]);
 
 /** A site hackbrief collects from, as recorded in docs/sources.md. */
 export const sources = pgTable("sources", {
@@ -44,8 +53,12 @@ export const events = pgTable(
     startsOn: date("starts_on", { mode: "string" }),
     endsOn: date("ends_on", { mode: "string" }),
     prizeText: text("prize_text"),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   // The event list sorts and filters by start date.
   (table) => [index("events_starts_on").on(table.startsOn)],
@@ -64,17 +77,33 @@ export const eventSources = pgTable(
       .references(() => sources.id, { onDelete: "cascade" }),
     externalId: text("external_id").notNull(),
     sourceUrl: text("source_url").notNull(),
-    firstSeenAt: timestamp("first_seen_at", { withTimezone: true }).notNull().defaultNow(),
-    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull().defaultNow(),
+    firstSeenAt: timestamp("first_seen_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     /** False once the source stops listing the event; the event itself is kept. */
     listed: boolean("listed").notNull().default(true),
+    /** Who to credit for this listing, where the source's licence names more than the source. */
+    creditName: text("credit_name"),
+    creditUrl: text("credit_url"),
+    /** When the credited party last updated the listing, which OpenAgenda's licence asks to show. */
+    creditUpdatedOn: date("credit_updated_on", { mode: "string" }),
   },
-  (table) => [unique("event_sources_source_external").on(table.sourceId, table.externalId)],
+  (table) => [
+    unique("event_sources_source_external").on(
+      table.sourceId,
+      table.externalId,
+    ),
+  ],
 );
 
 export const importRuns = pgTable("import_runs", {
   id: serial("id").primaryKey(),
-  startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
+  startedAt: timestamp("started_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   finishedAt: timestamp("finished_at", { withTimezone: true }),
   status: importStatus("status").notNull().default("running"),
 });

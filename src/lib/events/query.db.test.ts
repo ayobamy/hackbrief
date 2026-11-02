@@ -35,7 +35,15 @@ async function seed() {
     { eventId: id("Ended Hack"), sourceId: alpha?.id ?? 0, externalId: "1", sourceUrl: "https://alpha.example/1" },
     { eventId: id("Under Way"), sourceId: alpha?.id ?? 0, externalId: "2", sourceUrl: "https://alpha.example/2" },
     { eventId: id("Soon Hack"), sourceId: alpha?.id ?? 0, externalId: "3", sourceUrl: "https://alpha.example/3" },
-    { eventId: id("Soon Hack"), sourceId: beta?.id ?? 0, externalId: "b3", sourceUrl: "https://beta.example/3" },
+    {
+      eventId: id("Soon Hack"),
+      sourceId: beta?.id ?? 0,
+      externalId: "b3",
+      sourceUrl: "https://beta.example/3",
+      creditName: "Fictional Lab",
+      creditUrl: "https://lab.example/",
+      creditUpdatedOn: "2026-10-19",
+    },
     { eventId: id("Undated Contest"), sourceId: beta?.id ?? 0, externalId: "b4", sourceUrl: "https://beta.example/4" },
     { eventId: id("Dropped Hack"), sourceId: beta?.id ?? 0, externalId: "b5", sourceUrl: "https://beta.example/5", listed: false },
   ]);
@@ -53,12 +61,18 @@ describe("listUpcomingEvents", () => {
     expect(listed.map(({ name }) => name)).toEqual(["Under Way", "Soon Hack", "Undated Contest"]);
   });
 
-  it("attaches every source that lists an event, with its own link", async () => {
+  it("attaches every source that lists an event, with its own link and any listing credit", async () => {
     const [, soon] = await listUpcomingEvents(db, NO_FILTERS, TODAY);
 
     expect(soon?.sources).toEqual([
-      { slug: "alpha", name: "Alpha", attribution: "Alpha List", url: "https://alpha.example/3" },
-      { slug: "beta", name: "Beta", attribution: "Beta Feed", url: "https://beta.example/3" },
+      { slug: "alpha", name: "Alpha", attribution: "Alpha List", url: "https://alpha.example/3", credit: null },
+      {
+        slug: "beta",
+        name: "Beta",
+        attribution: "Beta Feed",
+        url: "https://beta.example/3",
+        credit: { name: "Fictional Lab", url: "https://lab.example/", updatedOn: "2026-10-19" },
+      },
     ]);
     expect(soon).toMatchObject({ city: "Lisbon", country: "Portugal", format: "in_person", startsOn: "2026-11-20" });
   });

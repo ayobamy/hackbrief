@@ -1,5 +1,6 @@
 import { formatDate } from "@/lib/coach/format";
 import { isPlaceholder } from "@/lib/sources/placeholder";
+import type { ListingCredit } from "@/lib/sources/types";
 
 const DAY_MONTH = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
 
@@ -60,4 +61,23 @@ export function prizeLine(text: string | null): string | null {
 /** Whether a stored URL may be drawn as a link: http(s) only, never javascript: or other schemes. */
 export function isWebUrl(url: string): boolean {
   return /^https?:\/\//i.test(url);
+}
+
+const UPDATED = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+
+/** "2026-10-19" as "19 Oct 2026": when a credited party last updated a listing. */
+export function formatUpdated(date: string): string {
+  return UPDATED.format(new Date(`${date}T00:00:00Z`));
+}
+
+/**
+ * A source's credit as text: its attribution, or, where its licence names each listing's licensor
+ * and last update, "Université Paris-Saclay on OpenAgenda (Licence Ouverte 2.0), updated 19 Oct 2026".
+ */
+export function creditText({ attribution, credit }: { attribution: string; credit: ListingCredit | null }): string {
+  if (!credit) {
+    return attribution;
+  }
+  const updated = credit.updatedOn ? `, updated ${formatUpdated(credit.updatedOn)}` : "";
+  return `${credit.name} on ${attribution}${updated}`;
 }

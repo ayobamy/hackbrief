@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   if (!isAuthorized(request.headers.get("authorization"), process.env.CRON_SECRET)) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
-  const summary = await runImport(getDatabase(), SOURCES, (url) => fetchSource(url));
+  const summary = await runImport(getDatabase(), SOURCES, (url, headers) => fetchSource(url, { headers }));
   if (summary.status !== "failed") {
     // The next visit to /events is served the old list while the new one is fetched.
     revalidateTag(EVENTS_TAG, "max");

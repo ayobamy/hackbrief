@@ -60,7 +60,7 @@ const QUESTIONS = [
   },
   {
     q: "Where do the hackathons come from?",
-    a: "From sources whose terms allow it: Hack Club's public API, Hackster's contests feed and HackHQ's open list (organisers' own sites only), imported once a day. More join as their terms allow; every listing links to its own page and credits its source.",
+    a: "From sources whose terms allow it: Hack Club's public API, Hackster's contests feed, HackHQ's open list (organisers' own sites only) and OpenAgenda's public agendas in France and Europe, imported once a day. More join as their terms allow; every listing links to its own page and credits its source.",
   },
   {
     q: "Does hackbrief keep the rules I paste?",

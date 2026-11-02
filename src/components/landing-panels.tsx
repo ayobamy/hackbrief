@@ -8,7 +8,7 @@ import { formatDate, formatTeamSize } from "@/lib/coach/format";
 import { SAMPLES } from "@/lib/coach/samples";
 import { planTimeline } from "@/lib/coach/timeline";
 import { FORMAT_LABELS } from "@/lib/events/filters";
-import { formatDateRange, isWebUrl } from "@/lib/events/format";
+import { creditText, formatDateRange, isWebUrl } from "@/lib/events/format";
 
 import { DateTile } from "./date-tile";
 import { CountUp } from "./motion/count-up";
@@ -60,6 +60,7 @@ export async function UpcomingPreview() {
       ) : (
         <ul className="divide-y divide-line">
           {events.slice(0, 4).map((event) => {
+            const source = event.sources[0];
             const row = (
               <>
                 <DateTile startsOn={event.startsOn} />
@@ -69,11 +70,13 @@ export async function UpcomingPreview() {
                     {[
                       formatDateRange(event.startsOn, event.endsOn),
                       event.format ? FORMAT_LABELS[event.format] : null,
-                      event.sources[0] ? `via ${event.sources[0].attribution}` : null,
+                      source && !source.credit ? `via ${source.attribution}` : null,
                     ]
                       .filter(Boolean)
                       .join(" · ")}
                   </span>
+                  {/* A licence that names the licensor and the last update gets a line of its own, never cut off. */}
+                  {source?.credit ? <span className="text-xs text-muted">via {creditText(source)}</span> : null}
                 </span>
               </>
             );

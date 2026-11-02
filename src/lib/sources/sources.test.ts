@@ -192,6 +192,18 @@ describe("fetchSource", () => {
     expect(init.redirect).toBe("follow");
   });
 
+  it("sends an API key in a header and then follows no redirect, so the key cannot leave the host", async () => {
+    const fetchImpl = vi.fn(async () => new Response("{}", { status: 200 }));
+
+    await fetchSource("https://api.example.org/v2", { fetchImpl, headers: { key: "test-key" } });
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    const headers = new Headers(init.headers);
+    expect(headers.get("key")).toBe("test-key");
+    expect(headers.get("user-agent")).toBe(USER_AGENT);
+    expect(init.redirect).toBe("error");
+    expect(url).not.toContain("test-key");
+  });
+
   it("treats any non-2xx answer as an error", async () => {
     const fetchImpl = vi.fn(async () => new Response("blocked", { status: 403 }));
 
@@ -199,7 +211,7 @@ describe("fetchSource", () => {
   });
 
   it("lists every source with an attribution", () => {
-    expect(SOURCES.map(({ slug }) => slug)).toEqual(["hackclub", "hackster", "hackhq"]);
+    expect(SOURCES.map(({ slug }) => slug)).toEqual(["hackclub", "hackster", "hackhq", "openagenda"]);
     expect(SOURCES.every(({ attribution }) => attribution.length > 0)).toBe(true);
   });
 });

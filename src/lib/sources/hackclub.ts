@@ -70,6 +70,5 @@ export const hackClub: Source = {
   url: SOURCE_URL,
   // Hack Club's API page: "If you use it, you must credit “Hack Club Hackathons” with a link".
   attribution: "Hack Club Hackathons",
-  feedUrl: "https://hackathons.hackclub.com/api/events/upcoming",
-  parse: parseHackClub,
+  load: async (fetchBody) => parseHackClub(await fetchBody("https://hackathons.hackclub.com/api/events/upcoming")),
 };

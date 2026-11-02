@@ -84,3 +84,18 @@ test("a malformed event id gives the plain coach, where a typed page link labels
     "https://lagoon-hack.example/rules",
   );
 });
+
+test("a listing whose licence asks for it credits its licensor and last update, on the list and in the coach", async ({ page }) => {
+  await page.goto("/events");
+
+  const card = page.getByRole("listitem").filter({ hasText: "Fictional Hack 09" });
+  await expect(card).toContainText("Listed by Université Fictive on OpenAgenda (Licence Ouverte 2.0), updated 19 Oct 2026");
+  await expect(card.getByRole("link", { name: "Université Fictive" })).toHaveAttribute("href", "https://universite-fictive.example/");
+  await expect(card.getByRole("link", { name: "OpenAgenda (Licence Ouverte 2.0)" })).toHaveAttribute(
+    "href",
+    "https://example.org/listed/09",
+  );
+
+  await card.getByRole("link", { name: "Build my brief for Fictional Hack 09" }).click();
+  await expect(page.getByText("Listed by Université Fictive on OpenAgenda (Licence Ouverte 2.0), updated 19 Oct 2026.")).toBeVisible();
+});
