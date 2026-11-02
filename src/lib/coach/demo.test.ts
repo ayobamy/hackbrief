@@ -63,8 +63,8 @@ describe("cardOf", () => {
     expect(CARDS.map(({ title }) => title)).toEqual([
       "Deadline",
       "Team and prize",
-      "Where the points are",
-      "To hand in",
+      "Judging criteria",
+      "What to submit",
     ]);
     expect(
       (

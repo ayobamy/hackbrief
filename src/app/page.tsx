@@ -37,7 +37,7 @@ const STEPS = [
 const PRINCIPLES = [
   {
     title: "Every number is computed",
-    text: "Weights, dates and days left come from tested code. A language model may one day word a summary; it never makes up a figure.",
+    text: "Weights, dates and countdowns come from tested code. If a language model ever helps phrase a summary, it will never supply a figure.",
   },
   {
     title: "Terms before data",
@@ -45,34 +45,34 @@ const PRINCIPLES = [
   },
   {
     title: "Private by default",
-    text: "Rules you paste are read on the page, in your browser. Nothing is sent to a server, and there is no account to make.",
+    text: "The rules you paste are read in your browser. Nothing is sent to a server, and there is no account to create.",
   },
   {
     title: "Open source",
-    text: "MIT licensed and built in the open: the code, the decisions and the list of sources are all on GitHub.",
+    text: "MIT-licensed and built in the open: the code, the design decisions and the list of sources are all on GitHub.",
   },
 ];
 
 const QUESTIONS = [
   {
     q: "Is hackbrief free?",
-    a: "Yes. It is free, open source under the MIT licence, non-commercial, and needs no account.",
+    a: "Yes. hackbrief is free, non-commercial and open source under the MIT licence, and you don't need an account.",
   },
   {
     q: "Where do the hackathons come from?",
-    a: "From sources whose terms allow it: Hack Club's public API, Hackster's contests feed, HackHQ's open list (organisers' own sites only) and OpenAgenda's public agendas in France and Europe, imported once a day. More join as their terms allow; every listing links to its own page and credits its source.",
+    a: "Only from sources whose terms permit it: Hack Club's public API, Hackster's contest feed, HackHQ's open list (events on organisers' own sites only) and OpenAgenda's public agendas in France and across Europe, refreshed once a day. More sources will join as their terms allow, and every listing links to its official page and credits its source.",
   },
   {
     q: "Does hackbrief keep the rules I paste?",
-    a: "No. The coach reads them in your browser, on the page. Nothing is sent to a server or stored, and the code that does it is public.",
+    a: "No. The coach reads them in your browser. Nothing is sent to a server or stored, and the code that does this is public.",
   },
   {
     q: "Is the advice written by AI?",
-    a: "No. Today every part of the brief, from the weights to the plan, comes from tested code. If a language model is added later, it will only word facts the code has already worked out, and it will be labelled.",
+    a: "No. Every part of the brief, from the weights to the plan, comes from tested code. If a language model is ever added, it will only phrase facts the code has already worked out, and it will be clearly labelled.",
   },
   {
-    q: "What rules can it read?",
-    a: "English rules as Markdown, tables or plain prose, with dates such as 2027-03-14, March 14, 2027 or 14th March 2027. Times are shown as written, not converted between time zones, and anything it could not find is listed for you to check.",
+    q: "What kinds of rules can it read?",
+    a: "Rules written in English, as Markdown, tables or plain text, with dates such as 2027-03-14, March 14, 2027 or 14th March 2027. Times are shown as written rather than converted between time zones, and anything the coach cannot find is flagged for you to check.",
   },
 ];
 
@@ -105,16 +105,16 @@ export default function Home() {
           <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 pt-16 pb-20 sm:px-6 sm:pt-24">
             <div className="flex max-w-3xl flex-col gap-7">
               <p className={`${LABEL} rise-in`}>
-                Open source · for students and early-career developers
+                Free and open source · For students and early-career developers
               </p>
               <h1 className="rise-in text-5xl leading-[0.95] font-semibold tracking-[-0.05em] [animation-delay:80ms] sm:text-7xl lg:text-[5.5rem]">
                 Pick the right hackathon.
                 <span className="block text-muted">Then play to win.</span>
               </h1>
               <p className="rise-in max-w-xl text-lg leading-8 text-muted [animation-delay:160ms]">
-                hackbrief lists hackathons from the sources that allow it, and turns
-                any event&apos;s rules into a plan: when it closes, what to hand
-                in, and where the judges&apos; points are.
+                hackbrief finds upcoming hackathons and turns any event&apos;s
+                rules into a one-page plan: when entries close, what to submit
+                and how the judges will score your project.
               </p>
               <div className="rise-in flex flex-wrap gap-3 [animation-delay:240ms]">
                 <Link href="/coach" className={PRIMARY}>
@@ -140,7 +140,7 @@ export default function Home() {
         >
           <div className="mx-auto mb-8 flex w-full max-w-6xl flex-col gap-2 px-4 sm:flex-row sm:items-end sm:justify-between sm:px-6">
             <h2 id="platforms-heading" className={LABEL}>
-              {PLATFORMS.length} platforms&apos; terms read before a single
+              {PLATFORMS.length} platforms&apos; terms reviewed before a single
               listing was collected
             </h2>
             <a
@@ -175,15 +175,15 @@ export default function Home() {
               className="flex flex-col gap-6 self-end text-lg leading-8 text-muted"
             >
               <p>
-                Every hackathon hides what matters in its own rules page: who
-                can enter, how big a team can be, what to hand in, and how the
-                judges will score it. Most people skim, build the wrong thing
-                well, and miss a required video.
+                Every hackathon buries the essentials in its rules: who can
+                enter, how large a team can be, what to submit and how the
+                judges will score it. Most entrants skim, build the wrong thing
+                well, and miss a required demo video.
               </p>
               <p className="text-ink">
-                hackbrief reads the rules for you and hands back one page: the
-                deadline counted down, the checklist, and the judging weights
-                turned into where to spend your hours.
+                hackbrief reads the rules for you and returns a single page: a
+                countdown to the deadline, a submission checklist, and the
+                judging weights turned into where to spend your time.
               </p>
             </Reveal>
           </div>
@@ -195,7 +195,7 @@ export default function Home() {
             <Reveal className="mb-16 flex max-w-2xl flex-col gap-4">
               <p className={LABEL}>How it works</p>
               <h2 id="how-heading" className={H2}>
-                From ten pages of rules to one page of plan.
+                From ten pages of rules to a one-page plan.
               </h2>
             </Reveal>
             <div className="grid grid-cols-1 gap-16 lg:grid-cols-[180px_minmax(0,1fr)]">
@@ -211,10 +211,10 @@ export default function Home() {
                       Find
                     </h3>
                     <p className="leading-7 text-muted">
-                      Upcoming hackathons in one list, filtered by format and
-                      source, each linked to its own page and to where hackbrief
-                      found it. Imported daily from {SOURCES.length} sources
-                      whose terms allow it.
+                      Upcoming hackathons in one list. Filter by format or
+                      source, and follow each event to its official page or to
+                      the source that listed it. Updated daily from
+                      {SOURCES.length} sources whose terms permit it.
                     </p>
                     <Link
                       href="/events"
@@ -239,9 +239,9 @@ export default function Home() {
                       Read
                     </h3>
                     <p className="leading-7 text-muted">
-                      Paste any hackathon&apos;s rules. hackbrief pulls out the
-                      deadline, who can enter, the team size and exactly what to
-                      hand in, and quotes the line each one came from.
+                      Paste the rules of any hackathon. hackbrief picks out the
+                      deadline, eligibility, team size and exactly what to
+                      submit, and cites the line each detail came from.
                     </p>
                   </Reveal>
                   <Reveal delay={120}>
@@ -258,9 +258,9 @@ export default function Home() {
                       Plan
                     </h3>
                     <p className="leading-7 text-muted">
-                      The deadline becomes a prep plan, counted back from the
-                      day the hacking starts to the hour you submit, with the
-                      finishing work your checklist asks for.
+                      hackbrief turns the dates into a preparation plan, counted
+                      back from the day hacking starts to the moment you submit,
+                      including the finishing tasks your checklist calls for.
                     </p>
                   </Reveal>
                   <Reveal delay={120}>
@@ -279,14 +279,14 @@ export default function Home() {
         >
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 py-24 sm:px-6">
             <Reveal className="flex max-w-2xl flex-col gap-4">
-              <p className={LABEL}>Try the strategy</p>
+              <p className={LABEL}>Try it yourself</p>
               <h2 id="playground-heading" className={H2}>
                 Move the judging weights. Watch the advice change.
               </h2>
               <p className="text-lg leading-8 text-muted">
-                This is the coach&apos;s own code: weights are scaled to whole
-                percentages that add up to 100, and each criterion gets its
-                focus.
+                This runs the coach&apos;s own code: weights are scaled to whole
+                percentages that total 100, and each criterion gets advice
+                matched to its share of the score.
               </p>
             </Reveal>
             <Reveal delay={120}>
@@ -309,11 +309,11 @@ export default function Home() {
               {[
                 {
                   value: PLATFORMS.length,
-                  label: "platforms whose terms were read",
+                  label: "platforms' terms reviewed",
                 },
-                { value: count("use"), label: "allow it, so hackbrief uses them" },
-                { value: count("ask"), label: "asked for permission first" },
-                { value: SOURCES.length, label: "sources imported every day" },
+                { value: count("use"), label: "allow reuse, so hackbrief uses them" },
+                { value: count("ask"), label: "need permission first" },
+                { value: SOURCES.length, label: "sources imported daily" },
               ].map((figure) => (
                 <li
                   key={figure.label}
@@ -364,9 +364,9 @@ export default function Home() {
         <section aria-labelledby="faq-heading" className="border-b border-line">
           <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
             <Reveal className="flex flex-col gap-4">
-              <p className={LABEL}>Questions</p>
+              <p className={LABEL}>FAQ</p>
               <h2 id="faq-heading" className={H2}>
-                Asked, and answered plainly.
+                Straight answers to common questions.
               </h2>
             </Reveal>
             <div className="flex flex-col">

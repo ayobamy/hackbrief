@@ -120,10 +120,10 @@ export const PLATFORMS: readonly Platform[] = [
 ];
 
 export const VERDICT_LABELS: Readonly<Record<Verdict, string>> = {
-  use: "Used",
-  care: "Usable with care",
-  ask: "Asked first",
-  link: "Linked to only",
+  use: "In use",
+  care: "Allowed with conditions",
+  ask: "Permission needed",
+  link: "Linked, not collected",
   "do-not-collect": "Not collected",
 };
 

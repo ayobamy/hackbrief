@@ -232,7 +232,7 @@ export function RulesDemo() {
           ))}
         </div>
         <span className={`${LABEL} hidden pb-3 sm:inline`}>
-          Brief {index + 1} of {SAMPLES.length}, read in your browser
+          Sample {index + 1} of {SAMPLES.length}, read in your browser
         </span>
       </div>
 
@@ -245,7 +245,7 @@ export function RulesDemo() {
         <div className="hidden md:block">
           <div className="flex items-baseline justify-between px-6 pt-5 pb-3">
             <span className={LABEL}>The rules, as pasted</span>
-            <span className={LABEL}>Fictional</span>
+            <span className={LABEL}>Fictional event</span>
           </div>
           <pre
             ref={rulesRef}
@@ -319,7 +319,7 @@ export function RulesDemo() {
             })}
           </ol>
           <p className="mt-3 hidden text-xs text-muted md:block">
-            Point at a part of the brief to see the lines it came from.
+            Hover over or select any part of the brief to highlight the lines it came from.
           </p>
         </div>
       </div>

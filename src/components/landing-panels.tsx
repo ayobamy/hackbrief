@@ -44,14 +44,14 @@ export async function UpcomingPreview() {
   return (
     <Sheet>
       <div className="flex items-baseline justify-between border-b border-line px-5 py-3">
-        <span className={LABEL}>Upcoming now</span>
+        <span className={LABEL}>Coming up</span>
         <span className="text-sm text-muted">
           <CountUp value={events.length} className="font-semibold text-ink" /> hackathons
         </span>
       </div>
       {events.length === 0 ? (
         <p className="px-5 py-6 text-sm leading-6 text-muted">
-          The list fills from the daily import of the sources that allow it.{" "}
+          New hackathons are added every day.{" "}
           <Link href="/events" className="text-ink underline underline-offset-4">
             See the list
           </Link>
@@ -126,15 +126,15 @@ export function ReadPanel() {
       value: `${formatDate(deadline.date)}${deadline.time ? `, ${deadline.time}` : ""}`,
     },
     team && { from: team.source, label: "Team", value: formatTeamSize(team) },
-    top && { from: `${top.name} (${top.stated}%)`, label: "Criterion", value: `${top.name}, ${top.weight}% of the score` },
-    video && { from: video.source, label: "To hand in", value: video.label },
+    top && { from: `${top.name} (${top.stated}%)`, label: "Top criterion", value: `${top.name}, ${top.weight}% of the score` },
+    video && { from: video.source, label: "To submit", value: video.label },
   ].filter((row): row is { from: string; label: string; value: string } => Boolean(row));
 
   return (
     <Sheet>
       <div className="hidden grid-cols-2 border-b border-line sm:grid">
         <span className={`${LABEL} border-r border-line px-5 py-3`}>In the rules</span>
-        <span className={`${LABEL} px-5 py-3`}>What hackbrief reads</span>
+        <span className={`${LABEL} px-5 py-3`}>What hackbrief finds</span>
       </div>
       <ol className="divide-y divide-line">
         {rows.map((row, position) => (

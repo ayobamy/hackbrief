@@ -12,8 +12,8 @@ export type Tag =
 export const CARDS: ReadonlyArray<{ title: string; tags: readonly Tag[] }> = [
   { title: "Deadline", tags: ["deadline"] },
   { title: "Team and prize", tags: ["team", "who can enter", "prize"] },
-  { title: "Where the points are", tags: ["criterion"] },
-  { title: "To hand in", tags: ["to hand in"] },
+  { title: "Judging criteria", tags: ["criterion"] },
+  { title: "What to submit", tags: ["to hand in"] },
 ];
 
 /** The index in CARDS of the card that explains a tagged line. */
