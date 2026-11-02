@@ -1,0 +1,30 @@
+# Secrets and local settings
+.env
+.env.*
+!.env.example
+
+# Dependencies and builds
+node_modules/
+.next/
+dist/
+build/
+coverage/
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+
+# Claude session state: memory, plans and audits stay on this machine
+.claude/memory/
+.claude/plans/
+.claude/audits/
+.claude/sessions/
+.claude/.local/
+.claude/settings.local.json
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store
