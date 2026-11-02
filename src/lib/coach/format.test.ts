@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatAmount, formatDate, formatDaysLeft, formatTeam } from "./format";
+import { formatAmount, formatDate, formatDaysLeft, formatLongDate, formatTeam } from "./format";
 
 describe("formatDate", () => {
   it("shows the date as written, whatever the viewer's time zone", () => {
@@ -43,5 +43,12 @@ describe("formatTeam", () => {
     [{ min: null, max: 4, soloAllowed: null }, "Up to 4 people; solo entry not mentioned"],
   ])("%j reads %s", (team, text) => {
     expect(formatTeam({ ...base, ...team })).toBe(text);
+  });
+});
+
+describe("formatLongDate", () => {
+  it("writes the date out in full, as a printed brief would, with no time-zone shift", () => {
+    expect(formatLongDate("2027-03-14")).toBe("Sunday 14 March 2027");
+    expect(formatLongDate("2027-01-01")).toBe("Friday 1 January 2027");
   });
 });

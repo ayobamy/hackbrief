@@ -18,13 +18,9 @@ export default function EventsPage({ searchParams }: PageProps<"/events">) {
       <SiteHeader />
       <main id="main" className="flex flex-1 flex-col">
         <header className="relative overflow-hidden border-b border-line">
-          <div
-            className="dot-grid pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,black_10%,transparent_90%)]"
-            aria-hidden="true"
-          />
           <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 pt-14 pb-12 sm:px-6">
             <p className="font-mono text-[11px] tracking-[0.14em] text-muted uppercase">Hackathons</p>
-            <h1 className="text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Upcoming hackathons</h1>
+            <h1 className="text-5xl tracking-[-0.02em] sm:text-6xl">Upcoming hackathons</h1>
             <p className="max-w-2xl leading-7 text-muted">
               From the sources whose terms let hackbrief list them, updated daily. Each one links to its own page
               and to where hackbrief found it. Found one you like?{" "}

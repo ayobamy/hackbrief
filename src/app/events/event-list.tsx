@@ -24,7 +24,8 @@ import { getEvents } from "./data";
 import { PageKeys } from "./page-keys";
 
 const FOCUS_RING = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
-const CARD = "rounded-2xl border border-line bg-panel shadow-card";
+const CARD = "border border-line bg-panel";
+const TAG = "font-mono text-[10.5px] tracking-[0.1em] uppercase";
 
 // Event and source URLs are checked when they are imported; links are drawn only for http(s) as well.
 function isWebUrl(url: string): boolean {
@@ -41,12 +42,12 @@ function Chip({ href, active, count, children }: { href: string; active: boolean
       href={href}
       scroll={false}
       aria-current={active ? "page" : undefined}
-      className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm transition-colors ${FOCUS_RING} ${
+      className={`inline-flex items-center gap-2 border px-3 py-1.5 text-sm transition-colors ${FOCUS_RING} ${
         active ? "border-ink bg-ink text-paper" : "border-line bg-panel hover:border-ink/40"
       }`}
     >
       {children}
-      <span className={`rounded-full px-1.5 text-xs tabular-nums ${active ? "bg-paper/20" : "bg-line/70 text-muted"}`}>
+      <span className={`font-mono text-[11px] tabular-nums ${active ? "text-paper/70" : "text-muted"}`}>
         {count}
         <span className="sr-only">{count === 1 ? " hackathon" : " hackathons"}</span>
       </span>
@@ -95,24 +96,14 @@ function Filters({ current, facets }: { current: EventFilters; facets: Facets })
 }
 
 const TIMING_STYLE: Readonly<Record<Timing["kind"], string>> = {
-  live: "bg-accent/15 text-ink",
+  live: "bg-accent/25 text-ink",
   soon: "bg-accent/10 text-ink",
-  later: "border border-line text-muted",
-  tba: "border border-dashed border-line text-muted",
+  later: "text-muted",
+  tba: "text-muted",
 };
 
 function TimingBadge({ when }: { when: Timing }) {
-  return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs ${TIMING_STYLE[when.kind]}`}>
-      {when.kind === "live" ? (
-        <span className="relative flex size-1.5" aria-hidden="true">
-          <span className="absolute inline-flex size-full rounded-full bg-accent opacity-70 motion-safe:animate-ping" />
-          <span className="relative inline-flex size-1.5 rounded-full bg-accent" />
-        </span>
-      ) : null}
-      {when.label}
-    </span>
-  );
+  return <span className={`${TAG} px-1.5 py-0.5 ${TIMING_STYLE[when.kind]}`}>{when.label}</span>;
 }
 
 function ExternalArrow() {
@@ -131,24 +122,24 @@ function EventCard({ event, today }: { event: EventListing; today: string }) {
   return (
     <li>
       <article
-        className={`${CARD} group relative flex h-full flex-col gap-4 p-5 transition duration-300 motion-reduce:transition-none ${
-          linked ? "hover:-translate-y-0.5 hover:border-ink/25 motion-reduce:hover:translate-y-0" : ""
+        className={`${CARD} group relative flex h-full flex-col gap-4 p-5 transition-colors duration-300 motion-reduce:transition-none ${
+          linked ? "hover:border-ink/40" : ""
         }`}
       >
         <div className="flex items-start justify-between gap-3">
           <DateTile startsOn={event.startsOn} />
           <div className="flex flex-wrap justify-end gap-1.5">
             {event.format ? (
-              <span className="rounded-full border border-line px-2.5 py-0.5 text-xs">{FORMAT_LABELS[event.format]}</span>
+              <span className={`${TAG} border border-line px-1.5 py-0.5`}>{FORMAT_LABELS[event.format]}</span>
             ) : null}
             <TimingBadge when={when} />
           </div>
         </div>
         <div className="flex flex-col gap-1.5">
-          <h3 className="text-base leading-snug font-semibold tracking-[-0.01em]">
+          <h3 className="text-xl leading-snug">
             {linked ? (
               // The link covers the whole card; the source credit below stays its own link above it.
-              <a href={event.url} className={`rounded-sm after:absolute after:inset-0 after:rounded-2xl ${FOCUS_RING}`}>
+              <a href={event.url} className={`after:absolute after:inset-0 ${FOCUS_RING}`}>
                 {event.name}
                 <ExternalArrow />
               </a>
@@ -187,7 +178,7 @@ function EventCard({ event, today }: { event: EventListing; today: string }) {
 }
 
 function PagerEnd({ href, rel, children }: { href: string | null; rel: "prev" | "next"; children: ReactNode }) {
-  const style = "inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm";
+  const style = "inline-flex items-center gap-1.5 border px-4 py-2 text-sm";
   if (!href) {
     return (
       <span aria-disabled="true" className={`${style} border-line text-muted/60`}>
@@ -228,7 +219,7 @@ function Pager({ page, pageCount, href }: { page: number; pageCount: number; hre
                   scroll={false}
                   aria-label={`Page ${number}`}
                   aria-current={number === page ? "page" : undefined}
-                  className={`flex size-9 items-center justify-center rounded-full text-sm tabular-nums transition-colors ${FOCUS_RING} ${
+                  className={`flex size-9 items-center justify-center font-serif text-[17px] tabular-nums transition-colors ${FOCUS_RING} ${
                     number === page ? "bg-ink text-paper" : "text-muted hover:bg-line/60 hover:text-ink"
                   }`}
                 >
@@ -243,8 +234,8 @@ function Pager({ page, pageCount, href }: { page: number; pageCount: number; hre
         </PagerEnd>
       </div>
       <p className="hidden text-xs text-muted pointer-fine:block">
-        Or press <kbd className="rounded border border-line bg-panel px-1.5 py-0.5 font-mono">←</kbd> and{" "}
-        <kbd className="rounded border border-line bg-panel px-1.5 py-0.5 font-mono">→</kbd> to turn the pages.
+        Or press <kbd className="border border-line bg-panel px-1.5 py-0.5 font-mono">←</kbd> and{" "}
+        <kbd className="border border-line bg-panel px-1.5 py-0.5 font-mono">→</kbd> to turn the pages.
       </p>
     </nav>
   );
@@ -317,10 +308,10 @@ export async function EventList({
       ) : (
         groupByMonth(shown.items, today).map((group) => (
           <section key={group.key} aria-labelledby={`month-${group.key}`} className="flex flex-col gap-4">
-            <h2 id={`month-${group.key}`} className="flex items-baseline gap-3 text-lg font-semibold tracking-[-0.02em]">
+            <h2 id={`month-${group.key}`} className="flex items-baseline gap-3 border-b border-line pb-2 text-2xl">
               {group.label}
               {/* Only for the eye: screen readers already announce how many items each list holds. */}
-              <span className="text-sm font-normal text-muted" aria-hidden="true">
+              <span className="font-mono text-xs text-muted" aria-hidden="true">
                 {group.events.length}
               </span>
             </h2>

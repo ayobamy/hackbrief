@@ -37,10 +37,27 @@ tokens (`bg-paper`, `text-ink`, `text-muted`, `border-line`, `bg-panel`, `bg-acc
 `src/lib/brand-tokens.ts` repeats the light values for the generated images, which cannot read CSS
 variables; change both together.
 
-## Type
+## Type and layout
 
-Geist for everything, Geist Mono for small upper-case labels. Headlines are semibold with tight
-tracking (about -0.045em at display sizes).
+hackbrief is set like a printed brief (issue #29), not like a generic web app.
+
+- **Newsreader** (serif, with optical sizes) for headings, figures and key facts such as a
+  deadline or a weight. Medium weight, close to normal tracking; the second line of the hero is
+  italic.
+- **IBM Plex Sans** for running text and controls.
+- **IBM Plex Mono** for small upper-case labels, tags, footnote numbers and pasted rules.
+
+All three are under the SIL Open Font License, loaded with `next/font`. Headings get the serif from
+one base rule in `src/app/globals.css`.
+
+Panels are flat sheets with square corners and hairline borders, built from `src/components/sheet.tsx`:
+no shadows, rounded cards, pills, dotted canvases or glows. Lists use dotted leaders between a name
+and its figure, and bars are two pixels of ink. Orange is used only as highlighter ink (marked lines
+of the rules, the tab underline, the selected time label), never for text. Footnote numbers tie each
+highlighted line of the rules to its part of the brief.
+
+Motion stays small and optional: lines rise in, bars grow, and the coach reads through a sample once.
+All of it stops under `prefers-reduced-motion`.
 
 ## Voice
 

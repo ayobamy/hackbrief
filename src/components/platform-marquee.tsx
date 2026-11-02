@@ -28,7 +28,7 @@ function Row({ hidden = false }: { hidden?: boolean }) {
           className="flex items-center gap-2 whitespace-nowrap text-sm text-muted"
         >
           <span
-            className={`size-2 shrink-0 rounded-full ${DOT[platform.verdict]}`}
+            className={`size-2 shrink-0 ${DOT[platform.verdict]}`}
             aria-hidden="true"
           />
           <span>{platform.name}</span>
@@ -61,7 +61,7 @@ export function PlatformMarquee() {
         <button
           type="button"
           onClick={() => setPaused((value) => !value)}
-          className="rounded-md border border-line px-2.5 py-1 font-mono uppercase tracking-[0.12em] hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="border border-line px-2.5 py-1 font-mono uppercase tracking-[0.12em] hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           {/* The label says what a press does next, so the button carries no pressed state. */}
           {paused ? "Play" : "Pause"}
@@ -70,7 +70,7 @@ export function PlatformMarquee() {
         {(Object.keys(VERDICT_LABELS) as Verdict[]).map((verdict) => (
           <span key={verdict} className="flex items-center gap-1.5">
             <span
-              className={`size-2 rounded-full ${DOT[verdict]}`}
+              className={`size-2 ${DOT[verdict]}`}
               aria-hidden="true"
             />
             {VERDICT_LABELS[verdict]}

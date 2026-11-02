@@ -7,7 +7,6 @@ import {
   UpcomingPreview,
   UpcomingSkeleton,
 } from "@/components/landing-panels";
-import { CARD } from "@/components/canvas";
 import { CountUp } from "@/components/motion/count-up";
 import { Reveal } from "@/components/motion/reveal";
 import { PlatformMarquee } from "@/components/platform-marquee";
@@ -22,10 +21,9 @@ import { SOURCES } from "@/lib/sources";
 const LABEL = "font-mono text-[11px] uppercase tracking-[0.14em] text-muted";
 const FOCUS =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
-const PRIMARY = `inline-flex items-center gap-2 rounded-md bg-ink px-5 py-3 text-sm font-medium text-paper transition-opacity hover:opacity-90 ${FOCUS}`;
-const SECONDARY = `inline-flex items-center gap-2 rounded-md border border-line bg-panel px-5 py-3 text-sm font-medium transition-colors hover:border-ink ${FOCUS}`;
-const H2 =
-  "text-3xl leading-[1.05] font-semibold tracking-[-0.035em] sm:text-5xl";
+const PRIMARY = `inline-flex items-center gap-2 bg-ink px-5 py-3 text-sm font-medium text-paper transition-opacity hover:opacity-90 ${FOCUS}`;
+const SECONDARY = `inline-flex items-center gap-2 border border-line bg-panel px-5 py-3 text-sm font-medium transition-colors hover:border-ink ${FOCUS}`;
+const H2 = "text-3xl leading-[1.08] tracking-[-0.015em] sm:text-5xl";
 
 const STEPS = [
   { id: "find", label: "Find" },
@@ -99,22 +97,14 @@ export default function Home() {
       <main id="main" className="flex flex-1 flex-col">
         {/* Hero: the promise, then the coach itself, running. */}
         <section className="relative overflow-hidden border-b border-line">
-          <div
-            className="dot-grid pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,black_20%,transparent_75%)]"
-            aria-hidden="true"
-          />
-          <div
-            className="glow-drift pointer-events-none absolute top-[38%] left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-accent/[0.08] blur-3xl"
-            aria-hidden="true"
-          />
           <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 pt-16 pb-20 sm:px-6 sm:pt-24">
             <div className="flex max-w-3xl flex-col gap-7">
               <p className={`${LABEL} rise-in`}>
                 Open source · for students and early-career developers
               </p>
-              <h1 className="rise-in text-5xl leading-[0.95] font-semibold tracking-[-0.05em] [animation-delay:80ms] sm:text-7xl lg:text-[5.5rem]">
+              <h1 className="rise-in text-5xl leading-[0.98] tracking-[-0.02em] [animation-delay:80ms] sm:text-7xl lg:text-[5.75rem]">
                 Pick the right hackathon.
-                <span className="block text-muted">Then play to win.</span>
+                <span className="block text-muted italic">Then play to win.</span>
               </h1>
               <p className="rise-in max-w-xl text-lg leading-8 text-muted [animation-delay:160ms]">
                 hackbrief lists hackathons from the sources that allow it, and turns
@@ -211,7 +201,7 @@ export default function Home() {
                 >
                   <Reveal className="flex flex-col gap-3">
                     <span className="font-mono text-sm text-muted">01</span>
-                    <h3 className="text-2xl font-semibold tracking-[-0.02em]">
+                    <h3 className="text-[28px] leading-tight">
                       Find
                     </h3>
                     <p className="leading-7 text-muted">
@@ -239,7 +229,7 @@ export default function Home() {
                 >
                   <Reveal className="flex flex-col gap-3">
                     <span className="font-mono text-sm text-muted">02</span>
-                    <h3 className="text-2xl font-semibold tracking-[-0.02em]">
+                    <h3 className="text-[28px] leading-tight">
                       Read
                     </h3>
                     <p className="leading-7 text-muted">
@@ -258,7 +248,7 @@ export default function Home() {
                 >
                   <Reveal className="flex flex-col gap-3">
                     <span className="font-mono text-sm text-muted">03</span>
-                    <h3 className="text-2xl font-semibold tracking-[-0.02em]">
+                    <h3 className="text-[28px] leading-tight">
                       Plan
                     </h3>
                     <p className="leading-7 text-muted">
@@ -308,7 +298,8 @@ export default function Home() {
             <h2 id="numbers-heading" className="sr-only">
               hackbrief in numbers
             </h2>
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Hairline rules between the figures: one-pixel gaps over the line colour. */}
+            <ul className="grid gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
               {[
                 {
                   value: PLATFORMS.length,
@@ -320,15 +311,11 @@ export default function Home() {
               ].map((figure) => (
                 <li
                   key={figure.label}
-                  className={`${CARD} relative flex flex-col gap-3 p-7`}
+                  className="flex flex-col gap-2 bg-paper p-7"
                 >
-                  <span
-                    className="absolute top-6 right-6 size-2 rounded-full bg-accent"
-                    aria-hidden="true"
-                  />
                   <CountUp
                     value={figure.value}
-                    className="text-5xl font-semibold tracking-[-0.04em]"
+                    className="font-serif text-6xl tracking-[-0.02em]"
                   />
                   <span className="text-sm text-muted">{figure.label}</span>
                 </li>
@@ -356,7 +343,7 @@ export default function Home() {
                     delay={index * 80}
                     className="flex flex-col gap-3 border-t border-ink pt-5"
                   >
-                    <h3 className="text-lg font-semibold tracking-[-0.02em]">
+                    <h3 className="text-2xl">
                       {principle.title}
                     </h3>
                     <p className="leading-7 text-muted">{principle.text}</p>
@@ -383,7 +370,7 @@ export default function Home() {
                   className="group border-b border-line py-5 first:border-t"
                 >
                   <summary
-                    className={`flex cursor-pointer list-none items-center justify-between gap-6 rounded-sm text-lg font-medium ${FOCUS}`}
+                    className={`flex cursor-pointer list-none items-center justify-between gap-6 font-serif text-xl ${FOCUS}`}
                   >
                     {item.q}
                     <span
@@ -405,34 +392,30 @@ export default function Home() {
           aria-labelledby="cta-heading"
           className="relative overflow-hidden bg-ink text-paper"
         >
-          <div
-            className="glow-drift pointer-events-none absolute -right-40 -bottom-40 h-[420px] w-[620px] rounded-full bg-accent/25 blur-3xl"
-            aria-hidden="true"
-          />
           <div className="relative mx-auto flex w-full max-w-6xl flex-col items-start gap-10 px-4 py-28 sm:px-6">
             <h2
               id="cta-heading"
-              className="max-w-4xl text-5xl leading-[0.98] font-semibold tracking-[-0.05em] sm:text-7xl"
+              className="max-w-4xl text-5xl leading-[1.02] tracking-[-0.02em] sm:text-7xl"
             >
               Your next hackathon starts with the rules.
             </h2>
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/coach"
-                className={`inline-flex items-center gap-2 rounded-md bg-paper px-5 py-3 text-sm font-medium text-ink transition-opacity hover:opacity-90 ${FOCUS}`}
+                className={`inline-flex items-center gap-2 bg-paper px-5 py-3 text-sm font-medium text-ink transition-opacity hover:opacity-90 ${FOCUS}`}
               >
                 Open the coach
                 <Arrow />
               </Link>
               <Link
                 href="/events"
-                className={`inline-flex items-center gap-2 rounded-md border border-paper/30 px-5 py-3 text-sm font-medium transition-colors hover:border-paper ${FOCUS}`}
+                className={`inline-flex items-center gap-2 border border-paper/30 px-5 py-3 text-sm font-medium transition-colors hover:border-paper ${FOCUS}`}
               >
                 Browse hackathons
               </Link>
               <a
                 href={REPOSITORY_URL}
-                className={`inline-flex items-center gap-2 rounded-md px-5 py-3 text-sm font-medium text-paper transition-opacity hover:opacity-80 ${FOCUS}`}
+                className={`inline-flex items-center gap-2 px-5 py-3 text-sm font-medium text-paper transition-opacity hover:opacity-80 ${FOCUS}`}
               >
                 Star it on GitHub
               </a>
