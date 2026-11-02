@@ -9,7 +9,7 @@ import { EventList, EventListSkeleton } from "./event-list";
 
 export const metadata: Metadata = {
   title: "Upcoming hackathons",
-  description: "Upcoming hackathons from sources whose terms allow hackr to list them, soonest first.",
+  description: "Upcoming hackathons from sources whose terms allow hackbrief to list them, soonest first.",
 };
 
 export default function EventsPage({ searchParams }: PageProps<"/events">) {
@@ -26,8 +26,8 @@ export default function EventsPage({ searchParams }: PageProps<"/events">) {
             <p className="font-mono text-[11px] tracking-[0.14em] text-muted uppercase">Hackathons</p>
             <h1 className="text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Upcoming hackathons</h1>
             <p className="max-w-2xl leading-7 text-muted">
-              From the sources whose terms let hackr list them, updated daily. Each one links to its own page
-              and to where hackr found it. Found one you like?{" "}
+              From the sources whose terms let hackbrief list them, updated daily. Each one links to its own page
+              and to where hackbrief found it. Found one you like?{" "}
               <Link href="/coach" className="font-medium text-ink underline underline-offset-4">
                 Paste its rules into the coach
               </Link>

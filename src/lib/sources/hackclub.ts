@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { EventFormat, ParseResult, Source, SourceEvent } from "./types";
 import { canonicalUrl, dateOnly, textOrNull } from "./url";
 
-// The documented API at https://hackathons.hackclub.com/data; fields hackr does not use are ignored.
+// The documented API at https://hackathons.hackclub.com/data; fields hackbrief does not use are ignored.
 const HackClubEvent = z.object({
   id: z.string().min(1),
   name: z.string().min(1),

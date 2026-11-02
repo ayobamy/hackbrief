@@ -23,7 +23,7 @@ describe("the platform catalogue", () => {
     expect(new Set(names)).toEqual(platformsInDocs());
   });
 
-  it("keeps the verdicts recorded in the docs for platforms hackr uses or refuses", () => {
+  it("keeps the verdicts recorded in the docs for platforms hackbrief uses or refuses", () => {
     const verdict = (name: string) => PLATFORMS.find((platform) => platform.name === name)?.verdict;
 
     expect(verdict("Hack Club Hackathons")).toBe("use");

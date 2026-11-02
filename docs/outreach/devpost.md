@@ -2,17 +2,17 @@
 
 A draft for Ahmed to send to `support@devpost.com`, the contact in section 20 of Devpost's
 [Terms of Service](https://info.devpost.com/terms). Devpost's terms forbid scraping (section 4) and
-reuse of Devpost content without written consent (section 7A), so hackr does not collect from
+reuse of Devpost content without written consent (section 7A), so hackbrief does not collect from
 Devpost until this is answered ([sources.md](../sources.md)). Record the reply there.
 
 ---
 
-**Subject:** Permission request: hackathon listings for hackr, an open-source hackathon guide for
+**Subject:** Permission request: hackathon listings for hackbrief, an open-source hackathon guide for
 students
 
 Hello Devpost team,
 
-I maintain hackr (<https://github.com/ayobamy/hackr>), a free, open-source (MIT) tool that helps
+I maintain hackbrief (<https://github.com/ayobamy/hackbrief>), a free, open-source (MIT) tool that helps
 students and early-career developers choose hackathons and prepare for them. Its first feature
 reads a hackathon's rules and turns the judging criteria into a plan; you can try it at
 <https://hackr-mauve.vercel.app/coach>. It is non-commercial.
@@ -36,5 +36,5 @@ Would Devpost allow this, or is there a better route? I am happy to share more d
 
 Kind regards,
 Ahmed Olawale
-Maintainer, hackr
-<https://github.com/ayobamy/hackr>
+Maintainer, hackbrief
+<https://github.com/ayobamy/hackbrief>

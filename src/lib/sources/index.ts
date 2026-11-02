@@ -6,9 +6,9 @@ import type { Source } from "./types";
 /** The sources the daily import reads, each recorded in docs/sources.md under "Use now". */
 export const SOURCES: readonly Source[] = [hackClub, hackster, hackHq];
 
-export const USER_AGENT = "hackr/0.1 (+https://github.com/ayobamy/hackr)";
+export const USER_AGENT = "hackbrief/0.1 (+https://github.com/ayobamy/hackbrief)";
 
-/** Fetches a source with hackr's user agent and a time limit; any non-2xx answer is an error. */
+/** Fetches a source with hackbrief's user agent and a time limit; any non-2xx answer is an error. */
 export async function fetchSource(
   url: string,
   { timeoutMs = 15_000, fetchImpl = fetch }: { timeoutMs?: number; fetchImpl?: typeof fetch } = {},

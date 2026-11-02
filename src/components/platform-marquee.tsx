@@ -39,7 +39,7 @@ function Row({ hidden = false }: { hidden?: boolean }) {
   );
 }
 
-/** Every platform whose terms hackr read, scrolling past, with a control to pause it (WCAG 2.2.2). */
+/** Every platform whose terms hackbrief read, scrolling past, with a control to pause it (WCAG 2.2.2). */
 export function PlatformMarquee() {
   // The button's choice and the pointer resting on the band each pause it, separately.
   const [paused, setPaused] = useState(false);

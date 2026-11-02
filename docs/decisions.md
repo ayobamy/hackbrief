@@ -1,6 +1,6 @@
 # Decisions
 
-What has been decided for hackr, when, and why. Newest decisions go at the end; a decision that
+What has been decided for hackbrief, when, and why. Newest decisions go at the end; a decision that
 changes keeps its entry, with a note pointing at the one that replaces it.
 
 ## D1. Data route: the paste-the-rules coach first
@@ -44,7 +44,7 @@ changes keeps its entry, with a note pointing at the one that replaces it.
   - [Neon Free](https://neon.com/docs/introduction/plans): "1 GB of Postgres storage per
     project", "100 CU-hours/project/month", and compute scales to zero after 5 minutes idle,
     which cannot be disabled, so the first request after a pause is slower.
-- **Consequences:** hackr stays non-commercial on Hobby. Taking money in any form (sponsored
+- **Consequences:** hackbrief stays non-commercial on Hobby. Taking money in any form (sponsored
   listings, paid tiers, ads) means moving to Vercel Pro first. The database itself is in D8.
 
 ## D5. Language model: none in the first coach; free OpenRouter models later
@@ -76,7 +76,7 @@ changes keeps its entry, with a note pointing at the one that replaces it.
 
 - **Decided:** 2 November 2026, by Ahmed.
 - **Decision:** no accounts. The coach works without signing in. Neon Auth is switched on in the
-  database (D8) so it is ready, but hackr shows no sign-in until this decision is revisited.
+  database (D8) so it is ready, but hackbrief shows no sign-in until this decision is revisited.
 - **Revisit when:** saved profiles and the fit score arrive (START-HERE, step 6).
 
 ## D7. Scaffold defaults
@@ -115,7 +115,7 @@ changes keeps its entry, with a note pointing at the one that replaces it.
 ## D8. The Neon database
 
 - **Decided:** 2 November 2026, by Ahmed, within D4.
-- **Decision:** one Neon database for hackr, created from Vercel's Neon integration, which bills
+- **Decision:** one Neon database for hackbrief, created from Vercel's Neon integration, which bills
   through Vercel; Ahmed's Neon account is the Vercel-managed kind. Choices made at creation:
   - **Region:** Washington, D.C. (`aws-us-east-1`), next to Vercel's default region for
     functions.
@@ -126,7 +126,7 @@ changes keeps its entry, with a note pointing at the one that replaces it.
     is on now to keep live updates possible later. Neither is used in the first version (D6).
   - **Postgres version:** 18 (18.6), Neon's default for new projects; local work and CI match it
     (D7).
-  - **Vercel project:** `hackr`, connected to the database for Production and Preview, with a
+  - **Vercel project:** `hackbrief`, connected to the database for Production and Preview, with a
     database branch per preview deployment and none for production deployments. Vercel's GitHub
     app already deploys this repository: pull request #6 got a public deployment at
     <https://hackr-mauve.vercel.app> on 2 November 2026, whose `/api/health` reached the database
@@ -154,3 +154,21 @@ changes keeps its entry, with a note pointing at the one that replaces it.
   (`.github/workflows/neon-preview-cleanup.yml`), once the repository has the `NEON_API_KEY`
   secret and the `NEON_PROJECT_ID` variable. The six left by earlier pull requests were deleted
   by hand on 2 November 2026.
+
+## D9. The name: hackbrief
+
+- **Decided:** 2 November 2026, by Ahmed.
+- **Decision:** the project, the site and the repository are called **hackbrief**; until then they
+  were called hackr. The "h" mark stays.
+- **Why:** "hackr" is already the name of [Hackr.io](https://hackr.io), a site of programming
+  courses for students and developers, the same audience; and "HackRx", the first alternative
+  considered, is Bajaj Finserv's own hackathon. Checked on 2 November 2026: no product found named
+  hackbrief, `hackbrief.dev` and `hackbrief.app` were unregistered, `hackbrief.com` was parked for
+  sale, and one GitHub repository used the name. hackbrief also says what the coach does: it turns
+  a hackathon's rules into a brief.
+- **What changed:** the GitHub repository (`ayobamy/hackbrief`; GitHub redirects the old address)
+  and the Vercel project, renamed by Ahmed; the site's name and text, the docs, the package name
+  and the crawler's user agent (issue #27).
+- **Kept:** the local database names and Postgres user (`hackr`, `hackr_test`), which no visitor
+  sees and which would make everyone rebuild their database; and the production address
+  `hackr-mauve.vercel.app` until a domain is bought.

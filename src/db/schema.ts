@@ -17,7 +17,7 @@ import {
 export const eventFormat = pgEnum("event_format", ["online", "in_person", "hybrid"]);
 export const importStatus = pgEnum("import_status", ["running", "succeeded", "partial", "failed"]);
 
-/** A site hackr collects from, as recorded in docs/sources.md. */
+/** A site hackbrief collects from, as recorded in docs/sources.md. */
 export const sources = pgTable("sources", {
   id: serial("id").primaryKey(),
   slug: text("slug").notNull().unique(),

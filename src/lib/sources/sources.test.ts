@@ -112,7 +112,7 @@ describe("isRestrictedUrl", () => {
 });
 
 describe("parseHackClub", () => {
-  it("maps events to hackr's shape and skips malformed ones", () => {
+  it("maps events to hackbrief's shape and skips malformed ones", () => {
     const { events, skipped } = parseHackClub(HACK_CLUB_BODY);
 
     expect(skipped).toBe(2);
@@ -183,7 +183,7 @@ describe("parseHackHq", () => {
 });
 
 describe("fetchSource", () => {
-  it("identifies hackr, follows redirects and returns the body", async () => {
+  it("identifies hackbrief, follows redirects and returns the body", async () => {
     const fetchImpl = vi.fn(async () => new Response("[]", { status: 200 }));
 
     await expect(fetchSource("https://example.org/feed", { fetchImpl })).resolves.toBe("[]");

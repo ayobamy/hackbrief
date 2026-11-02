@@ -1,6 +1,6 @@
-# hackr
+# hackbrief
 
-![hackr](public/logo-mark.svg)
+![hackbrief](public/logo-mark.svg)
 
 A hackathon finder and coach for early-career developers and students: which hackathons to join,
 and how to win them, without reading ten pages of rules for each one.
@@ -17,7 +17,8 @@ outline in
 - [START-HERE](docs/START-HERE.md): the idea, what is decided and the first steps
 - [decisions.md](docs/decisions.md): what was decided and why
 - [coach.md](docs/coach.md): how the coach reads rules and computes each number
-- [architecture.md](docs/architecture.md) and [data-model.md](docs/data-model.md): how hackr is built
+- [architecture.md](docs/architecture.md) and [data-model.md](docs/data-model.md): how hackbrief is
+  built
 - [implementation-plan.md](docs/implementation-plan.md): what comes next
 - [brand.md](docs/brand.md): the logo, colours and type
 - [sources.md](docs/sources.md), [platforms.md](docs/platforms.md) and

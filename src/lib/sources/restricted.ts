@@ -1,8 +1,8 @@
 import { hostOf } from "./url";
 
 // Platforms whose terms forbid collection or say to ask first (docs/sources.md, "Ask permission"
-// and "Do not collect"). An entry that an open list took from one of them is left out, so hackr
-// never collects their listings second-hand. Kaggle and DrivenData are here too: hackr reads them
+// and "Do not collect"). An entry that an open list took from one of them is left out, so hackbrief
+// never collects their listings second-hand. Kaggle and DrivenData are here too: hackbrief reads them
 // only through their own API or GitHub repository.
 const RESTRICTED_DOMAINS = [
   "devpost.com",
@@ -39,7 +39,7 @@ const RESTRICTED_DOMAINS = [
 // Eventbrite runs a site per country (eventbrite.co.uk, eventbrite.com.ng and so on).
 const EVENTBRITE = /(?:^|\.)eventbrite\.[a-z.]+$/;
 
-/** Whether a URL is on a platform hackr may not collect from second-hand. */
+/** Whether a URL is on a platform hackbrief may not collect from second-hand. */
 export function isRestrictedUrl(url: string): boolean {
   const host = hostOf(url);
   if (!host) {

@@ -40,7 +40,7 @@ const PRINCIPLES = [
   },
   {
     title: "Terms before data",
-    text: "hackr reads each site's terms before collecting anything, takes only what they allow, and credits every source.",
+    text: "hackbrief reads each site's terms before collecting anything, takes only what they allow, and credits every source.",
   },
   {
     title: "Private by default",
@@ -54,7 +54,7 @@ const PRINCIPLES = [
 
 const QUESTIONS = [
   {
-    q: "Is hackr free?",
+    q: "Is hackbrief free?",
     a: "Yes. It is free, open source under the MIT licence, non-commercial, and needs no account.",
   },
   {
@@ -62,7 +62,7 @@ const QUESTIONS = [
     a: "From sources whose terms allow it: Hack Club's public API, Hackster's contests feed and HackHQ's open list (organisers' own sites only), imported once a day. More join as their terms allow; every listing links to its own page and credits its source.",
   },
   {
-    q: "Does hackr keep the rules I paste?",
+    q: "Does hackbrief keep the rules I paste?",
     a: "No. The coach reads them in your browser, on the page. Nothing is sent to a server or stored, and the code that does it is public.",
   },
   {
@@ -117,7 +117,7 @@ export default function Home() {
                 <span className="block text-muted">Then play to win.</span>
               </h1>
               <p className="rise-in max-w-xl text-lg leading-8 text-muted [animation-delay:160ms]">
-                hackr lists hackathons from the sources that allow it, and turns
+                hackbrief lists hackathons from the sources that allow it, and turns
                 any event&apos;s rules into a plan: when it closes, what to hand
                 in, and where the judges&apos; points are.
               </p>
@@ -185,7 +185,7 @@ export default function Home() {
                 well, and miss a required video.
               </p>
               <p className="text-ink">
-                hackr reads the rules for you and hands back one page: the
+                hackbrief reads the rules for you and hands back one page: the
                 deadline counted down, the checklist, and the judging weights
                 turned into where to spend your hours.
               </p>
@@ -216,7 +216,7 @@ export default function Home() {
                     </h3>
                     <p className="leading-7 text-muted">
                       Upcoming hackathons in one list, filtered by format and
-                      source, each linked to its own page and to where hackr
+                      source, each linked to its own page and to where hackbrief
                       found it. Imported daily from {SOURCES.length} sources
                       whose terms allow it.
                     </p>
@@ -243,7 +243,7 @@ export default function Home() {
                       Read
                     </h3>
                     <p className="leading-7 text-muted">
-                      Paste any hackathon&apos;s rules. hackr pulls out the
+                      Paste any hackathon&apos;s rules. hackbrief pulls out the
                       deadline, who can enter, the team size and exactly what to
                       hand in, and quotes the line each one came from.
                     </p>
@@ -306,7 +306,7 @@ export default function Home() {
         >
           <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
             <h2 id="numbers-heading" className="sr-only">
-              hackr in numbers
+              hackbrief in numbers
             </h2>
             <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {[
@@ -314,7 +314,7 @@ export default function Home() {
                   value: PLATFORMS.length,
                   label: "platforms whose terms were read",
                 },
-                { value: count("use"), label: "allow it, so hackr uses them" },
+                { value: count("use"), label: "allow it, so hackbrief uses them" },
                 { value: count("ask"), label: "asked for permission first" },
                 { value: SOURCES.length, label: "sources imported every day" },
               ].map((figure) => (
@@ -337,14 +337,14 @@ export default function Home() {
           </div>
         </section>
 
-        {/* What hackr promises. */}
+        {/* What hackbrief promises. */}
         <section
           aria-labelledby="principles-heading"
           className="border-b border-line"
         >
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 py-24 sm:px-6">
             <Reveal className="flex max-w-2xl flex-col gap-4">
-              <p className={LABEL}>What hackr promises</p>
+              <p className={LABEL}>What hackbrief promises</p>
               <h2 id="principles-heading" className={H2}>
                 Honest numbers, respected sources, your data left alone.
               </h2>

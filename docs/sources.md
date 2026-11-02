@@ -1,33 +1,33 @@
 # Data sources
 
-Which sites hackr may collect hackathon data from, on what terms, and whom to ask for the rest.
+Which sites hackbrief may collect hackathon data from, on what terms, and whom to ask for the rest.
 CLAUDE.md rule 5 applies: nothing is collected from a site until its terms and robots.txt are read
 and recorded here. The full catalogue of platforms is in [platforms.md](platforms.md); this page
-is the register of what hackr does with them.
+is the register of what hackbrief does with them.
 
 All pages were read on 2 November 2026. Rows marked **re-checked** were read again by hand that day
 against the live page, with the quoted words confirmed; the others come from the research pass
-the same day and are to be re-read before hackr relies on them.
+the same day and are to be re-read before hackbrief relies on them.
 
-## How hackr treats a source
+## How hackbrief treats a source
 
 1. **Terms first.** Terms of service override robots.txt. A site whose terms forbid automated
    access or reuse is not collected without written permission, whatever robots.txt allows.
-2. **Official channels only.** Where a site offers an API, a feed or an open data file, hackr
+2. **Official channels only.** Where a site offers an API, a feed or an open data file, hackbrief
    uses that and nothing else.
 3. **Identify, rate-limit, cache.** Requests carry the user agent
-   `hackr/<version> (+https://github.com/ayobamy/hackr)`, go no faster than one a second per site
-   (slower where robots.txt sets a crawl delay), run at most once a day, and are cached.
+   `hackbrief/<version> (+https://github.com/ayobamy/hackbrief)`, go no faster than one a second
+   per site (slower where robots.txt sets a crawl delay), run at most once a day, and are cached.
 4. **Stop on a block.** A captcha, a firewall page or a 403 ends collection from that site until a
    person has looked. Blocks are never worked around.
 5. **Attribute and link back.** Every event shows where it came from, with a link to the source's
    own page, and follows any attribution the source asks for.
-6. **Facts, not copies.** hackr stores the facts it needs (name, dates, place, format, link,
+6. **Facts, not copies.** hackbrief stores the facts it needs (name, dates, place, format, link,
    prizes, judging weights) and its own summaries, not copied descriptions.
 
 ## Use now
 
-| Source | What hackr gets | Channel | Conditions | Status |
+| Source | What hackbrief gets | Channel | Conditions | Status |
 | --- | --- | --- | --- | --- |
 | [Hack Club Hackathons](https://hackathons.hackclub.com/data) | High-school hackathons worldwide: name, start, end, city, country, virtual or hybrid, website (14 upcoming on 2 November) | JSON API: `/api/events/upcoming`, `/api/events/all` | "If you use it, you must credit “Hack Club Hackathons” with a link". Use the documented API only: the backend host's robots.txt is `Disallow: /`. Site code is MIT. | Re-checked |
 | [Kaggle](https://www.kaggle.com/docs/api) | Data-science and ML competitions: title, deadline, category, reward, team count | Official API and CLI, free account token; client is Apache-2.0 ([kaggle-cli](https://github.com/Kaggle/kaggle-cli)) | The website terms ban crawling "through use of manual or automated means", so never read the site itself. The terms page renders only in a browser and was read once through a text renderer: re-read it in a browser. | Client licence re-checked |
@@ -39,12 +39,12 @@ the same day and are to be re-read before hackr relies on them.
 
 ### Added in the second research pass (issue #14)
 
-| Source | What hackr gets | Channel | Conditions | Status |
+| Source | What hackbrief gets | Channel | Conditions | Status |
 | --- | --- | --- | --- | --- |
 | [OpenAgenda](https://developers.openagenda.com/en/) | Event agendas across France, the EU and Switzerland, including hackathons | Free REST API, needs a key | Terms (updated 14 October 2026): events on a public agenda "sont diffusées sous la Licence Ouverte 2.0 (Etalab)" and reusable "y compris à des fins commerciales, à la condition d'en mentionner la source". Credit each agenda's organisation. | Re-checked |
 | [Jugend hackt](https://jugendhackt.org/kalender/) | Youth hackathons and labs in Germany, Austria and Switzerland | WordPress feeds | "Die Inhalte dieser Webseite sind, sofern nicht anders angegeben, nach Creative Commons 4.0 Attribution lizenziert" (CC BY 4.0, unless stated otherwise). Events are for ages 12 to 18: label them. | Re-checked |
 | [CASSINI Hackathons](https://www.cassini.eu/hackathons) | The EU Space Programme's hackathons, one edition at a time across about ten cities | Public pages | "downloading, reproduction and use of all the materials and documents published on the Website are authorised provided the source is acknowledged as follow: © EUSPA 2026", except third-party material. | Re-checked |
-| [Wikidata](https://www.wikidata.org/wiki/Wikidata:Licensing) | Facts about well-known hackathons (dates, organisers, websites): 262 items, few upcoming, so for filling in details rather than discovery | SPARQL endpoint `query.wikidata.org` | Structured data is CC0. Send a User-Agent naming hackr with a contact, and keep within the query service's limits. | Licence re-checked |
+| [Wikidata](https://www.wikidata.org/wiki/Wikidata:Licensing) | Facts about well-known hackathons (dates, organisers, websites): 262 items, few upcoming, so for filling in details rather than discovery | SPARQL endpoint `query.wikidata.org` | Structured data is CC0. Send a User-Agent naming hackbrief with a contact, and keep within the query service's limits. | Licence re-checked |
 | [dribdat/awesome-hackathon](https://github.com/dribdat/awesome-hackathon) | A CC0 list of hackathon platforms and tools: leads for new sources, not events | GitHub | CC0-1.0. | From research |
 
 **With care, from the second pass** (from research; re-read before building on them):
@@ -92,16 +92,16 @@ hackathon was listed twice and merged):
   token. Displayed events "must include and display a link to the event webpage associated with
   that event on Doorkeeper", without `nofollow`, and "You shall not use the Doorkeeper APIs in, or
   to develop, a product or service that competes with products or services offered by Doorkeeper."
-  Ask Doorkeeper whether hackr counts as competing before using it. Re-checked.
+  Ask Doorkeeper whether hackbrief counts as competing before using it. Re-checked.
 - **[Eventbrite](https://www.eventbrite.com/platform/api)**: the API returns events only for an
-  organiser, venue or series ID hackr already knows; Eventbrite's support article says public event
+  organiser, venue or series ID hackbrief already knows; Eventbrite's support article says public event
   search ended on 12 December 2019 (not re-read). Its terms (13.1) ban scraping, and the API terms
   limit storage and display. Little value for discovery.
 
 ## Ask permission
 
 These sites hold useful listings, rules or winners, but their terms forbid collection, say nothing
-about it, or put their API behind a paid plan. hackr links to them and asks before collecting.
+about it, or put their API behind a paid plan. hackbrief links to them and asks before collecting.
 
 | Source | Why ask | Contact |
 | --- | --- | --- |
@@ -131,7 +131,7 @@ about it, or put their API behind a paid plan. hackr links to them and asks befo
 
 ## Link out only
 
-hackr may store what a user enters about these and link to them, but collects nothing:
+hackbrief may store what a user enters about these and link to them, but collects nothing:
 BeMyApp, Google Developer Groups (Bevy), Junction, HackZurich, Microsoft Imagine Cup, Google
 Solution Challenge, Smart India Hackathon, Sympla, tech.africa, Startup Map Hub, the Africa's
 Talking developer community, and African government challenge pages. DoraHacks and Smart India
