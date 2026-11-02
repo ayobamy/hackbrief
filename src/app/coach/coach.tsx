@@ -489,7 +489,7 @@ export function Coach({
           rows={12}
           spellCheck={false}
           placeholder="Paste the rules page here: dates, eligibility, what to submit and the judging criteria."
-          className={`w-full border border-line bg-panel p-3 font-mono text-sm ${FOCUS_RING}`}
+          className={`scroll-brand w-full border border-line bg-panel p-3 font-mono text-sm ${FOCUS_RING}`}
         />
         <p id={hintId} className="text-sm text-muted">
           Your text stays in your browser: hackbrief reads it on this page and does not send or store

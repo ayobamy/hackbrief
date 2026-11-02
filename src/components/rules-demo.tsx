@@ -207,7 +207,7 @@ export function RulesDemo() {
         <div
           role="tablist"
           aria-label="Sample rules"
-          className="-mb-px flex max-w-full gap-5 overflow-x-auto"
+          className="scroll-brand -mb-px flex max-w-full gap-5 overflow-x-auto"
           onKeyDown={onKeyDown}
         >
           {SAMPLES.map((option, position) => (
@@ -249,7 +249,7 @@ export function RulesDemo() {
           </div>
           <pre
             ref={rulesRef}
-            className="relative h-[480px] overflow-auto pb-4 font-mono text-[11.5px] leading-[1.8] whitespace-pre-wrap"
+            className="scroll-brand relative h-[480px] overflow-auto pb-4 font-mono text-[11.5px] leading-[1.8] whitespace-pre-wrap"
             tabIndex={0}
             role="region"
             aria-label={`The rules of ${sample.name}`}
