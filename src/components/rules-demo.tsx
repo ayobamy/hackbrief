@@ -139,7 +139,7 @@ export function RulesDemo() {
 
   const bodies: ReactNode[] = [
     <div key="deadline" className="flex flex-col gap-1">
-      <p className="font-serif text-[28px] leading-tight tracking-[-0.015em]">
+      <p className="text-[26px] leading-tight font-semibold tracking-[-0.03em]">
         {deadline ? formatLongDate(deadline.date) : "Not found in the rules"}
       </p>
       <p className="text-sm text-muted">
@@ -157,7 +157,7 @@ export function RulesDemo() {
         <div key={term} className="flex items-baseline">
           <dt className="text-sm text-muted">{term}</dt>
           <span className="mx-2 flex-1 translate-y-[-3px] border-b border-dotted border-muted/50" aria-hidden="true" />
-          <dd className="font-serif text-[17px]">{value}</dd>
+          <dd className="text-sm font-medium">{value}</dd>
         </div>
       ))}
     </dl>,
@@ -168,8 +168,8 @@ export function RulesDemo() {
             <div className="flex items-baseline">
               <span className="min-w-0 truncate text-sm">{note.criterion}</span>
               <span className="mx-2 flex-1 translate-y-[-3px] border-b border-dotted border-muted/50" aria-hidden="true" />
-              <span className="mr-3 font-serif text-sm text-muted italic">{EMPHASIS[note.emphasis]}</span>
-              <span className="w-12 text-right font-serif text-[17px] tabular-nums">{note.weight}%</span>
+              <span className="mr-3 text-xs text-muted">{EMPHASIS[note.emphasis]}</span>
+              <span className="w-12 text-right font-mono text-sm tabular-nums">{note.weight}%</span>
             </div>
             <div className="h-[2px] w-full bg-line" aria-hidden="true">
               <div
@@ -181,7 +181,7 @@ export function RulesDemo() {
         ))}
       </ul>
       {topNote ? (
-        <p key={`${sample.id}-note`} className="rise-in font-serif text-[15px] leading-6 text-muted italic">
+        <p key={`${sample.id}-note`} className="rise-in border-l-2 border-accent pl-3 text-[13px] leading-5 text-muted">
           {topNote.text}
         </p>
       ) : null}
@@ -245,7 +245,7 @@ export function RulesDemo() {
         <div className="hidden md:block">
           <div className="flex items-baseline justify-between px-6 pt-5 pb-3">
             <span className={LABEL}>The rules, as pasted</span>
-            <span className="font-serif text-sm text-muted italic">fictional</span>
+            <span className={LABEL}>Fictional</span>
           </div>
           <pre
             ref={rulesRef}
@@ -283,7 +283,7 @@ export function RulesDemo() {
 
         <div className="flex flex-col px-4 pt-5 pb-4 sm:px-6">
           <span className={LABEL}>The brief</span>
-          <p className="mt-1 font-serif text-2xl leading-tight">{sample.name}</p>
+          <p className="mt-1 text-xl leading-tight font-semibold tracking-[-0.02em]">{sample.name}</p>
           <ol className="mt-4 flex flex-col border-b border-line">
             {CARDS.map((card, position) => {
               const selected = shown === position;
@@ -318,7 +318,7 @@ export function RulesDemo() {
               );
             })}
           </ol>
-          <p className="mt-3 hidden font-serif text-sm text-muted italic md:block">
+          <p className="mt-3 hidden text-xs text-muted md:block">
             Point at a part of the brief to see the lines it came from.
           </p>
         </div>

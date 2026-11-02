@@ -136,7 +136,7 @@ function EventCard({ event, today }: { event: EventListing; today: string }) {
           </div>
         </div>
         <div className="flex flex-col gap-1.5">
-          <h3 className="text-xl leading-snug">
+          <h3 className="text-base leading-snug font-semibold tracking-[-0.01em]">
             {linked ? (
               // The link covers the whole card; the source credit below stays its own link above it.
               <a href={event.url} className={`after:absolute after:inset-0 ${FOCUS_RING}`}>
@@ -219,7 +219,7 @@ function Pager({ page, pageCount, href }: { page: number; pageCount: number; hre
                   scroll={false}
                   aria-label={`Page ${number}`}
                   aria-current={number === page ? "page" : undefined}
-                  className={`flex size-9 items-center justify-center font-serif text-[17px] tabular-nums transition-colors ${FOCUS_RING} ${
+                  className={`flex size-9 items-center justify-center text-sm tabular-nums transition-colors ${FOCUS_RING} ${
                     number === page ? "bg-ink text-paper" : "text-muted hover:bg-line/60 hover:text-ink"
                   }`}
                 >
@@ -308,7 +308,7 @@ export async function EventList({
       ) : (
         groupByMonth(shown.items, today).map((group) => (
           <section key={group.key} aria-labelledby={`month-${group.key}`} className="flex flex-col gap-4">
-            <h2 id={`month-${group.key}`} className="flex items-baseline gap-3 border-b border-line pb-2 text-2xl">
+            <h2 id={`month-${group.key}`} className="flex items-baseline gap-3 border-b border-line pb-2 text-lg font-semibold tracking-[-0.02em]">
               {group.label}
               {/* Only for the eye: screen readers already announce how many items each list holds. */}
               <span className="font-mono text-xs text-muted" aria-hidden="true">

@@ -31,7 +31,7 @@ export async function UpcomingPreview() {
       <div className="flex items-baseline justify-between border-b border-line px-5 py-3">
         <span className={LABEL}>Upcoming now</span>
         <span className="text-sm text-muted">
-          <CountUp value={events.length} className="font-serif text-lg text-ink" /> hackathons
+          <CountUp value={events.length} className="font-semibold text-ink" /> hackathons
         </span>
       </div>
       {events.length === 0 ? (
@@ -48,7 +48,7 @@ export async function UpcomingPreview() {
             <li key={event.id} className="flex items-center gap-4 px-5 py-3">
               <DateTile startsOn={event.startsOn} />
               <span className="flex min-w-0 flex-col gap-0.5">
-                <span className="truncate font-serif text-[17px]">{event.name}</span>
+                <span className="truncate text-sm font-medium">{event.name}</span>
                 <span className="truncate text-xs text-muted">
                   {[
                     formatDateRange(event.startsOn, event.endsOn),
@@ -109,7 +109,7 @@ export function ReadPanel() {
             </span>
             <span className="flex flex-col gap-0.5 px-5 pb-3.5 pl-[50px] sm:py-3.5 sm:pl-5">
               <span className={LABEL}>{row.label}</span>
-              <span className="font-serif text-[17px] leading-snug">{row.value}</span>
+              <span className="text-sm font-medium leading-snug">{row.value}</span>
             </span>
           </li>
         ))}
@@ -127,14 +127,14 @@ export function PlanPanel() {
     <Sheet>
       <div className="flex items-baseline justify-between border-b border-line px-5 py-3">
         <span className={LABEL}>Prep plan</span>
-        <span className="font-serif text-sm text-muted italic">{LAGOON?.name}</span>
+        <span className="text-sm text-muted">{LAGOON?.name}</span>
       </div>
       <ol className="divide-y divide-line">
         {LAGOON_BRIEF.plan.map((step) => (
           <li key={step.title} className="grid gap-x-5 gap-y-1 px-5 py-3.5 sm:grid-cols-[132px_1fr]">
             <span className="font-mono text-xs text-muted tabular-nums sm:pt-1">{formatDate(step.date)}</span>
             <span className="flex flex-col gap-0.5">
-              <span className="font-serif text-[17px]">{step.title}</span>
+              <span className="text-sm font-medium">{step.title}</span>
               <span className="text-[13px] leading-5 text-muted">{step.detail}</span>
             </span>
           </li>

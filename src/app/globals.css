@@ -11,9 +11,9 @@
   --color-on-accent: var(--on-accent);
   --color-background: var(--paper);
   --color-foreground: var(--ink);
-  --font-sans: var(--font-plex-sans);
-  --font-serif: var(--font-newsreader);
-  --font-mono: var(--font-plex-mono);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --shadow-card: var(--card-shadow);
 }
 
 body {
@@ -23,17 +23,22 @@ body {
 }
 
 /*
- * Headings are set in the serif, as in a printed brief; labels and code stay in the mono. In the base
- * layer, so a heading's own utility classes can still change its weight or spacing.
+ * Headings are semibold Geist with tight tracking. In the base layer, so a heading's own utility
+ * classes can still change its weight or spacing.
  */
 @layer base {
   h1,
   h2,
   h3 {
-    font-family: var(--font-serif), ui-serif, Georgia, serif;
-    font-weight: 500;
-    letter-spacing: -0.01em;
+    font-weight: 600;
+    letter-spacing: -0.02em;
   }
+}
+
+/* The faint dot grid the rubric playground's cards sit on. */
+.dot-grid {
+  background-image: radial-gradient(var(--line) 1px, transparent 1px);
+  background-size: 22px 22px;
 }
 
 /*

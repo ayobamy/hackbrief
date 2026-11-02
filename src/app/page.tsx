@@ -23,7 +23,8 @@ const FOCUS =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 const PRIMARY = `inline-flex items-center gap-2 bg-ink px-5 py-3 text-sm font-medium text-paper transition-opacity hover:opacity-90 ${FOCUS}`;
 const SECONDARY = `inline-flex items-center gap-2 border border-line bg-panel px-5 py-3 text-sm font-medium transition-colors hover:border-ink ${FOCUS}`;
-const H2 = "text-3xl leading-[1.08] tracking-[-0.015em] sm:text-5xl";
+const H2 =
+  "text-3xl leading-[1.05] font-semibold tracking-[-0.035em] sm:text-5xl";
 
 const STEPS = [
   { id: "find", label: "Find" },
@@ -102,9 +103,9 @@ export default function Home() {
               <p className={`${LABEL} rise-in`}>
                 Open source · for students and early-career developers
               </p>
-              <h1 className="rise-in text-5xl leading-[0.98] tracking-[-0.02em] [animation-delay:80ms] sm:text-7xl lg:text-[5.75rem]">
+              <h1 className="rise-in text-5xl leading-[0.95] font-semibold tracking-[-0.05em] [animation-delay:80ms] sm:text-7xl lg:text-[5.5rem]">
                 Pick the right hackathon.
-                <span className="block text-muted italic">Then play to win.</span>
+                <span className="block text-muted">Then play to win.</span>
               </h1>
               <p className="rise-in max-w-xl text-lg leading-8 text-muted [animation-delay:160ms]">
                 hackbrief lists hackathons from the sources that allow it, and turns
@@ -201,7 +202,7 @@ export default function Home() {
                 >
                   <Reveal className="flex flex-col gap-3">
                     <span className="font-mono text-sm text-muted">01</span>
-                    <h3 className="text-[28px] leading-tight">
+                    <h3 className="text-2xl font-semibold tracking-[-0.02em]">
                       Find
                     </h3>
                     <p className="leading-7 text-muted">
@@ -229,7 +230,7 @@ export default function Home() {
                 >
                   <Reveal className="flex flex-col gap-3">
                     <span className="font-mono text-sm text-muted">02</span>
-                    <h3 className="text-[28px] leading-tight">
+                    <h3 className="text-2xl font-semibold tracking-[-0.02em]">
                       Read
                     </h3>
                     <p className="leading-7 text-muted">
@@ -248,7 +249,7 @@ export default function Home() {
                 >
                   <Reveal className="flex flex-col gap-3">
                     <span className="font-mono text-sm text-muted">03</span>
-                    <h3 className="text-[28px] leading-tight">
+                    <h3 className="text-2xl font-semibold tracking-[-0.02em]">
                       Plan
                     </h3>
                     <p className="leading-7 text-muted">
@@ -315,7 +316,7 @@ export default function Home() {
                 >
                   <CountUp
                     value={figure.value}
-                    className="font-serif text-6xl tracking-[-0.02em]"
+                    className="text-5xl font-semibold tracking-[-0.04em]"
                   />
                   <span className="text-sm text-muted">{figure.label}</span>
                 </li>
@@ -343,7 +344,7 @@ export default function Home() {
                     delay={index * 80}
                     className="flex flex-col gap-3 border-t border-ink pt-5"
                   >
-                    <h3 className="text-2xl">
+                    <h3 className="text-lg font-semibold tracking-[-0.02em]">
                       {principle.title}
                     </h3>
                     <p className="leading-7 text-muted">{principle.text}</p>
@@ -370,7 +371,7 @@ export default function Home() {
                   className="group border-b border-line py-5 first:border-t"
                 >
                   <summary
-                    className={`flex cursor-pointer list-none items-center justify-between gap-6 font-serif text-xl ${FOCUS}`}
+                    className={`flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-medium ${FOCUS}`}
                   >
                     {item.q}
                     <span
@@ -395,7 +396,7 @@ export default function Home() {
           <div className="relative mx-auto flex w-full max-w-6xl flex-col items-start gap-10 px-4 py-28 sm:px-6">
             <h2
               id="cta-heading"
-              className="max-w-4xl text-5xl leading-[1.02] tracking-[-0.02em] sm:text-7xl"
+              className="max-w-4xl text-5xl leading-[0.98] font-semibold tracking-[-0.05em] sm:text-7xl"
             >
               Your next hackathon starts with the rules.
             </h2>
