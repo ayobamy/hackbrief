@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { isPlaceholder } from "./placeholder";
 import { isRestrictedUrl } from "./restricted";
 import type { EventFormat, ParseResult, Source, SourceEvent } from "./types";
 import { canonicalUrl, dateOnly, textOrNull } from "./url";
@@ -56,10 +57,10 @@ function cityOf(listing: HackHqListing): string | null {
   return location && !/^(?:online|virtual|remote|global)$/i.test(location) ? location : null;
 }
 
-// "TBA", "N/A" and the like say nothing about the prize.
+// "TBA", "N/A", a lone dash and the like say nothing about the prize.
 function prizeOf(listing: HackHqListing): string | null {
   const prize = textOrNull(listing.prize);
-  return prize && !/^(?:tba|tbd|n\/?a|none|unknown|-+)$/i.test(prize) ? prize : null;
+  return prize && !isPlaceholder(prize) ? prize : null;
 }
 
 function toEvent(listing: HackHqListing): SourceEvent {

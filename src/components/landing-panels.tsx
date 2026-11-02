@@ -6,9 +6,10 @@ import { buildBrief } from "@/lib/coach/brief";
 import { formatDate, formatTeamSize } from "@/lib/coach/format";
 import { SAMPLES } from "@/lib/coach/samples";
 import { FORMAT_LABELS } from "@/lib/events/filters";
-import { dateTile, formatDateRange } from "@/lib/events/format";
+import { formatDateRange } from "@/lib/events/format";
 
 import { CARD, Canvas, StepBadge } from "./canvas";
+import { DateTile } from "./date-tile";
 import { CountUp } from "./motion/count-up";
 
 // The Lagoon sample, read by the coach at build time; the panels below show its real output.
@@ -66,16 +67,9 @@ export async function UpcomingPreview() {
         ) : (
           <ul className="flex flex-col gap-1 px-2 pb-2">
             {events.slice(0, 4).map((event) => {
-              const tile = dateTile(event.startsOn);
               return (
                 <li key={event.id} className="flex items-center gap-4 rounded-xl px-3 py-2.5 transition-colors hover:bg-paper">
-                  <span
-                    className="flex w-11 shrink-0 flex-col items-center rounded-lg border border-line bg-paper py-1 leading-none"
-                    aria-hidden="true"
-                  >
-                    <span className="text-[10px] text-muted uppercase">{tile?.month ?? "TBA"}</span>
-                    <span className="pt-0.5 text-base font-semibold tabular-nums">{tile?.day ?? "–"}</span>
-                  </span>
+                  <DateTile startsOn={event.startsOn} />
                   <span className="flex min-w-0 flex-col gap-0.5">
                     <span className="truncate text-sm font-medium">{event.name}</span>
                     <span className="truncate text-xs text-muted">

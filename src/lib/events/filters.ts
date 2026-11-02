@@ -27,19 +27,28 @@ export function parseFilters(
   const source = first(params.source);
   return {
     // Own keys only: `in` would also accept inherited names such as "toString".
-    format: format && Object.hasOwn(FORMAT_LABELS, format) ? (format as EventFormat) : null,
+    format:
+      format && Object.hasOwn(FORMAT_LABELS, format)
+        ? (format as EventFormat)
+        : null,
     source: source && sourceSlugs.includes(source) ? source : null,
   };
 }
 
-/** The query string for a set of filters, without empty values: "?format=online". */
-export function filterQuery(filters: EventFilters): string {
+/**
+ * The query string for a set of filters and a page, without empty values or page 1:
+ * "?format=online&page=2".
+ */
+export function filterQuery(filters: EventFilters, page = 1): string {
   const params = new URLSearchParams();
   if (filters.format) {
     params.set("format", filters.format);
   }
   if (filters.source) {
     params.set("source", filters.source);
+  }
+  if (page > 1) {
+    params.set("page", String(page));
   }
   const query = params.toString();
   return query ? `?${query}` : "";

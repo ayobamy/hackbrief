@@ -1,4 +1,5 @@
 import { formatDate } from "@/lib/coach/format";
+import { isPlaceholder } from "@/lib/sources/placeholder";
 
 const DAY_MONTH = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
 
@@ -45,4 +46,13 @@ export function dateTile(startsOn: string | null): { month: string; day: string 
   const parts = TILE.formatToParts(new Date(`${startsOn}T00:00:00Z`));
   const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? "";
   return { month: part("month"), day: part("day") };
+}
+
+/**
+ * Prize text worth showing, trimmed, or null for placeholders. Rows imported before placeholders were
+ * filtered still hold "TBA", and imports never blank a field out, so the check also runs here.
+ */
+export function prizeLine(text: string | null): string | null {
+  const trimmed = text?.trim() ?? "";
+  return trimmed && !isPlaceholder(trimmed) ? trimmed : null;
 }
