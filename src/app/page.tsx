@@ -98,6 +98,8 @@ export default function Home() {
       <main id="main" className="flex flex-1 flex-col">
         {/* Hero: the promise, then the coach itself, running. */}
         <section className="relative overflow-hidden border-b border-line">
+          <div className="hero-glow pointer-events-none absolute inset-x-0 top-0 h-[860px]" aria-hidden="true" />
+          <div className="hero-grain pointer-events-none absolute inset-x-0 top-0 h-[860px]" aria-hidden="true" />
           <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 pt-16 pb-20 sm:px-6 sm:pt-24">
             <div className="flex max-w-3xl flex-col gap-7">
               <p className={`${LABEL} rise-in`}>

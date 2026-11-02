@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 import { DateTile } from "@/components/date-tile";
 import { filterQuery, FORMAT_LABELS, parseFilters, type EventFilters } from "@/lib/events/filters";
-import { formatDateRange, formatLocation, prizeLine } from "@/lib/events/format";
+import { formatDateRange, formatLocation, isWebUrl, prizeLine } from "@/lib/events/format";
 import {
   applyFilters,
   facetCounts,
@@ -26,11 +26,6 @@ import { PageKeys } from "./page-keys";
 const FOCUS_RING = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 const CARD = "border border-line bg-panel";
 const TAG = "font-mono text-[10.5px] tracking-[0.1em] uppercase";
-
-// Event and source URLs are checked when they are imported; links are drawn only for http(s) as well.
-function isWebUrl(url: string): boolean {
-  return /^https?:\/\//i.test(url);
-}
 
 function hackathons(count: number): string {
   return count === 1 ? "1 hackathon" : `${count} hackathons`;

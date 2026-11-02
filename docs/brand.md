@@ -49,7 +49,7 @@ headline face on Lightdash's site, was also considered: it is a paid typeface, s
 this open-source repository without a web licence.
 
 Panels are flat sheets with square corners and hairline borders, built from
-`src/components/sheet.tsx`: no rounded cards, pills or glows in the hero, the panels or the lists.
+`src/components/sheet.tsx`: no rounded cards or pills in the hero, the panels or the lists.
 Lists use dotted leaders between a name and its figure, and bars are two pixels of ink. Orange is
 used only as highlighter ink (marked lines of the rules, the tab underline, the selected time label),
 never for text. Footnote numbers tie each highlighted line of the rules to its part of the brief.
@@ -57,6 +57,12 @@ never for text. Footnote numbers tie each highlighted line of the rules to its p
 The rubric playground keeps its earlier look, at Ahmed's request (issue #32): two square cards with
 a soft shadow on a dotted surface, a segmented weights bar in shades of the accent, and each piece of
 advice in its own card.
+
+The hero has one warm light (issue #35): the accent rising from the top-right corner and fading into
+the page, with fine grain over that corner (`.hero-glow` and `.hero-grain` in `src/app/globals.css`,
+strength set per theme by `--glow` and `--grain` in `src/app/theme.css`). It is static and
+decorative. Measured on 2 November 2026, the hero text keeps at least 4.9:1 contrast against the
+brightest part of the glow behind it, in both themes, on a phone and on a desktop.
 
 Motion stays small and optional: lines rise in, bars grow, and the coach reads through a sample once.
 All of it stops under `prefers-reduced-motion`.

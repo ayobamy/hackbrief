@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { filterQuery, parseFilters } from "./filters";
-import { dateTile, formatDateRange, formatLocation, prizeLine } from "./format";
+import { dateTile, formatDateRange, formatLocation, isWebUrl, prizeLine } from "./format";
 
 const SLUGS = ["hackclub", "hackster", "hackhq"];
 
@@ -78,5 +78,18 @@ describe("prizeLine", () => {
     [null, null],
   ])("%j reads as %j", (text, line) => {
     expect(prizeLine(text)).toBe(line);
+  });
+});
+
+describe("isWebUrl", () => {
+  it.each([
+    ["https://falcon-hack.example", true],
+    ["http://falcon-hack.example/rules", true],
+    ["HTTPS://FALCON-HACK.EXAMPLE", true],
+    ["javascript:alert(1)", false],
+    ["mailto:team@falcon-hack.example", false],
+    ["falcon-hack.example", false],
+  ])("%s is a web link: %s", (url, expected) => {
+    expect(isWebUrl(url)).toBe(expected);
   });
 });

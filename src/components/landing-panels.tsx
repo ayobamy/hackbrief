@@ -6,7 +6,7 @@ import { buildBrief } from "@/lib/coach/brief";
 import { formatDate, formatTeamSize } from "@/lib/coach/format";
 import { SAMPLES } from "@/lib/coach/samples";
 import { FORMAT_LABELS } from "@/lib/events/filters";
-import { formatDateRange } from "@/lib/events/format";
+import { formatDateRange, isWebUrl } from "@/lib/events/format";
 
 import { DateTile } from "./date-tile";
 import { CountUp } from "./motion/count-up";
@@ -15,6 +15,18 @@ import { Footnote, LABEL, Sheet } from "./sheet";
 // The Lagoon sample, read by the coach at build time; the panels below show its real output.
 const LAGOON = SAMPLES.find((sample) => sample.id === "lagoon") ?? SAMPLES[0];
 const LAGOON_BRIEF = LAGOON ? buildBrief(LAGOON.text, "2026-11-02") : null;
+
+function ExternalArrow() {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      className="size-4 shrink-0 text-muted opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
+      aria-hidden="true"
+    >
+      <path d="M5.5 4.5h6v6M11.5 4.5 4.5 11.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
 
 /** Real upcoming hackathons from the database, through the same cached query as /events. */
 export async function UpcomingPreview() {
@@ -44,23 +56,41 @@ export async function UpcomingPreview() {
         </p>
       ) : (
         <ul className="divide-y divide-line">
-          {events.slice(0, 4).map((event) => (
-            <li key={event.id} className="flex items-center gap-4 px-5 py-3">
-              <DateTile startsOn={event.startsOn} />
-              <span className="flex min-w-0 flex-col gap-0.5">
-                <span className="truncate text-sm font-medium">{event.name}</span>
-                <span className="truncate text-xs text-muted">
-                  {[
-                    formatDateRange(event.startsOn, event.endsOn),
-                    event.format ? FORMAT_LABELS[event.format] : null,
-                    event.sources[0] ? `via ${event.sources[0].attribution}` : null,
-                  ]
-                    .filter(Boolean)
-                    .join(" · ")}
+          {events.slice(0, 4).map((event) => {
+            const row = (
+              <>
+                <DateTile startsOn={event.startsOn} />
+                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <span className="truncate text-sm font-medium">{event.name}</span>
+                  <span className="truncate text-xs text-muted">
+                    {[
+                      formatDateRange(event.startsOn, event.endsOn),
+                      event.format ? FORMAT_LABELS[event.format] : null,
+                      event.sources[0] ? `via ${event.sources[0].attribution}` : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </span>
                 </span>
-              </span>
-            </li>
-          ))}
+              </>
+            );
+            return (
+              <li key={event.id}>
+                {isWebUrl(event.url) ? (
+                  // The whole row links to the event's own page, as a card on /events does.
+                  <a
+                    href={event.url}
+                    className="group flex items-center gap-4 px-5 py-3 transition-colors hover:bg-paper focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent motion-reduce:transition-none"
+                  >
+                    {row}
+                    <ExternalArrow />
+                  </a>
+                ) : (
+                  <div className="flex items-center gap-4 px-5 py-3">{row}</div>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </Sheet>
