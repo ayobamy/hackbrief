@@ -38,7 +38,7 @@ function Fact({ label, value, detail }: { label: string; value: string; detail?:
   return (
     <div className="flex flex-col gap-1 border border-line p-4">
       <dt className="text-sm text-muted">{label}</dt>
-      <dd className="font-serif text-xl">{value}</dd>
+      <dd className="text-lg font-semibold">{value}</dd>
       {detail ? <dd className="text-sm text-muted">{detail}</dd> : null}
     </div>
   );
@@ -76,7 +76,7 @@ function Judging({ brief }: { brief: Brief }) {
               <span className={`px-1.5 py-0.5 font-mono text-[10.5px] tracking-[0.1em] uppercase ${EMPHASIS_STYLE[note.emphasis]}`}>
                 {EMPHASIS_LABEL[note.emphasis]}
               </span>
-              <span className="font-serif text-lg tabular-nums">{note.weight}%</span>
+              <span className="font-semibold tabular-nums">{note.weight}%</span>
             </span>
           </div>
           <div className="h-[2px] w-full bg-line" aria-hidden="true">

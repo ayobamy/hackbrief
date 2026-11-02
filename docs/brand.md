@@ -39,22 +39,24 @@ variables; change both together.
 
 ## Type and layout
 
-hackbrief is set like a printed brief (issue #29), not like a generic web app.
+- **Geist** for everything: semibold with tight tracking for headings (about -0.05em at display
+  sizes, -0.035em for section headings), regular for text.
+- **Geist Mono** for small upper-case labels, tags, footnote numbers, figures and pasted rules.
 
-- **Newsreader** (serif, with optical sizes) for headings, figures and key facts such as a
-  deadline or a weight. Medium weight, close to normal tracking; the second line of the hero is
-  italic.
-- **IBM Plex Sans** for running text and controls.
-- **IBM Plex Mono** for small upper-case labels, tags, footnote numbers and pasted rules.
+Both are under the SIL Open Font License, loaded with `next/font`. A serif pairing (Newsreader with
+IBM Plex) was tried in issue #29 and dropped in issue #32 at Ahmed's request. Britti Sans, the
+headline face on Lightdash's site, was also considered: it is a paid typeface, so it cannot ship in
+this open-source repository without a web licence.
 
-All three are under the SIL Open Font License, loaded with `next/font`. Headings get the serif from
-one base rule in `src/app/globals.css`.
+Panels are flat sheets with square corners and hairline borders, built from
+`src/components/sheet.tsx`: no rounded cards, pills or glows in the hero, the panels or the lists.
+Lists use dotted leaders between a name and its figure, and bars are two pixels of ink. Orange is
+used only as highlighter ink (marked lines of the rules, the tab underline, the selected time label),
+never for text. Footnote numbers tie each highlighted line of the rules to its part of the brief.
 
-Panels are flat sheets with square corners and hairline borders, built from `src/components/sheet.tsx`:
-no shadows, rounded cards, pills, dotted canvases or glows. Lists use dotted leaders between a name
-and its figure, and bars are two pixels of ink. Orange is used only as highlighter ink (marked lines
-of the rules, the tab underline, the selected time label), never for text. Footnote numbers tie each
-highlighted line of the rules to its part of the brief.
+The rubric playground keeps its earlier look, at Ahmed's request (issue #32): two square cards with
+a soft shadow on a dotted surface, a segmented weights bar in shades of the accent, and each piece of
+advice in its own card.
 
 Motion stays small and optional: lines rise in, bars grow, and the coach reads through a sample once.
 All of it stops under `prefers-reduced-motion`.

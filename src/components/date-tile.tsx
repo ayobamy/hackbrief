@@ -9,7 +9,7 @@ export function DateTile({ startsOn, className = "" }: { startsOn: string | null
       aria-hidden="true"
     >
       <span className="font-mono text-[10px] tracking-[0.1em] text-muted uppercase">{tile?.month ?? "TBA"}</span>
-      <span className="pt-1 font-serif text-xl tabular-nums">{tile?.day ?? "–"}</span>
+      <span className="pt-1 text-lg font-semibold tabular-nums">{tile?.day ?? "–"}</span>
     </span>
   );
 }
