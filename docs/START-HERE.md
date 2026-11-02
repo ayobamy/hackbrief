@@ -1,11 +1,11 @@
-# Start here: the hackr handover
+# Start here: the hackbrief handover
 
 Written on 2 November 2026 so a new Claude Code session can start building straight away. Read
 [CLAUDE.md](../CLAUDE.md) for the rules every change follows.
 
 ## The idea
 
-**hackr** is a hackathon finder and coach for early-career developers and students who want to
+**hackbrief** is a hackathon finder and coach for early-career developers and students who want to
 join more hackathons and actually place. The job it does: "Tell me which hackathons I should
 join and how to win them, without me reading ten pages each time."
 
@@ -16,7 +16,7 @@ Ahmed's full outline is in [mvp-outline.md](mvp-outline.md). In short, three flo
 2. **Deep-dive on one hackathon:** one digestible brief: what it is, who can join, key dates,
    prizes; what the judges weigh most and what to nail; a submission checklist.
 3. **Patterns from past winners:** common stacks, domains, team sizes, demo formats, and a short
-   playbook for that kind of event. This is the part that sets hackr apart.
+   playbook for that kind of event. This is the part that sets hackbrief apart.
 
 On top sits the coach: a prep plan, and strategy notes tied to the judging rubric ("technical
 quality is 30%: spend the time on a reliable demo, not five extra features").
@@ -56,8 +56,8 @@ rule 5). The ways forward, to decide first:
 | --- | --- | --- |
 | A. Ask Devpost | Email for written permission or a data partnership | Slow, uncertain; worth sending now in parallel |
 | B. Permitted sources | Sources whose terms allow collection or offer an API or feed: MLH, Devfolio, DoraHacks, ETHGlobal, lablab.ai, Luma event pages and others, each to be checked | Medium |
-| C. Paste the rules | The user pastes a hackathon's rules and judging text (or uploads a PDF); hackr builds the brief, the checklist and the strategy from it | Fast, works for any hackathon, no scraping |
-| D. Organisers submit | Organisers list their events in hackr | Slow to grow |
+| C. Paste the rules | The user pastes a hackathon's rules and judging text (or uploads a PDF); hackbrief builds the brief, the checklist and the strategy from it | Fast, works for any hackathon, no scraping |
+| D. Organisers submit | Organisers list their events in hackbrief | Slow to grow |
 
 A sensible start: **C first** (the coach works on day one for any hackathon), then **B** for the
 listing and the fit score, and **A** sent in parallel. Ahmed decides.
@@ -73,7 +73,7 @@ Not yet a full review; these came up while reading Devpost's terms:
   [Bright Data](https://brightdata.com/products/web-scraper/devpost).
 
 They collect data. None of them is a coach that turns a rubric and past winners into a plan,
-which is where hackr differs. The full review of finders and coaching tools is in
+which is where hackbrief differs. The full review of finders and coaching tools is in
 [competitors.md](competitors.md).
 
 ## Questions answered

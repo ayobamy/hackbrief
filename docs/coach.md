@@ -1,6 +1,6 @@
 # The coach: from pasted rules to a plan
 
-The coach is hackr's first feature (issue #4, data route D1 in [decisions.md](decisions.md)). A
+The coach is hackbrief's first feature (issue #4, data route D1 in [decisions.md](decisions.md)). A
 user pastes a hackathon's rules and judging text at `/coach` and gets a brief:
 
 - the submission deadline and how many days are left;
@@ -12,7 +12,7 @@ user pastes a hackathon's rules and judging text at `/coach` and gets a brief:
 
 ## Privacy
 
-The text is read in the browser, on the page. It is not sent to hackr's server or to anyone else,
+The text is read in the browser, on the page. It is not sent to hackbrief's server or to anyone else,
 and it is not stored. A check in a real browser on 2 November 2026 confirmed that building a brief
 makes no network request carrying the text.
 

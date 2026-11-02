@@ -1,5 +1,5 @@
 /**
- * hackr's mark: a bold lowercase "h" in an ink square, with an orange block beside it, a typing
+ * hackbrief's mark: a bold lowercase "h" in an ink square, with an orange block beside it, a typing
  * cursor: hacking, and the next move. It follows the colour theme through the CSS variables.
  */
 export function LogoMark({ className = "size-7", title }: { className?: string; title?: string }) {
@@ -28,7 +28,7 @@ export function Logo({ className = "" }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <LogoMark />
-      <span className="text-lg font-semibold tracking-[-0.03em]">hackr</span>
+      <span className="text-lg font-semibold tracking-[-0.03em]">hackbrief</span>
     </span>
   );
 }

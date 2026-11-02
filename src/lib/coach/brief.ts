@@ -23,7 +23,7 @@ export interface Brief {
   prizes: PrizeLine[];
   topPrizes: Amount[];
   plan: PlanStep[];
-  /** What hackr could not find or had to assume, in plain words. */
+  /** What hackbrief could not find or had to assume, in plain words. */
   warnings: string[];
 }
 
@@ -37,10 +37,10 @@ function warningsFor(brief: Omit<Brief, "warnings">, truncated: boolean): string
     warnings.push("No judging criteria found. Paste the judging or rubric section to get strategy notes.");
   } else if (judging.unit === "none") {
     warnings.push(
-      `The rules list ${judging.criteria.length} criteria without weights, so hackr treats them as equal. Ask the organisers if some count more.`,
+      `The rules list ${judging.criteria.length} criteria without weights, so hackbrief treats them as equal. Ask the organisers if some count more.`,
     );
   } else if (judging.unit === "percent" && judging.statedTotal !== 100) {
-    warnings.push(`The stated weights add up to ${judging.statedTotal}%, so hackr scaled them to 100%.`);
+    warnings.push(`The stated weights add up to ${judging.statedTotal}%, so hackbrief scaled them to 100%.`);
   }
   if (!brief.deadline) {
     warnings.push("No submission deadline found, so there is no countdown or prep plan.");
@@ -48,7 +48,7 @@ function warningsFor(brief: Omit<Brief, "warnings">, truncated: boolean): string
     warnings.push("The submission deadline has passed.");
   }
   if (brief.dates.some((date) => date.yearAssumed)) {
-    warnings.push("Some dates had no year; hackr assumed the next one that keeps them upcoming.");
+    warnings.push("Some dates had no year; hackbrief assumed the next one that keeps them upcoming.");
   }
   return warnings;
 }

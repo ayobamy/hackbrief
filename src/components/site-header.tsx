@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { Logo } from "./logo";
 
-export const REPOSITORY_URL = "https://github.com/ayobamy/hackr";
+export const REPOSITORY_URL = "https://github.com/ayobamy/hackbrief";
 
 const LINK =
   "rounded-md px-2 py-1 text-sm text-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
@@ -14,7 +14,7 @@ export function SiteHeader() {
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <Link
           href="/"
-          aria-label="hackr, home"
+          aria-label="hackbrief, home"
           className="rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
         >
           <Logo />

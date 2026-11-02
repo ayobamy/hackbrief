@@ -16,7 +16,7 @@ export interface KeyDate {
   date: string;
   /** The time of day as written ("11:59 PM PT"), or null. */
   time: string | null;
-  /** The rules gave no year, so hackr assumed the one that keeps the date upcoming. */
+  /** The rules gave no year, so hackbrief assumed the one that keeps the date upcoming. */
   yearAssumed: boolean;
   /** The line of the rules the date came from. */
   source: string;

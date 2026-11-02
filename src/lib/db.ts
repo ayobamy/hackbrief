@@ -10,7 +10,7 @@ function createDatabase(url: string) {
 
 // One client per server process. Kept on globalThis so that hot reloads in development reuse it
 // instead of opening a new pool on every edit.
-const globalForDatabase = globalThis as typeof globalThis & { hackrDatabase?: Database };
+const globalForDatabase = globalThis as typeof globalThis & { hackbriefDatabase?: Database };
 
 /**
  * The database client, created on first use so that builds and tests that never touch the
@@ -21,6 +21,6 @@ export function getDatabase(): Database {
   if (!url) {
     throw new Error("DATABASE_URL is not set; copy .env.example to .env.local");
   }
-  globalForDatabase.hackrDatabase ??= createDatabase(url);
-  return globalForDatabase.hackrDatabase;
+  globalForDatabase.hackbriefDatabase ??= createDatabase(url);
+  return globalForDatabase.hackbriefDatabase;
 }

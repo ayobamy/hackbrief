@@ -30,14 +30,14 @@ erDiagram
 
 ### `sources`
 
-One row per site in [sources.md](sources.md) that hackr collects from.
+One row per site in [sources.md](sources.md) that hackbrief collects from.
 
 | Column | Type | Notes |
 | --- | --- | --- |
 | `id` | serial | |
 | `slug` | text, unique | `hackclub`, `kaggle`, `hackster`, `nasa-space-apps` |
 | `name`, `url` | text | Shown with every event, linked |
-| `channel` | enum: `api`, `feed`, `repository`, `manual` | How hackr reads it |
+| `channel` | enum: `api`, `feed`, `repository`, `manual` | How hackbrief reads it |
 | `attribution` | text | The credit the source asks for, shown as written |
 | `terms_url`, `terms_read_on` | text, date | When the terms were last read |
 | `enabled` | boolean | Off stops the import at once, without a deploy |
@@ -90,7 +90,7 @@ Which source listed which event, so one event found in two places stays one even
 
 | Table | Columns | Notes |
 | --- | --- | --- |
-| `projects` | `event_id`, `source_id`, `name`, `summary`, `team_size`, `url`, `repo_url`, `demo_url`, `video_url`, `licence`, `prize_place`, `won` | Only from sources whose terms allow it (NASA Space Apps, DrivenData winners on GitHub). `summary` is hackr's own words, not a copy |
+| `projects` | `event_id`, `source_id`, `name`, `summary`, `team_size`, `url`, `repo_url`, `demo_url`, `video_url`, `licence`, `prize_place`, `won` | Only from sources whose terms allow it (NASA Space Apps, DrivenData winners on GitHub). `summary` is hackbrief's own words, not a copy |
 | `project_technologies` | `project_id`, `technology_id` | Feeds "common stacks among winners" |
 
 ### Import bookkeeping
@@ -128,7 +128,7 @@ order by e.deadline_on;
 
 ## Rules for the schema
 
-- **Facts, not copies.** Store dates, weights, amounts and links; write summaries in hackr's own
+- **Facts, not copies.** Store dates, weights, amounts and links; write summaries in hackbrief's own
   words or leave them out.
 - **Numbers in code.** Weights, statuses and fit scores are computed by tested functions and stored
   as their results; the database holds no hidden logic.

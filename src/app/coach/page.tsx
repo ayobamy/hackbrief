@@ -20,7 +20,7 @@ export default function CoachPage() {
           <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">Coach</p>
           <h1 className="text-4xl font-semibold tracking-[-0.04em]">Paste the rules, get a plan</h1>
           <p className="text-muted">
-            Paste a hackathon&apos;s rules and judging criteria. hackr pulls out the dates, who can
+            Paste a hackathon&apos;s rules and judging criteria. hackbrief pulls out the dates, who can
             enter and what to submit, and turns the judging weights into where to spend your time.
           </p>
         </header>

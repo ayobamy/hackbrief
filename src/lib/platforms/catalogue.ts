@@ -1,4 +1,4 @@
-// Every platform in docs/platforms.md, with hackr's verdict on it. Generated from that file, and a
+// Every platform in docs/platforms.md, with hackbrief's verdict on it. Generated from that file, and a
 // test (catalogue.test.ts) fails if the two drift apart; change the docs and this list together.
 
 export type Verdict = "use" | "care" | "ask" | "link" | "do-not-collect";

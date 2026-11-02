@@ -35,7 +35,7 @@ function toEvent(entry: string): SourceEvent | null {
   if (!id || !title || !link || !canonicalUrl(link)) {
     return null;
   }
-  // The feed carries no contest dates, and its summary text is Hackster's: hackr keeps the facts
+  // The feed carries no contest dates, and its summary text is Hackster's: hackbrief keeps the facts
   // (title, link, sponsor) and links to the contest page for the rest.
   return {
     externalId: id,

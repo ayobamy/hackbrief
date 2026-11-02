@@ -159,7 +159,7 @@ describe("buildBrief on the samples", () => {
     expect(brief.team).toMatchObject({ min: 1, max: 3, soloAllowed: true });
     expect(brief.checklist.map(({ id }) => id)).toEqual(["repository", "readme", "live-demo", "licence", "pitch"]);
     expect(brief.topPrizes).toEqual([{ currency: "GBP", value: 2000 }]);
-    expect(brief.warnings).toEqual(["Some dates had no year; hackr assumed the next one that keeps them upcoming."]);
+    expect(brief.warnings).toEqual(["Some dates had no year; hackbrief assumed the next one that keeps them upcoming."]);
   });
 });
 
@@ -173,10 +173,10 @@ describe("buildBrief warnings", () => {
 
   it("says when criteria have no weights, weights do not add up, or the deadline has passed", () => {
     expect(buildBrief("Judging\n- Innovation\n- Design\nDeadline: 2027-01-01", TODAY).warnings[0]).toBe(
-      "The rules list 2 criteria without weights, so hackr treats them as equal. Ask the organisers if some count more.",
+      "The rules list 2 criteria without weights, so hackbrief treats them as equal. Ask the organisers if some count more.",
     );
     expect(buildBrief("Judging\n- Impact (60%)\n- Design (30%)", TODAY).warnings[0]).toBe(
-      "The stated weights add up to 90%, so hackr scaled them to 100%.",
+      "The stated weights add up to 90%, so hackbrief scaled them to 100%.",
     );
     expect(buildBrief("Judging\n- Impact (100%)\nSubmission deadline: 2026-10-01", TODAY).warnings).toEqual([
       "The submission deadline has passed.",

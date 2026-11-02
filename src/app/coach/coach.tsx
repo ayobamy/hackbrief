@@ -267,7 +267,7 @@ export function Coach() {
           className={`w-full rounded-lg border border-line bg-panel p-3 font-mono text-sm ${FOCUS_RING}`}
         />
         <p id={hintId} className="text-sm text-muted">
-          Your text stays in your browser: hackr reads it on this page and does not send or store
+          Your text stays in your browser: hackbrief reads it on this page and does not send or store
           it.
         </p>
         <div className="flex flex-wrap items-center gap-3">

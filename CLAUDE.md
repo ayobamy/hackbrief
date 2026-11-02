@@ -1,8 +1,8 @@
-# hackr: notes for Claude Code
+# hackbrief: notes for Claude Code
 
 Ahmed Olawale's open-source project: a hackathon finder and coach. It tells early-career
 developers and students which hackathons to join and how to win them, without reading ten pages
-of rules for each one. The repository is public on GitHub: `ayobamy/hackr`.
+of rules for each one. The repository is public on GitHub: `ayobamy/hackbrief`.
 
 **Read [docs/START-HERE.md](docs/START-HERE.md) first.** It has the idea, what is decided, the
 blocker on data sources, the open questions and the first steps.
@@ -85,7 +85,7 @@ that reads the database or the request starts with `await connection()` or uses 
 ## Environment
 
 - `gh` is logged in as `ayobamy` (git protocol: SSH).
-- `origin` is `git@github-personal:ayobamy/hackr.git`: the `github-personal` SSH alias uses
+- `origin` is `git@github-personal:ayobamy/hackbrief.git`: the `github-personal` SSH alias uses
   Ahmed's personal key. Keep that form for any new remote.
 - Node.js 24, pnpm 10 and Docker are installed (Markdown lint runs through
   `npx markdownlint-cli2`). `make check` needs the local Postgres: run `make db-up` first.

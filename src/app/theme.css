@@ -1,5 +1,5 @@
 /*
- * hackr's colour tokens, the one place raw colours live. Warm paper and near-black ink, one signal
+ * hackbrief's colour tokens, the one place raw colours live. Warm paper and near-black ink, one signal
  * orange used for marks and bars only (never for body text, where it would fail contrast). Muted
  * text keeps at least 4.5:1 against paper in both themes.
  */

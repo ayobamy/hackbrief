@@ -11,7 +11,7 @@ test("the home page leads to the coach and the event list", async ({
   await expect(
     page.getByRole("link", { name: "Browse upcoming hackathons" }),
   ).toHaveAttribute("href", "/events");
-  await expect(page.getByRole("link", { name: "hackr, home" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "hackbrief, home" })).toHaveAttribute(
     "href",
     "/",
   );

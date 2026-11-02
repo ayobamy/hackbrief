@@ -1,6 +1,6 @@
 # Architecture
 
-hackr is one Next.js 16 application on Vercel, with a Neon Postgres database, a daily import job
+hackbrief is one Next.js 16 application on Vercel, with a Neon Postgres database, a daily import job
 for the sources whose terms allow it, and the coach running in the visitor's browser. The
 decisions behind each piece are in [decisions.md](decisions.md) (D1 to D8).
 
@@ -51,7 +51,7 @@ sequenceDiagram
   Cron->>Job: GET, Authorization: Bearer CRON_SECRET
   Job->>DB: start an import run
   loop each enabled source adapter
-    Job->>Source: fetch with hackr's user agent, at most one request a second
+    Job->>Source: fetch with hackbrief's user agent, at most one request a second
     Source-->>Job: JSON or Atom
     Job->>Job: validate against a schema, normalise to an event
     Job->>DB: upsert by (source, external ID)
@@ -61,7 +61,7 @@ sequenceDiagram
 ```
 
 - **One adapter per source** in `src/lib/sources/`, each a pure function from the source's
-  response to hackr's event shape, tested against recorded fixtures. Adding a source means adding
+  response to hackbrief's event shape, tested against recorded fixtures. Adding a source means adding
   an adapter and its row in [sources.md](sources.md), nothing else.
 - **Idempotent:** the same run twice changes nothing; an event that disappears from a source is
   marked as no longer listed, not deleted.
@@ -97,7 +97,7 @@ is computed there; with sign-in it is saved on the server.
 
 ### Summaries from a language model (later)
 
-A summary is generated once per event from the facts hackr has already computed, through a free
+A summary is generated once per event from the facts hackbrief has already computed, through a free
 OpenRouter model, stored with the event, and labelled as written by a model. When the model is
 unavailable or over its limit, the page shows the computed facts without a summary (D5).
 
@@ -116,7 +116,7 @@ src/lib/fit/             the fit score (planned)
 
 ## Limits that shape the design
 
-| Service | Limit (read 2 November 2026) | Effect on hackr |
+| Service | Limit (read 2 November 2026) | Effect on hackbrief |
 | --- | --- | --- |
 | Vercel Hobby | Non-commercial use only; cron once a day, started within the hour; functions up to 300 s; 1,000,000 invocations and 4 active CPU-hours a month | Daily imports; static and cached pages; move to Pro before taking money in any form |
 | Neon Free | 1 GB per project; 100 CU-hours a month; compute pauses after 5 idle minutes; 10 branches per project | Facts only, no copied pages; cached reads so the compute can sleep; clean up preview branches (#7) |
@@ -139,7 +139,7 @@ src/lib/fit/             the fit score (planned)
 
 | Failure | What the visitor sees | How it is caught |
 | --- | --- | --- |
-| A source is down or blocks hackr | Yesterday's events from that source | The import run records the error; blocks stop that source until a person looks |
+| A source is down or blocks hackbrief | Yesterday's events from that source | The import run records the error; blocks stop that source until a person looks |
 | A source changes its format | Records that fail validation are skipped, others go through | Counts per source in the import run; adapter tests use recorded responses |
 | The database is paused | A slower first page (the compute wakes in well under the 5 s health limit) | `/api/health` |
 | The database is down | Cached pages keep working; uncached ones show an error page | `/api/health` returns 503 |

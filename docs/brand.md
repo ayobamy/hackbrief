@@ -1,13 +1,13 @@
 # Brand
 
-hackr's logo, colours and type, and how to use them. Added in issue #17.
+hackbrief's logo, colours and type, and how to use them. Added in issue #17.
 
 ## The logo
 
-![The hackr mark](../public/logo-mark.svg)
+![The hackbrief mark](../public/logo-mark.svg)
 
 The mark is a bold lowercase "h" in a rounded ink square, with an orange block beside it like a
-typing cursor: hacking, and the next move. Beside the wordmark "hackr" it forms the logo.
+typing cursor: hacking, and the next move. Beside the wordmark "hackbrief" it forms the logo.
 
 | File | Use |
 | --- | --- |

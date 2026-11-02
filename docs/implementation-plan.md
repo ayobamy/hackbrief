@@ -131,6 +131,6 @@ paging and filtering.
 
 1. Send the Devpost request ([outreach/devpost.md](outreach/devpost.md)) and record the answer.
 2. Ask MLH, Devfolio, ETHGlobal, lablab.ai, Zindi, Unstop and TAIKAI in turn, starting with the
-   ones with most events for hackr's users; record each answer in sources.md.
+   ones with most events for hackbrief's users; record each answer in sources.md.
 3. An organiser submission form (route D in START-HERE), reviewed by hand before publishing. This
    is the main way to cover Africa, where no single calendar exists ([platforms.md](platforms.md)).

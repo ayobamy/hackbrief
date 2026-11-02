@@ -1,7 +1,7 @@
 # Hackathon platforms
 
 Every platform found that lists hackathons or competitions, grouped by kind and region, with what
-each shows and what hackr may do with it. Researched on 2 November 2026. The verdicts and their
+each shows and what hackbrief may do with it. Researched on 2 November 2026. The verdicts and their
 reasons are in [sources.md](sources.md):
 
 - **Use now:** an API, feed or open licence allows it.
@@ -11,7 +11,7 @@ reasons are in [sources.md](sources.md):
 - **Do not collect.**
 
 "Rules" means the platform shows each event's rules or judging criteria; "Winners" means it shows
-past winning projects, which feed hackr's past-winner patterns.
+past winning projects, which feed hackbrief's past-winner patterns.
 
 ## Student and general listings
 
@@ -177,7 +177,7 @@ START-HERE) and links shared by users the main way to cover the region.
 Cloud and AI vendors (AWS, Google, Microsoft, IBM Call for Code) and blockchain ecosystems
 (Chainlink, Polkadot, NEAR, Base, Hedera, Stellar, Cardano, Sui, Avalanche) mostly run their
 hackathons on Devpost, DoraHacks, Devfolio, Kaggle or their own one-off sites; none offers a feed
-hackr may use. [Hugging Face](https://huggingface.co) hackathon organisations are the exception:
+hackbrief may use. [Hugging Face](https://huggingface.co) hackathon organisations are the exception:
 its Hub API is usable with care. Link out to the rest.
 
 ## Contest and bounty platforms (second pass)

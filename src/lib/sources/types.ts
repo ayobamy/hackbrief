@@ -1,6 +1,6 @@
 export type EventFormat = "online" | "in_person" | "hybrid";
 
-/** One hackathon as a source lists it, in hackr's shape. Dates are YYYY-MM-DD. */
+/** One hackathon as a source lists it, in hackbrief's shape. Dates are YYYY-MM-DD. */
 export interface SourceEvent {
   /** The source's own ID for the event; with the source, it makes imports idempotent. */
   externalId: string;
@@ -21,7 +21,7 @@ export interface SourceEvent {
 
 export interface ParseResult {
   events: SourceEvent[];
-  /** Entries left out: malformed, ended, or from an origin hackr may not use. */
+  /** Entries left out: malformed, ended, or from an origin hackbrief may not use. */
   skipped: number;
 }
 
