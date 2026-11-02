@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { filterQuery, parseFilters } from "./filters";
-import { dateTile, formatDateRange, formatLocation, isWebUrl, prizeLine } from "./format";
+import { creditText, dateTile, formatDateRange, formatLocation, formatUpdated, isWebUrl, prizeLine } from "./format";
 
 const SLUGS = ["hackclub", "hackster", "hackhq"];
 
@@ -91,5 +91,31 @@ describe("isWebUrl", () => {
     ["falcon-hack.example", false],
   ])("%s is a web link: %s", (url, expected) => {
     expect(isWebUrl(url)).toBe(expected);
+  });
+});
+
+describe("formatUpdated", () => {
+  it("writes a date the way the credit line shows it", () => {
+    expect(formatUpdated("2026-10-19")).toBe("19 Oct 2026");
+  });
+});
+
+describe("creditText", () => {
+  const credit = { name: "Université Fictive", url: "https://universite-fictive.example", updatedOn: "2027-01-20" };
+
+  it("is the source's attribution when the licence names nobody else", () => {
+    expect(creditText({ attribution: "Hack Club Hackathons", credit: null })).toBe("Hack Club Hackathons");
+  });
+
+  it("names the licensor and the last update where the licence asks", () => {
+    expect(creditText({ attribution: "OpenAgenda (Licence Ouverte 2.0)", credit })).toBe(
+      "Université Fictive on OpenAgenda (Licence Ouverte 2.0), updated 20 Jan 2027",
+    );
+  });
+
+  it("leaves the date out when the source gives none", () => {
+    expect(creditText({ attribution: "OpenAgenda (Licence Ouverte 2.0)", credit: { ...credit, updatedOn: null } })).toBe(
+      "Université Fictive on OpenAgenda (Licence Ouverte 2.0)",
+    );
   });
 });

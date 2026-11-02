@@ -67,6 +67,5 @@ export const hackster: Source = {
   name: "Hackster.io contests",
   url: "https://www.hackster.io/contests",
   attribution: "Hackster.io",
-  feedUrl: "https://www.hackster.io/contests.atom",
-  parse: parseHacksterFeed,
+  load: async (fetchBody) => parseHacksterFeed(await fetchBody("https://www.hackster.io/contests.atom")),
 };

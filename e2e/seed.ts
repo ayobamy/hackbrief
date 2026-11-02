@@ -10,6 +10,13 @@ import { SOURCES } from "../src/lib/sources";
 export const SEEDED = 26;
 
 const FORMATS = ["online", "in_person", "hybrid"] as const;
+
+/** The fictional licensor credited on the listings OpenAgenda gets (Fictional Hack 09 to 11, 21 to 23). */
+export const OPENAGENDA_CREDIT = {
+  creditName: "Université Fictive",
+  creditUrl: "https://universite-fictive.example/",
+  creditUpdatedOn: "2026-10-19",
+};
 const DAY_MS = 86_400_000;
 
 function daysFromToday(days: number): string {
@@ -59,13 +66,18 @@ export default async function seed() {
     const eventRows = await db.insert(events).values(listings).returning({ id: events.id });
 
     await db.insert(eventSources).values(
-      eventRows.map((row, index) => ({
-        eventId: row.id,
+      eventRows.map((row, index) => {
         // Sources rotate every three events, so no source lines up with one format.
-        sourceId: sourceRows[Math.floor(index / FORMATS.length) % sourceRows.length]?.id ?? 0,
-        externalId: `fictional-${number(index)}`,
-        sourceUrl: `https://example.org/listed/${number(index)}`,
-      })),
+        const slot = Math.floor(index / FORMATS.length) % sourceRows.length;
+        return {
+          eventId: row.id,
+          sourceId: sourceRows[slot]?.id ?? 0,
+          externalId: `fictional-${number(index)}`,
+          sourceUrl: `https://example.org/listed/${number(index)}`,
+          // OpenAgenda's licence names each listing's licensor and last update.
+          ...(SOURCES[slot]?.slug === "openagenda" ? OPENAGENDA_CREDIT : {}),
+        };
+      }),
     );
   } finally {
     await client.end();

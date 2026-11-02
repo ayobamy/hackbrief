@@ -97,6 +97,6 @@ export const hackHq: Source = {
   name: "HackHQ",
   url: SOURCE_URL,
   attribution: "HackHQ (MIT licence)",
-  feedUrl: "https://raw.githubusercontent.com/Hack-HQ/hackhq/main/.github/scripts/listings.json",
-  parse: parseHackHq,
+  load: async (fetchBody) =>
+    parseHackHq(await fetchBody("https://raw.githubusercontent.com/Hack-HQ/hackhq/main/.github/scripts/listings.json")),
 };

@@ -2,7 +2,7 @@ import { and, asc, eq, exists, gte, inArray, isNull, or, sql } from "drizzle-orm
 
 import { eventSources, events, sources } from "@/db/schema";
 import type { Database } from "@/lib/db";
-import type { EventFormat } from "@/lib/sources/types";
+import type { EventFormat, ListingCredit } from "@/lib/sources/types";
 
 import type { EventFilters } from "./filters";
 
@@ -12,6 +12,8 @@ export interface ListingSource {
   attribution: string;
   /** The page on the source that lists this event. */
   url: string;
+  /** Who else to credit for this listing, where the source's licence asks (OpenAgenda). */
+  credit: ListingCredit | null;
 }
 
 export interface EventListing {
@@ -95,6 +97,9 @@ async function withSources(db: Database, rows: Array<Omit<EventListing, "sources
       name: sources.name,
       attribution: sources.attribution,
       url: eventSources.sourceUrl,
+      creditName: eventSources.creditName,
+      creditUrl: eventSources.creditUrl,
+      creditUpdatedOn: eventSources.creditUpdatedOn,
     })
     .from(eventSources)
     .innerJoin(sources, eq(sources.id, eventSources.sourceId))
@@ -103,6 +108,14 @@ async function withSources(db: Database, rows: Array<Omit<EventListing, "sources
 
   return rows.map((row) => ({
     ...row,
-    sources: links.filter((link) => link.eventId === row.id).map(({ slug, name, attribution, url }) => ({ slug, name, attribution, url })),
+    sources: links
+      .filter((link) => link.eventId === row.id)
+      .map(({ slug, name, attribution, url, creditName, creditUrl, creditUpdatedOn }) => ({
+        slug,
+        name,
+        attribution,
+        url,
+        credit: creditName ? { name: creditName, url: creditUrl, updatedOn: creditUpdatedOn } : null,
+      })),
   }));
 }

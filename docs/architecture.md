@@ -15,7 +15,7 @@ flowchart LR
     cron[["Vercel Cron<br/>once a day"]]
   end
   db[("Neon Postgres 18<br/>aws-us-east-1")]
-  sources[["Allowed sources<br/>Hack Club API · Kaggle API<br/>Hackster feed · GitHub repositories"]]
+  sources[["Allowed sources<br/>Hack Club API · OpenAgenda API<br/>Hackster feed · GitHub repositories"]]
   llm[["OpenRouter free models<br/>(later)"]]
 
   user -- HTTPS --> pages
@@ -60,9 +60,10 @@ sequenceDiagram
   Job->>Job: revalidate the cached event pages
 ```
 
-- **One adapter per source** in `src/lib/sources/`, each a pure function from the source's
-  response to hackbrief's event shape, tested against recorded fixtures. Adding a source means adding
-  an adapter and its row in [sources.md](sources.md), nothing else.
+- **One adapter per source** in `src/lib/sources/`: its `load` fetches through the function the
+  import hands it (once for a feed, page by page for an API with a key), and a pure parser turns
+  the response into hackbrief's event shape, tested against recorded fixtures. Adding a source means
+  adding an adapter and its row in [sources.md](sources.md), nothing else.
 - **Idempotent:** the same run twice changes nothing; an event that disappears from a source is
   marked as no longer listed, not deleted.
 - **Within the limits:** Hobby allows cron jobs once a day, started within the hour, and functions
