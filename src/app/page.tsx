@@ -7,6 +7,7 @@ import {
   UpcomingPreview,
   UpcomingSkeleton,
 } from "@/components/landing-panels";
+import { GitHubStar } from "@/components/github-star";
 import { CountUp } from "@/components/motion/count-up";
 import { Reveal } from "@/components/motion/reveal";
 import { PlatformMarquee } from "@/components/platform-marquee";
@@ -418,12 +419,7 @@ export default function Home() {
               >
                 Browse hackathons
               </Link>
-              <a
-                href={REPOSITORY_URL}
-                className={`inline-flex items-center gap-2 px-5 py-3 text-sm font-medium text-paper transition-opacity hover:opacity-80 ${FOCUS}`}
-              >
-                Star it on GitHub
-              </a>
+              <GitHubStar href={REPOSITORY_URL} />
             </div>
           </div>
         </section>

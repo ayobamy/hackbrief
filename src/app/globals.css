@@ -9,6 +9,11 @@
   --color-panel: var(--panel);
   --color-accent: var(--accent);
   --color-on-accent: var(--on-accent);
+  --color-gh-button: var(--gh-button);
+  --color-gh-button-hover: var(--gh-button-hover);
+  --color-gh-button-border: var(--gh-button-border);
+  --color-gh-button-text: var(--gh-button-text);
+  --color-star: var(--star);
   --color-background: var(--paper);
   --color-foreground: var(--ink);
   --font-sans: var(--font-geist-sans);
@@ -58,6 +63,40 @@ body {
   mask-image: radial-gradient(60% 85% at 95% -5%, black, transparent 75%);
   mix-blend-mode: overlay;
   opacity: var(--grain);
+}
+
+/* Specks that burst from the GitHub button's star when it is pointed at; each flies to its --to. */
+@keyframes sparkle {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--to-x), var(--to-y)) scale(0.3);
+  }
+}
+
+/*
+ * Scrollbars inside the coach's sheets and boxes: a dark track in the line colour and a thumb in the
+ * brand orange. scrollbar-color for Chrome and Firefox; the -webkit- rules for Safari.
+ */
+.scroll-brand {
+  scrollbar-color: var(--accent) var(--line);
+  scrollbar-width: thin;
+}
+
+.scroll-brand::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scroll-brand::-webkit-scrollbar-track {
+  background: var(--line);
+}
+
+.scroll-brand::-webkit-scrollbar-thumb {
+  background: var(--accent);
 }
 
 /* The faint dot grid the rubric playground's cards sit on. */
