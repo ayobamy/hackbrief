@@ -26,6 +26,13 @@ the sources in [sources.md](sources.md). House rules for every change are in
 5. Add an end-to-end test of the coach (Playwright: a sample, a pasted text, the focus move) to
    `make check` and CI. Done when CI runs it.
 
+## M2 and M3 so far (issue #10)
+
+The tables the import needs (sources, events, their links and import runs), the first migration,
+adapters for Hack Club, Hackster and HackHQ, and `/api/cron/import` with a daily schedule. Still
+open from M2 and M3: the remaining tables (criteria, prizes, projects), fictional seed data, the
+Kaggle adapter, revalidating cached pages after a run, and batching the import's queries.
+
 ## M2. The data model (START-HERE step 4)
 
 1. Add Drizzle Kit; write `src/db/schema.ts` as in [data-model.md](data-model.md). Done when

@@ -27,7 +27,7 @@ flowchart LR
   routes -. "summaries of computed facts" .-> llm
 ```
 
-Today the coach, the home page and the health route exist; the rest is planned in
+Today the coach, the home page, the health route and the daily import exist; the rest is planned in
 [implementation-plan.md](implementation-plan.md).
 
 ## Flows
@@ -39,7 +39,7 @@ the brief; nothing is sent to the server or stored. The page is prerendered as s
 costs no function time and never wakes the database. How each number is computed is in
 [coach.md](coach.md).
 
-### The daily import (next)
+### The daily import (built, issue #10)
 
 ```mermaid
 sequenceDiagram
@@ -67,7 +67,12 @@ sequenceDiagram
   marked as no longer listed, not deleted.
 - **Within the limits:** Hobby allows cron jobs once a day, started within the hour, and functions
   of up to 300 seconds. If the import grows past that, each source gets its own daily job.
-- **Protected:** the route answers only requests carrying the `CRON_SECRET` that Vercel sends.
+- **Protected:** the route answers only requests carrying the `CRON_SECRET` that Vercel sends, and
+  refuses everything when no secret is configured.
+- **Measured** on 2 November 2026: 51 events from three sources. Each listing takes about four
+  database round trips in turn, so a run took 90 to 120 seconds from a laptop 240 ms from the
+  database, and should take seconds on Vercel in the same region. Batching those queries is the
+  next step once sources grow.
 
 ### Event list and detail pages (next)
 

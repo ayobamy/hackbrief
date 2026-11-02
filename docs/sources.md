@@ -37,6 +37,26 @@ the same day and are to be re-read before hackr relies on them.
 | [Hackalist](https://github.com/Hackalist/Hackalist.github.io) | Older hackathon listings by month | Static JSON `/api/1.0/YEAR/MONTH.json` | "The API is public, so feel free to use it for your own projects." But "This site is no longer actively updated": history only, not current events. | Re-checked |
 | [HackHQ](https://github.com/Hack-HQ/hackhq) | A daily-updated list, mainly North American student hackathons | `listings.json` in an MIT repository | MIT. Its entries are extracted by a model from organisers' and Devpost pages, so treat them as leads: confirm each against the organiser's own site, and do not import text that came from Devpost. | Licence re-checked |
 
+## What the daily import reads
+
+Built in issue #10: `src/lib/sources/` holds one adapter per source and `/api/cron/import` runs
+them once a day. The first real run, on 2 November 2026, saved 52 listings as 51 events (one
+hackathon was listed twice and merged):
+
+| Source | Listings fetched | Saved | Left out |
+| --- | --- | --- | --- |
+| Hack Club Hackathons | 14 | 14 | 0 |
+| Hackster.io contests | 3 | 3 | 0 |
+| HackHQ | 238 | 35 | 203: ended, or taken from a platform that says ask first |
+
+- **HackHQ** entries are kept only when their origin is an organiser's site, Hack Club or one of
+  HackHQ's contributors, and their link is not on a platform listed under "Ask permission" or "Do
+  not collect" below (`src/lib/sources/restricted.ts`). Its entries from Devpost, MLH, Luma and
+  lablab.ai are never imported.
+- **Hackalist** is not imported: its newest file is from March 2025, so it has no current events.
+- **Kaggle** joins once there is an API token; **NASA Space Apps** and **DrivenData** winners join
+  with the past-winner patterns (M6 in [implementation-plan.md](implementation-plan.md)).
+
 ## Usable with care
 
 - **[Doorkeeper](https://www.doorkeeper.jp/developer/api?locale=en)** (Japan): a public API with a
