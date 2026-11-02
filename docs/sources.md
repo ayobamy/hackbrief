@@ -25,6 +25,33 @@ the same day and are to be re-read before hackbrief relies on them.
 6. **Facts, not copies.** hackbrief stores the facts it needs (name, dates, place, format, link,
    prizes, judging weights) and its own summaries, not copied descriptions.
 
+## Reading an event's own page
+
+Decision D11 (issue #41): when a visitor clicks **Build my brief** on a listing, hackbrief reads that
+hackathon's own page for them, so the brief can be built at once. The bounds:
+
+- **Listed events only.** The address comes from hackbrief's database, never from what a visitor
+  types; the coach's optional link field is a label and is never fetched.
+- **Restricted platforms are never read.** That covers every platform under "Ask permission" and "Do
+  not collect" below (`src/lib/sources/restricted.ts`), and Hackster's contest pages, whose feed
+  alone is used. A redirect to one of them stops the read.
+- **robots.txt is obeyed** for the user agent `hackbrief` (RFC 9309): a missing file allows reading,
+  a server error forbids it.
+- **The fetch is hardened** (`src/lib/rules/`). Only http(s) is read. Every connection must reach a
+  public IP address: the DNS answer is checked as the connection is made, and an address written as
+  an IP is checked before. Redirects are followed by hand (at most 3) and checked like the first
+  request. Each request has an 8-second limit, at most 2 MB is read, and only HTML or plain text is
+  used.
+- **One page plus at most two.** The event's page, and at most two pages on the same site whose path
+  names its rules, FAQ, judging, criteria or guidelines.
+- **Cached for hours, never stored.** The result sits in the server's cache for hours, so an
+  organiser's site sees at most a few requests a day; nothing is written to the database. The text
+  is shown to the visitor who asked, in the coach's box, and the brief keeps facts, not copies.
+
+Unlike a source in the tables below, an organiser's own site is not checked against its terms
+first: hackbrief reads it once on a visitor's behalf, the way their browser would, identified by its
+user agent. A site that objects can disallow `hackbrief` in its robots.txt, and it is no longer read.
+
 ## Use now
 
 | Source | What hackbrief gets | Channel | Conditions | Status |

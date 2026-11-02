@@ -86,3 +86,14 @@ export function localToday(now: Date = new Date()): string {
   const day = String(now.getDate()).padStart(2, "0");
   return `${now.getFullYear()}-${month}-${day}`;
 }
+
+/** Whether a text gave the brief anything to show: a deadline, judging criteria, a team size, something to hand in or a prize. */
+export function hasFindings(brief: Brief): boolean {
+  return (
+    brief.deadline !== null ||
+    brief.judging.criteria.length > 0 ||
+    brief.team !== null ||
+    brief.checklist.length > 0 ||
+    brief.topPrizes.length > 0
+  );
+}

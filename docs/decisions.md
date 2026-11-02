@@ -179,7 +179,7 @@ changes keeps its entry, with a note pointing at the one that replaces it.
 
 ## D10. Briefs from listings are guided, not fetched
 
-- **Decided:** 2 November 2026, by Ahmed.
+- **Decided:** 2 November 2026, by Ahmed. Changed the same day by D11, which reads the event's page.
 - **Decision:** "Build my brief" on a listing opens the coach for that event with its facts filled
   in and a link to its own page; the visitor copies the rules in. hackbrief does not fetch
   organisers' pages or links that visitors type.
@@ -192,3 +192,20 @@ changes keeps its entry, with a note pointing at the one that replaces it.
   a visitor types.
 - **Revisit when:** Devpost grants permission (`docs/outreach/devpost.md`), or a source offers
   rules in a form hackbrief may read.
+
+## D11. Read an event's own page when a visitor asks
+
+- **Decided:** 2 November 2026, by Ahmed. Changes D10.
+- **Decision:** when a visitor clicks "Build my brief" on a listing, hackbrief reads that
+  hackathon's own page (and up to two same-site rules pages) and builds the brief at once when it
+  finds anything; otherwise the guided paste of D10 still applies. The bounds are in
+  [sources.md](sources.md#reading-an-events-own-page): listed events only, restricted platforms and
+  feed-only sources never read, robots.txt obeyed, public addresses only, time and size limits, and
+  a cache of hours instead of storage.
+- **Why:** the copy-and-paste step is the slowest part of the coach, and Ahmed wants the brief at
+  once wherever the page allows it. The probe behind D10 still sets expectations: most organisers'
+  homepages hold little of their rules, so many briefs will be partial or fall back to pasting.
+  Checked on 2 November 2026: itch.io's Game Off page gives the deadline, and one listed site gives
+  a full brief from three pages.
+- **What it does not change:** links that visitors type are still never fetched, and Devpost is
+  still not read without its permission.

@@ -24,6 +24,14 @@ and who listed it), a link to its own page to copy the rules from, and the paste
 titled with the event. The id is checked to be a well-formed UUID before it reaches the database
 (`src/lib/events/context.ts`), and any other value gives the plain coach.
 
+Since issue #41 (decision D11) the server also reads that hackathon's own page, and up to two
+same-site pages whose path names its rules, FAQ or judging. When the coach finds anything in them
+(a deadline, criteria, a team size, something to hand in or a prize), it fills the box and builds the
+brief at once, and says which pages it read; anything still missing can be pasted in. When it finds
+nothing, or may not read the page, it says why and asks for a paste as before. If the visitor has
+already started typing, their text is left alone. How the page is read is in
+[sources.md](sources.md#reading-an-events-own-page).
+
 For a hackathon hackbrief does not list, an optional field takes the link to its page. The link
 only labels the brief and links back; hackbrief never opens or reads it, and it stays in the
 browser like the pasted text. Only the event id of a listed event goes to the server, to look the

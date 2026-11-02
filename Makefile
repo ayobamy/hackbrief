@@ -41,10 +41,11 @@ build:
 	pnpm run build
 
 # End-to-end tests in Chromium against the production build; run `make e2e-install` once first.
-# They read the test database, which e2e/seed.ts fills with fictional hackathons, never DATABASE_URL.
+# They read the test database, which e2e/seed.ts fills with fictional hackathons, never DATABASE_URL,
+# and never fetch real event pages (READ_EVENT_PAGES=off), so they need no internet.
 e2e:
 	DATABASE_URL=$(TEST_DATABASE_URL) DATABASE_URL_UNPOOLED= pnpm exec drizzle-kit migrate
-	DATABASE_URL=$(TEST_DATABASE_URL) pnpm exec playwright test
+	READ_EVENT_PAGES=off DATABASE_URL=$(TEST_DATABASE_URL) pnpm exec playwright test
 
 e2e-install:
 	pnpm exec playwright install chromium

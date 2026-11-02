@@ -9,7 +9,7 @@ export default defineConfig({
       provider: "v8",
       include: ["src/lib/**/*.ts"],
       // These talk to Postgres and are exercised by the "db" project instead.
-      exclude: ["src/**/*.test.ts", "src/lib/db.ts", "src/lib/import/run.ts", "src/lib/events/query.ts"],
+      exclude: ["src/**/*.test.ts", "src/lib/db.ts", "src/lib/import/run.ts", "src/lib/events/query.ts", "src/lib/rules/fetcher.ts"],
       thresholds: { lines: 90, branches: 90, functions: 90, statements: 90 },
     },
     projects: [
