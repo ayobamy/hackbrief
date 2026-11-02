@@ -53,8 +53,9 @@ blocker on data sources, the open questions and the first steps.
 ## Layout
 
 ```text
-src/app/                Next.js App Router: pages, layouts and route handlers (api/health)
+src/app/                Next.js App Router: pages (/, /coach), layouts, route handlers (api/health)
 src/lib/                logic with unit tests beside it (*.test.ts); *.db.test.ts need Postgres
+src/lib/coach/          the coach: parsers for pasted rules, strategy, plan (docs/coach.md)
 docs/                   START-HERE, the MVP outline, decisions and sources
 compose.yaml            Postgres 18 for local work (make db-up), host port 5433
 .github/workflows/      CI: make check against a Postgres service, on pull requests and main
