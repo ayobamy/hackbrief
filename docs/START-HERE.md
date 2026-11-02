@@ -73,8 +73,8 @@ Not yet a full review; these came up while reading Devpost's terms:
   [Bright Data](https://brightdata.com/products/web-scraper/devpost).
 
 They collect data. None of them is a coach that turns a rubric and past winners into a plan,
-which is where hackr differs. A proper review of existing hackathon finders and coaching tools is
-one of the first steps.
+which is where hackr differs. The full review of finders and coaching tools is in
+[competitors.md](competitors.md).
 
 ## Questions answered
 
@@ -87,7 +87,8 @@ first coach), and no sign-in yet. The reasons and the plan limits are in
 
 1. Settle the data route and the stack: issue #3 ([decisions.md](decisions.md)).
 2. `docs/sources.md`: each source's terms and robots.txt read and cited, with what may be
-   collected.
+   collected: issue #5 ([sources.md](sources.md), [platforms.md](platforms.md)). What comes
+   next is in [implementation-plan.md](implementation-plan.md).
 3. Scaffold the app, extend `make check` with the linters and tests, and run it in CI: issue #3.
 4. The data model, with fixtures of fictional events, rubrics and winners.
 5. The coach from pasted rules: extract dates, eligibility, deliverables and judging criteria

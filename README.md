@@ -10,6 +10,17 @@ outline in
 [docs/mvp-outline.md](docs/mvp-outline.md) and what has been decided in
 [docs/decisions.md](docs/decisions.md).
 
+## Docs
+
+- [START-HERE](docs/START-HERE.md): the idea, what is decided and the first steps
+- [decisions.md](docs/decisions.md): what was decided and why
+- [coach.md](docs/coach.md): how the coach reads rules and computes each number
+- [architecture.md](docs/architecture.md) and [data-model.md](docs/data-model.md): how hackr is built
+- [implementation-plan.md](docs/implementation-plan.md): what comes next
+- [sources.md](docs/sources.md), [platforms.md](docs/platforms.md) and
+  [competitors.md](docs/competitors.md): where hackathon data may come from, and who else is
+  in this space
+
 ## Development
 
 You need Node.js 24, pnpm 10 and Docker (for a local Postgres).
