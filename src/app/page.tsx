@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { Suspense } from "react";
 
-import { PlanPanel, ReadPanel, UpcomingPreview, UpcomingSkeleton } from "@/components/landing-panels";
+import {
+  PlanPanel,
+  ReadPanel,
+  UpcomingPreview,
+  UpcomingSkeleton,
+} from "@/components/landing-panels";
 import { CountUp } from "@/components/motion/count-up";
 import { Reveal } from "@/components/motion/reveal";
 import { PlatformMarquee } from "@/components/platform-marquee";
@@ -14,10 +19,12 @@ import { countByVerdict, PLATFORMS } from "@/lib/platforms/catalogue";
 import { SOURCES } from "@/lib/sources";
 
 const LABEL = "font-mono text-[11px] uppercase tracking-[0.14em] text-muted";
-const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+const FOCUS =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 const PRIMARY = `inline-flex items-center gap-2 rounded-md bg-ink px-5 py-3 text-sm font-medium text-paper transition-opacity hover:opacity-90 ${FOCUS}`;
 const SECONDARY = `inline-flex items-center gap-2 rounded-md border border-line bg-panel px-5 py-3 text-sm font-medium transition-colors hover:border-ink ${FOCUS}`;
-const H2 = "text-3xl leading-[1.05] font-semibold tracking-[-0.035em] sm:text-5xl";
+const H2 =
+  "text-3xl leading-[1.05] font-semibold tracking-[-0.035em] sm:text-5xl";
 
 const STEPS = [
   { id: "find", label: "Find" },
@@ -54,10 +61,6 @@ const QUESTIONS = [
     a: "From sources whose terms allow it: Hack Club's public API, Hackster's contests feed and HackHQ's open list (organisers' own sites only), imported once a day. More join as their terms allow; every listing links to its own page and credits its source.",
   },
   {
-    q: "Why is Devpost not in the list?",
-    a: "Devpost's terms forbid scraping and reuse without written consent, so hackr has asked for permission instead. Until it says yes, you can paste any Devpost hackathon's rules into the coach yourself.",
-  },
-  {
     q: "Does hackr keep the rules I paste?",
     a: "No. The coach reads them in your browser, on the page. Nothing is sent to a server or stored, and the code that does it is public.",
   },
@@ -74,7 +77,12 @@ const QUESTIONS = [
 function Arrow() {
   return (
     <svg viewBox="0 0 16 16" className="size-4" aria-hidden="true">
-      <path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <path
+        d="M3 8h9M8.5 4.5 12 8l-3.5 3.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+      />
     </svg>
   );
 }
@@ -100,14 +108,17 @@ export default function Home() {
           />
           <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 pt-16 pb-20 sm:px-6 sm:pt-24">
             <div className="flex max-w-3xl flex-col gap-7">
-              <p className={`${LABEL} rise-in`}>Open source · for students and early-career developers</p>
+              <p className={`${LABEL} rise-in`}>
+                Open source · for students and early-career developers
+              </p>
               <h1 className="rise-in text-5xl leading-[0.95] font-semibold tracking-[-0.05em] [animation-delay:80ms] sm:text-7xl lg:text-[5.5rem]">
                 Pick the right hackathon.
                 <span className="block text-muted">Then play to win.</span>
               </h1>
               <p className="rise-in max-w-xl text-lg leading-8 text-muted [animation-delay:160ms]">
-                hackr lists hackathons from the sources that allow it, and turns any event&apos;s rules
-                into a plan: when it closes, what to hand in, and where the judges&apos; points are.
+                hackr lists hackathons from the sources that allow it, and turns
+                any event&apos;s rules into a plan: when it closes, what to hand
+                in, and where the judges&apos; points are.
               </p>
               <div className="rise-in flex flex-wrap gap-3 [animation-delay:240ms]">
                 <Link href="/coach" className={PRIMARY}>
@@ -126,10 +137,14 @@ export default function Home() {
         </section>
 
         {/* Every platform read, scrolling by. */}
-        <section aria-labelledby="platforms-heading" className="border-b border-line py-14">
+        <section
+          aria-labelledby="platforms-heading"
+          className="border-b border-line py-14"
+        >
           <div className="mx-auto mb-8 flex w-full max-w-6xl flex-col gap-2 px-4 sm:flex-row sm:items-end sm:justify-between sm:px-6">
             <h2 id="platforms-heading" className={LABEL}>
-              {PLATFORMS.length} platforms&apos; terms read before a single listing was collected
+              {PLATFORMS.length} platforms&apos; terms read before a single
+              listing was collected
             </h2>
             <a
               href={`${REPOSITORY_URL}/blob/main/docs/platforms.md`}
@@ -144,25 +159,34 @@ export default function Home() {
         </section>
 
         {/* The problem, and the promise. */}
-        <section aria-labelledby="problem-heading" className="border-b border-line">
+        <section
+          aria-labelledby="problem-heading"
+          className="border-b border-line"
+        >
           <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-24 sm:px-6 lg:grid-cols-2 lg:gap-16">
             <Reveal className="flex flex-col gap-4">
               <p className={LABEL}>
                 The problem <span aria-hidden="true">→</span> the promise
               </p>
               <h2 id="problem-heading" className={H2}>
-                The rubric is in paragraph nine. The deadline is in another time zone.
+                The rubric is in paragraph nine. The deadline is in another time
+                zone.
               </h2>
             </Reveal>
-            <Reveal delay={120} className="flex flex-col gap-6 self-end text-lg leading-8 text-muted">
+            <Reveal
+              delay={120}
+              className="flex flex-col gap-6 self-end text-lg leading-8 text-muted"
+            >
               <p>
-                Every hackathon hides what matters in its own rules page: who can enter, how big a team
-                can be, what to hand in, and how the judges will score it. Most people skim, build the
-                wrong thing well, and miss a required video.
+                Every hackathon hides what matters in its own rules page: who
+                can enter, how big a team can be, what to hand in, and how the
+                judges will score it. Most people skim, build the wrong thing
+                well, and miss a required video.
               </p>
               <p className="text-ink">
-                hackr reads the rules for you and hands back one page: the deadline counted down, the
-                checklist, and the judging weights turned into where to spend your hours.
+                hackr reads the rules for you and hands back one page: the
+                deadline counted down, the checklist, and the judging weights
+                turned into where to spend your hours.
               </p>
             </Reveal>
           </div>
@@ -180,16 +204,25 @@ export default function Home() {
             <div className="grid gap-16 lg:grid-cols-[180px_1fr]">
               <StepRail steps={STEPS} />
               <div className="flex flex-col gap-28">
-                <article id="find" className="grid scroll-mt-28 items-start gap-8 md:grid-cols-[0.8fr_1.2fr]">
+                <article
+                  id="find"
+                  className="grid scroll-mt-28 items-start gap-8 md:grid-cols-[0.8fr_1.2fr]"
+                >
                   <Reveal className="flex flex-col gap-3">
                     <span className="font-mono text-sm text-muted">01</span>
-                    <h3 className="text-2xl font-semibold tracking-[-0.02em]">Find</h3>
+                    <h3 className="text-2xl font-semibold tracking-[-0.02em]">
+                      Find
+                    </h3>
                     <p className="leading-7 text-muted">
-                      Upcoming hackathons in one list, filtered by format and source, each linked to its
-                      own page and to where hackr found it. Imported daily from {SOURCES.length} sources
+                      Upcoming hackathons in one list, filtered by format and
+                      source, each linked to its own page and to where hackr
+                      found it. Imported daily from {SOURCES.length} sources
                       whose terms allow it.
                     </p>
-                    <Link href="/events" className={`${LABEL} mt-2 w-fit underline underline-offset-4 hover:text-ink ${FOCUS}`}>
+                    <Link
+                      href="/events"
+                      className={`${LABEL} mt-2 w-fit underline underline-offset-4 hover:text-ink ${FOCUS}`}
+                    >
                       Browse the list
                     </Link>
                   </Reveal>
@@ -199,26 +232,38 @@ export default function Home() {
                     </Suspense>
                   </Reveal>
                 </article>
-                <article id="read" className="grid scroll-mt-28 items-start gap-8 md:grid-cols-[0.8fr_1.2fr]">
+                <article
+                  id="read"
+                  className="grid scroll-mt-28 items-start gap-8 md:grid-cols-[0.8fr_1.2fr]"
+                >
                   <Reveal className="flex flex-col gap-3">
                     <span className="font-mono text-sm text-muted">02</span>
-                    <h3 className="text-2xl font-semibold tracking-[-0.02em]">Read</h3>
+                    <h3 className="text-2xl font-semibold tracking-[-0.02em]">
+                      Read
+                    </h3>
                     <p className="leading-7 text-muted">
-                      Paste any hackathon&apos;s rules. hackr pulls out the deadline, who can enter, the
-                      team size and exactly what to hand in, and quotes the line each one came from.
+                      Paste any hackathon&apos;s rules. hackr pulls out the
+                      deadline, who can enter, the team size and exactly what to
+                      hand in, and quotes the line each one came from.
                     </p>
                   </Reveal>
                   <Reveal delay={120}>
                     <ReadPanel />
                   </Reveal>
                 </article>
-                <article id="plan" className="grid scroll-mt-28 items-start gap-8 md:grid-cols-[0.8fr_1.2fr]">
+                <article
+                  id="plan"
+                  className="grid scroll-mt-28 items-start gap-8 md:grid-cols-[0.8fr_1.2fr]"
+                >
                   <Reveal className="flex flex-col gap-3">
                     <span className="font-mono text-sm text-muted">03</span>
-                    <h3 className="text-2xl font-semibold tracking-[-0.02em]">Plan</h3>
+                    <h3 className="text-2xl font-semibold tracking-[-0.02em]">
+                      Plan
+                    </h3>
                     <p className="leading-7 text-muted">
-                      The deadline becomes a prep plan, counted back from the day the hacking starts to
-                      the hour you submit, with the finishing work your checklist asks for.
+                      The deadline becomes a prep plan, counted back from the
+                      day the hacking starts to the hour you submit, with the
+                      finishing work your checklist asks for.
                     </p>
                   </Reveal>
                   <Reveal delay={120}>
@@ -231,7 +276,10 @@ export default function Home() {
         </section>
 
         {/* The rubric playground. */}
-        <section aria-labelledby="playground-heading" className="border-b border-line">
+        <section
+          aria-labelledby="playground-heading"
+          className="border-b border-line"
+        >
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 py-24 sm:px-6">
             <Reveal className="flex max-w-2xl flex-col gap-4">
               <p className={LABEL}>Try the strategy</p>
@@ -239,8 +287,9 @@ export default function Home() {
                 Move the judging weights. Watch the advice change.
               </h2>
               <p className="text-lg leading-8 text-muted">
-                This is the coach&apos;s own code: weights are scaled to whole percentages that add up
-                to 100, and each criterion gets its focus.
+                This is the coach&apos;s own code: weights are scaled to whole
+                percentages that add up to 100, and each criterion gets its
+                focus.
               </p>
             </Reveal>
             <Reveal delay={120}>
@@ -250,20 +299,32 @@ export default function Home() {
         </section>
 
         {/* The figures behind the promises. */}
-        <section aria-labelledby="numbers-heading" className="border-b border-line">
+        <section
+          aria-labelledby="numbers-heading"
+          className="border-b border-line"
+        >
           <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
             <h2 id="numbers-heading" className="sr-only">
               hackr in numbers
             </h2>
             <ul className="grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
               {[
-                { value: PLATFORMS.length, label: "platforms whose terms were read" },
+                {
+                  value: PLATFORMS.length,
+                  label: "platforms whose terms were read",
+                },
                 { value: count("use"), label: "allow it, so hackr uses them" },
                 { value: count("ask"), label: "asked for permission first" },
                 { value: SOURCES.length, label: "sources imported every day" },
               ].map((figure) => (
-                <li key={figure.label} className="flex flex-col gap-2 bg-paper p-7">
-                  <CountUp value={figure.value} className="text-5xl font-semibold tracking-[-0.04em]" />
+                <li
+                  key={figure.label}
+                  className="flex flex-col gap-2 bg-paper p-7"
+                >
+                  <CountUp
+                    value={figure.value}
+                    className="text-5xl font-semibold tracking-[-0.04em]"
+                  />
                   <span className="text-sm text-muted">{figure.label}</span>
                 </li>
               ))}
@@ -272,7 +333,10 @@ export default function Home() {
         </section>
 
         {/* What hackr promises. */}
-        <section aria-labelledby="principles-heading" className="border-b border-line">
+        <section
+          aria-labelledby="principles-heading"
+          className="border-b border-line"
+        >
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 py-24 sm:px-6">
             <Reveal className="flex max-w-2xl flex-col gap-4">
               <p className={LABEL}>What hackr promises</p>
@@ -283,8 +347,13 @@ export default function Home() {
             <ul className="grid gap-x-10 gap-y-10 sm:grid-cols-2">
               {PRINCIPLES.map((principle, index) => (
                 <li key={principle.title}>
-                  <Reveal delay={index * 80} className="flex flex-col gap-3 border-t border-ink pt-5">
-                    <h3 className="text-lg font-semibold tracking-[-0.02em]">{principle.title}</h3>
+                  <Reveal
+                    delay={index * 80}
+                    className="flex flex-col gap-3 border-t border-ink pt-5"
+                  >
+                    <h3 className="text-lg font-semibold tracking-[-0.02em]">
+                      {principle.title}
+                    </h3>
                     <p className="leading-7 text-muted">{principle.text}</p>
                   </Reveal>
                 </li>
@@ -304,7 +373,10 @@ export default function Home() {
             </Reveal>
             <div className="flex flex-col">
               {QUESTIONS.map((item) => (
-                <details key={item.q} className="group border-b border-line py-5 first:border-t">
+                <details
+                  key={item.q}
+                  className="group border-b border-line py-5 first:border-t"
+                >
                   <summary
                     className={`flex cursor-pointer list-none items-center justify-between gap-6 rounded-sm text-lg font-medium ${FOCUS}`}
                   >
@@ -324,7 +396,10 @@ export default function Home() {
         </section>
 
         {/* The close. */}
-        <section aria-labelledby="cta-heading" className="relative overflow-hidden bg-ink text-paper">
+        <section
+          aria-labelledby="cta-heading"
+          className="relative overflow-hidden bg-ink text-paper"
+        >
           <div
             className="glow-drift pointer-events-none absolute -right-40 -bottom-40 h-[420px] w-[620px] rounded-full bg-accent/25 blur-3xl"
             aria-hidden="true"
