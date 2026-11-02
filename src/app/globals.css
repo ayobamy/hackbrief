@@ -9,11 +9,11 @@
   --color-panel: var(--panel);
   --color-accent: var(--accent);
   --color-on-accent: var(--on-accent);
-  --shadow-card: var(--card-shadow);
   --color-background: var(--paper);
   --color-foreground: var(--ink);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-plex-sans);
+  --font-serif: var(--font-newsreader);
+  --font-mono: var(--font-plex-mono);
 }
 
 body {
@@ -22,10 +22,18 @@ body {
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* The faint dot grid behind the landing page's hero. */
-.dot-grid {
-  background-image: radial-gradient(var(--line) 1px, transparent 1px);
-  background-size: 22px 22px;
+/*
+ * Headings are set in the serif, as in a printed brief; labels and code stay in the mono. In the base
+ * layer, so a heading's own utility classes can still change its weight or spacing.
+ */
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif), ui-serif, Georgia, serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
 }
 
 /*
@@ -51,12 +59,6 @@ body {
   }
 }
 
-@keyframes drift {
-  50% {
-    transform: translate3d(4%, -6%, 0) scale(1.08);
-  }
-}
-
 .marquee-track {
   animation: marquee 120s linear infinite;
 }
@@ -74,10 +76,6 @@ body {
   animation: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
-.glow-drift {
-  animation: drift 18s ease-in-out infinite;
-}
-
 /* Set by the Reveal component only once JavaScript runs, and only for content not yet on screen. */
 .reveal {
   transition:
@@ -93,8 +91,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .marquee-track,
   .bar-grow,
-  .rise-in,
-  .glow-drift {
+  .rise-in {
     animation: none;
   }
 

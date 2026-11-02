@@ -5,7 +5,7 @@ import { Logo } from "./logo";
 export const REPOSITORY_URL = "https://github.com/ayobamy/hackbrief";
 
 const LINK =
-  "rounded-md px-2 py-1 text-sm text-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+  "px-2 py-1 text-sm text-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
 /** The bar at the top of every page: the logo home, the two features, and the source code. */
 export function SiteHeader() {
@@ -15,7 +15,7 @@ export function SiteHeader() {
         <Link
           href="/"
           aria-label="hackbrief, home"
-          className="rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+          className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
         >
           <Logo />
         </Link>
@@ -31,7 +31,7 @@ export function SiteHeader() {
           </a>
           <Link
             href="/coach"
-            className="ml-1 hidden rounded-md bg-ink px-3 py-1.5 text-sm font-medium text-paper hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:inline-block"
+            className="ml-1 hidden bg-ink px-3 py-1.5 text-sm font-medium text-paper hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:inline-block"
           >
             Paste the rules
           </Link>

@@ -14,6 +14,20 @@ export function formatDate(date: string): string {
   return DATE_FORMAT.format(new Date(`${date}T00:00:00Z`));
 }
 
+const LONG_DATE_FORMAT = new Intl.DateTimeFormat("en-GB", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+/** "2027-03-14" as "Sunday 14 March 2027", for headline dates; no time-zone shift either. */
+export function formatLongDate(date: string): string {
+  // en-GB writes "Sunday, 14 March 2027"; British print style drops the comma after the weekday.
+  return LONG_DATE_FORMAT.format(new Date(`${date}T00:00:00Z`)).replace(",", "");
+}
+
 export function formatDaysLeft(days: number): string {
   if (days === 0) {
     return "Today";

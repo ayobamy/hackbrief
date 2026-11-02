@@ -15,15 +15,15 @@ import { buildBrief, localToday } from "@/lib/coach/brief";
 import { CARDS, cardOf, tagLines } from "@/lib/coach/highlight";
 import {
   formatAmount,
-  formatDate,
   formatDaysLeft,
+  formatLongDate,
   formatSolo,
   formatTeamSize,
 } from "@/lib/coach/format";
 import { SAMPLES } from "@/lib/coach/samples";
 import type { Emphasis } from "@/lib/coach/strategy";
 
-import { CARD, CHIP, Canvas, Check, Handles, StepBadge } from "./canvas";
+import { Footnote, LABEL, SHEET, Tick } from "./sheet";
 
 // The server renders with this day and the browser hydrates with it, so the two match; the
 // visitor's own date takes over straight after, and only then does the countdown show.
@@ -41,9 +41,6 @@ const EMPHASIS: Readonly<Record<Emphasis, string>> = {
   steady: "Steady",
   light: "Light",
 };
-
-// Shades of the one accent for the rubric bar, heaviest criterion first.
-const SHADES = [1, 0.7, 0.45, 0.28, 0.18, 0.12];
 
 function reducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -141,106 +138,76 @@ export function RulesDemo() {
   const topNote = strategy[0];
 
   const bodies: ReactNode[] = [
-    <div key="deadline" className="flex flex-col gap-2">
-      <p className="text-2xl font-semibold tracking-[-0.03em]">
-        {deadline ? formatDate(deadline.date) : "Not found"}
+    <div key="deadline" className="flex flex-col gap-1">
+      <p className="font-serif text-[28px] leading-tight tracking-[-0.015em]">
+        {deadline ? formatLongDate(deadline.date) : "Not found in the rules"}
       </p>
-      <p className="flex flex-wrap items-center gap-2 text-sm text-muted">
-        {deadline?.time ?? "No time given"}
-        {today && daysLeft !== null ? (
-          <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-medium text-ink">
-            {formatDaysLeft(daysLeft)}
-          </span>
-        ) : null}
+      <p className="text-sm text-muted">
+        {[deadline?.time, today && daysLeft !== null ? formatDaysLeft(daysLeft) : null]
+          .filter(Boolean)
+          .join(" · ") || " "}
       </p>
     </div>,
-    <ul key="team" className="flex flex-wrap gap-2">
-      <li className={CHIP}>
-        {team ? formatTeamSize(team) : "Team size not stated"}
-      </li>
-      {team ? <li className={CHIP}>{formatSolo(team)}</li> : null}
-      <li className={CHIP}>
-        {topPrizes[0] ? (
-          <>
-            <span className="text-muted">Top prize</span>
-            <span className="font-medium">{formatAmount(topPrizes[0])}</span>
-          </>
-        ) : (
-          "No prize stated"
-        )}
-      </li>
-    </ul>,
-    <div key="points" className="flex flex-col gap-4">
-      <div
-        className="flex h-2.5 w-full gap-0.5 overflow-hidden rounded-full"
-        aria-hidden="true"
-      >
-        {strategy.map((note, rank) => (
-          <span
-            key={`${sample.id}-${note.criterion}`}
-            className="bar-grow h-full rounded-[2px] bg-accent"
-            style={{
-              width: `${note.weight}%`,
-              opacity: SHADES[rank] ?? 0.1,
-              animationDelay: `${rank * 80}ms`,
-            }}
-          />
-        ))}
-      </div>
+    <dl key="team" className="flex flex-col gap-1.5">
+      {[
+        ["Team", team ? formatTeamSize(team) : "Not stated"],
+        ["Solo", team ? formatSolo(team) : "Not stated"],
+        ["Top prize", topPrizes[0] ? formatAmount(topPrizes[0]) : "Not stated"],
+      ].map(([term, value]) => (
+        <div key={term} className="flex items-baseline">
+          <dt className="text-sm text-muted">{term}</dt>
+          <span className="mx-2 flex-1 translate-y-[-3px] border-b border-dotted border-muted/50" aria-hidden="true" />
+          <dd className="font-serif text-[17px]">{value}</dd>
+        </div>
+      ))}
+    </dl>,
+    <div key="points" className="flex flex-col gap-3">
       <ul aria-label="Judging weights" className="flex flex-col gap-2">
-        {strategy.map((note, rank) => (
-          <li
-            key={`${sample.id}-${note.criterion}`}
-            className="flex items-center gap-2.5 text-sm"
-          >
-            <span
-              className="size-2.5 shrink-0 rounded-[3px] bg-accent"
-              style={{ opacity: SHADES[rank] ?? 0.1 }}
-              aria-hidden="true"
-            />
-            <span className="min-w-0 flex-1 truncate">{note.criterion}</span>
-            <span className="text-xs text-muted">
-              {EMPHASIS[note.emphasis]}
-            </span>
-            <span className="w-10 text-right font-mono tabular-nums">
-              {note.weight}%
-            </span>
+        {strategy.map((note) => (
+          <li key={`${sample.id}-${note.criterion}`} className="flex flex-col gap-1">
+            <div className="flex items-baseline">
+              <span className="min-w-0 truncate text-sm">{note.criterion}</span>
+              <span className="mx-2 flex-1 translate-y-[-3px] border-b border-dotted border-muted/50" aria-hidden="true" />
+              <span className="mr-3 font-serif text-sm text-muted italic">{EMPHASIS[note.emphasis]}</span>
+              <span className="w-12 text-right font-serif text-[17px] tabular-nums">{note.weight}%</span>
+            </div>
+            <div className="h-[2px] w-full bg-line" aria-hidden="true">
+              <div
+                className={`bar-grow h-[2px] ${note.emphasis === "focus" ? "bg-ink" : "bg-muted/60"}`}
+                style={{ width: `${note.weight}%` }}
+              />
+            </div>
           </li>
         ))}
       </ul>
       {topNote ? (
-        <p
-          key={`${sample.id}-note`}
-          className="rise-in border-l-2 border-accent pl-3 text-[13px] leading-5 text-muted"
-        >
+        <p key={`${sample.id}-note`} className="rise-in font-serif text-[15px] leading-6 text-muted italic">
           {topNote.text}
         </p>
       ) : null}
     </div>,
-    <ul key="hand-in" className="flex flex-wrap gap-2">
-      {checklist.slice(0, 5).map((item, position) => (
+    <ul key="hand-in" className="grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
+      {checklist.slice(0, 6).map((item, position) => (
         <li
           key={`${sample.id}-${item.id}`}
-          className={`${CHIP} rise-in`}
+          className="rise-in flex items-start gap-2.5 text-sm"
           style={{ animationDelay: `${150 + position * 70}ms` }}
         >
-          <Check className="size-3.5" />
+          <Tick />
           {item.label}
         </li>
       ))}
-      {checklist.length > 5 ? (
-        <li className={`${CHIP} text-muted`}>+{checklist.length - 5} more</li>
-      ) : null}
+      {checklist.length > 6 ? <li className="text-sm text-muted">and {checklist.length - 6} more</li> : null}
     </ul>,
   ];
 
   return (
-    <Canvas>
-      <div className="flex flex-wrap items-center justify-between gap-3 px-3 pt-3 sm:px-5 sm:pt-5">
+    <div className={SHEET}>
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b border-line px-4 pt-3 sm:px-6">
         <div
           role="tablist"
           aria-label="Sample rules"
-          className="flex max-w-full gap-1 overflow-x-auto rounded-full border border-line bg-paper/80 p-1 backdrop-blur [scrollbar-width:none]"
+          className="-mb-px flex max-w-full gap-5 overflow-x-auto"
           onKeyDown={onKeyDown}
         >
           {SAMPLES.map((option, position) => (
@@ -256,22 +223,16 @@ export function RulesDemo() {
               aria-controls={panelId}
               tabIndex={position === index ? 0 : -1}
               onClick={() => choose(position)}
-              className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent ${
-                position === index
-                  ? "bg-ink text-paper"
-                  : "text-muted hover:text-ink"
+              className={`shrink-0 border-b-2 pt-1 pb-2.5 text-sm whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+                position === index ? "border-accent text-ink" : "border-transparent text-muted hover:text-ink"
               }`}
             >
               {option.name}
             </button>
           ))}
         </div>
-        <span className="flex items-center gap-2 rounded-full border border-line bg-paper/80 px-3 py-1.5 text-xs text-muted backdrop-blur">
-          <span className="relative flex size-2" aria-hidden="true">
-            <span className="absolute inline-flex size-full rounded-full bg-accent opacity-60 motion-safe:animate-ping" />
-            <span className="relative inline-flex size-2 rounded-full bg-accent" />
-          </span>
-          The coach, running in your browser
+        <span className={`${LABEL} hidden pb-3 sm:inline`}>
+          Brief {index + 1} of {SAMPLES.length}, read in your browser
         </span>
       </div>
 
@@ -279,102 +240,74 @@ export function RulesDemo() {
         id={panelId}
         role="tabpanel"
         aria-labelledby={`${baseId}-tab-${sample.id}`}
-        className="grid grid-cols-1 gap-5 p-3 sm:p-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-8"
+        className="grid md:grid-cols-[1fr_1.1fr] md:divide-x md:divide-line"
       >
-        {/* The sheet takes the height of the card column beside it and scrolls inside. */}
-        <div className={`${CARD} hidden flex-col overflow-hidden md:flex`}>
-          <div className="flex items-center justify-between border-b border-line px-5 py-3 text-xs text-muted">
-            <span>Pasted rules</span>
-            <span className="rounded-full border border-line px-2 py-0.5">
-              Fictional
-            </span>
+        <div className="hidden md:block">
+          <div className="flex items-baseline justify-between px-6 pt-5 pb-3">
+            <span className={LABEL}>The rules, as pasted</span>
+            <span className="font-serif text-sm text-muted italic">fictional</span>
           </div>
-          <div className="relative min-h-[420px] flex-1">
-            <pre
-              ref={rulesRef}
-              className="absolute inset-0 overflow-auto py-3 font-mono text-[11.5px] leading-[1.75] whitespace-pre-wrap"
-              tabIndex={0}
-              role="region"
-              aria-label={`The rules of ${sample.name}`}
-            >
-              {lines.map(({ line, tag }, position) => {
-                const card = tag ? cardOf(tag) : null;
-                const lit = card !== null && card === shown;
-                const style =
-                  card === null
-                    ? `border-transparent ${shown === null ? "text-muted" : "text-muted/60"}`
-                    : lit
-                      ? "border-accent bg-accent/15 text-ink"
-                      : shown === null
-                        ? "border-accent/40 bg-accent/[0.06] text-ink"
-                        : "border-transparent bg-accent/[0.03] text-ink/60";
-                return (
-                  <span
-                    key={`${sample.id}-${position}`}
-                    data-card={card ?? undefined}
-                    className={`flex items-start justify-between gap-3 border-l-2 px-5 transition-colors duration-300 motion-reduce:transition-none ${style}`}
-                  >
-                    <span>{line || " "}</span>
-                    {card !== null ? (
-                      <span
-                        className={`mt-[3px] flex size-4 shrink-0 items-center justify-center rounded-full text-[9px] transition-colors duration-300 motion-reduce:transition-none ${
-                          lit
-                            ? "bg-accent text-on-accent"
-                            : "border border-line text-muted"
-                        }`}
-                        aria-hidden="true"
-                      >
-                        {card + 1}
-                      </span>
-                    ) : null}
-                  </span>
-                );
-              })}
-            </pre>
-          </div>
+          <pre
+            ref={rulesRef}
+            className="relative h-[480px] overflow-auto pb-4 font-mono text-[11.5px] leading-[1.8] whitespace-pre-wrap"
+            tabIndex={0}
+            role="region"
+            aria-label={`The rules of ${sample.name}`}
+          >
+            {lines.map(({ line, tag }, position) => {
+              const card = tag ? cardOf(tag) : null;
+              const lit = card !== null && card === shown;
+              const style =
+                card === null
+                  ? shown === null
+                    ? "text-muted"
+                    : "text-muted/60"
+                  : lit
+                    ? "bg-accent/25 text-ink"
+                    : shown === null
+                      ? "bg-accent/10 text-ink"
+                      : "text-ink/60";
+              return (
+                <span
+                  key={`${sample.id}-${position}`}
+                  data-card={card ?? undefined}
+                  className={`flex items-start justify-between gap-3 px-6 transition-colors duration-300 motion-reduce:transition-none ${style}`}
+                >
+                  <span>{line || " "}</span>
+                  {card !== null ? <Footnote n={card + 1} active={lit} className="mt-[2px]" /> : null}
+                </span>
+              );
+            })}
+          </pre>
         </div>
 
-        <div className="flex flex-col gap-3">
-          <ol className="relative flex flex-col gap-4 pl-11">
-            <span
-              className="absolute top-5 bottom-5 left-[13px] w-px bg-line"
-              aria-hidden="true"
-            />
+        <div className="flex flex-col px-4 pt-5 pb-4 sm:px-6">
+          <span className={LABEL}>The brief</span>
+          <p className="mt-1 font-serif text-2xl leading-tight">{sample.name}</p>
+          <ol className="mt-4 flex flex-col border-b border-line">
             {CARDS.map((card, position) => {
               const selected = shown === position;
               return (
                 <li
                   key={`${sample.id}-${card.title}`}
-                  className="rise-in relative"
-                  style={{ animationDelay: `${position * 90}ms` }}
+                  className={`flex gap-3 border-t border-line py-4 transition-colors duration-300 motion-reduce:transition-none ${
+                    selected ? "bg-accent/[0.07]" : ""
+                  }`}
                   onMouseEnter={() => setHovered(position)}
                   onMouseLeave={() => setHovered(null)}
                 >
-                  <StepBadge
-                    n={position + 1}
-                    active={selected}
-                    className="absolute top-4 -left-11"
-                  />
-                  <div
-                    className={`${CARD} relative flex flex-col gap-3 p-4 transition-colors duration-300 motion-reduce:transition-none sm:p-5 ${
-                      selected ? "border-ink/25" : ""
-                    }`}
-                  >
-                    {selected ? <Handles /> : null}
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-medium text-muted">
-                        {card.title}
-                      </p>
+                  <Footnote n={position + 1} active={selected} className="mt-[1px]" />
+                  <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+                    <div className="flex items-baseline justify-between gap-3">
+                      <p className={LABEL}>{card.title}</p>
                       <button
                         type="button"
                         aria-pressed={pinned === position}
                         aria-label={`Show in the rules: ${card.title}`}
-                        onClick={() =>
-                          setPinned(pinned === position ? null : position)
-                        }
+                        onClick={() => setPinned(pinned === position ? null : position)}
                         onFocus={() => setHovered(position)}
                         onBlur={() => setHovered(null)}
-                        className="hidden rounded-full px-2 py-0.5 text-xs text-muted transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent aria-pressed:bg-accent/15 aria-pressed:text-ink md:inline-flex"
+                        className="hidden font-mono text-[11px] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-ink hover:decoration-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent aria-pressed:text-ink aria-pressed:decoration-accent md:inline"
                       >
                         Show in the rules
                       </button>
@@ -385,23 +318,20 @@ export function RulesDemo() {
               );
             })}
           </ol>
-          <p className="hidden pl-11 text-xs text-muted md:block">
-            Point at a card to see the lines it came from.
+          <p className="mt-3 hidden font-serif text-sm text-muted italic md:block">
+            Point at a part of the brief to see the lines it came from.
           </p>
         </div>
       </div>
 
-      <div className="flex justify-center px-3 pb-4 sm:pb-5">
-        <p className="flex flex-wrap items-center justify-center gap-x-2 rounded-full border border-line bg-paper/80 px-4 py-1.5 text-xs text-muted backdrop-blur">
-          <span>
-            {timing
-              ? `Read ${timing.chars.toLocaleString("en")} characters in ${timing.ms < 1 ? timing.ms.toFixed(1) : Math.round(timing.ms)} ms`
-              : `Read ${text.length.toLocaleString("en")} characters`}
-          </span>
-          <span aria-hidden="true">·</span>
-          <span>Nothing sent, nothing stored</span>
-        </p>
-      </div>
-    </Canvas>
+      <p className="flex flex-wrap justify-between gap-x-4 gap-y-1 border-t border-line px-4 py-2.5 font-mono text-[11px] text-muted sm:px-6">
+        <span>
+          {timing
+            ? `Read ${timing.chars.toLocaleString("en")} characters in ${timing.ms < 1 ? timing.ms.toFixed(1) : Math.round(timing.ms)} ms`
+            : `Read ${text.length.toLocaleString("en")} characters`}
+        </span>
+        <span>Nothing sent, nothing stored</span>
+      </p>
+    </div>
   );
 }
