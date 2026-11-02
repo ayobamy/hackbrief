@@ -10,6 +10,7 @@ import {
 import { CountUp } from "@/components/motion/count-up";
 import { Reveal } from "@/components/motion/reveal";
 import { PlatformMarquee } from "@/components/platform-marquee";
+import { Surface } from "@/components/sheet";
 import { RubricPlayground } from "@/components/rubric-playground";
 import { RulesDemo } from "@/components/rules-demo";
 import { SiteFooter } from "@/components/site-footer";
@@ -124,9 +125,10 @@ export default function Home() {
                 </Link>
               </div>
             </div>
-            <div className="rise-in [animation-delay:320ms]">
+            {/* The demo lifts off a dotted surface, like the rubric playground (issue #37). */}
+            <Surface className="rise-in p-3 [animation-delay:320ms] sm:p-5">
               <RulesDemo />
-            </div>
+            </Surface>
           </div>
         </section>
 

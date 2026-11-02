@@ -33,3 +33,23 @@ export function Tick() {
     </svg>
   );
 }
+
+/** A card that lifts off a Surface: square, with a soft shadow (docs/brand.md). */
+export const CARD = "border border-line bg-panel shadow-card";
+
+/**
+ * The dotted surface the landing page's interactive pieces sit on (the coach demo, the rubric
+ * playground), with a faint glow in one corner. Square, like every panel.
+ */
+export function Surface({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={`relative overflow-hidden border border-line bg-panel/40 ${className}`}>
+      <div className="dot-grid pointer-events-none absolute inset-0 opacity-80" aria-hidden="true" />
+      <div
+        className="pointer-events-none absolute -top-40 -right-32 h-80 w-[28rem] rounded-full bg-accent/[0.07] blur-3xl"
+        aria-hidden="true"
+      />
+      <div className="relative">{children}</div>
+    </div>
+  );
+}
