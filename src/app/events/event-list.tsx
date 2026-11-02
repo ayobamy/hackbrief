@@ -157,21 +157,31 @@ function EventCard({ event, today }: { event: EventListing; today: string }) {
             </p>
           ) : null}
         </div>
-        <p className="relative z-10 mt-auto border-t border-line pt-3 text-xs text-muted">
-          Listed by{" "}
-          {event.sources.map((source, index) => (
-            <span key={source.slug}>
-              {index > 0 ? ", " : ""}
-              {isWebUrl(source.url) ? (
-                <a href={source.url} className={`underline underline-offset-4 hover:text-ink ${FOCUS_RING}`}>
-                  {source.attribution}
-                </a>
-              ) : (
-                source.attribution
-              )}
-            </span>
-          ))}
-        </p>
+        {/* Above the card's own link, so these stay links of their own. */}
+        <div className="relative z-10 mt-auto flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-t border-line pt-3">
+          <p className="text-xs text-muted">
+            Listed by{" "}
+            {event.sources.map((source, index) => (
+              <span key={source.slug}>
+                {index > 0 ? ", " : ""}
+                {isWebUrl(source.url) ? (
+                  <a href={source.url} className={`underline underline-offset-4 hover:text-ink ${FOCUS_RING}`}>
+                    {source.attribution}
+                  </a>
+                ) : (
+                  source.attribution
+                )}
+              </span>
+            ))}
+          </p>
+          <Link
+            href={`/coach?event=${event.id}`}
+            aria-label={`Build my brief for ${event.name}`}
+            className={`border-b border-ink text-sm font-medium hover:border-accent ${FOCUS_RING}`}
+          >
+            Build my brief <span aria-hidden="true">→</span>
+          </Link>
+        </div>
       </article>
     </li>
   );

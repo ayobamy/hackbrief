@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
+import { getEvent } from "@/app/events/data";
+import { eventContext, parseEventId, type EventContext } from "@/lib/events/context";
+
 import { Coach } from "./coach";
 
 export const metadata: Metadata = {
@@ -11,7 +14,23 @@ export const metadata: Metadata = {
     "Paste a hackathon's rules and judging criteria; get the key dates, a submission checklist and a strategy weighted by the rubric.",
 };
 
-export default function CoachPage() {
+// A brief opened from the list (`/coach?event=<id>`) shows that event; any other id, or none, gives the
+// plain coach. The lookup is cached like the list, and an unavailable database only loses the context.
+async function lookUpEvent(searchParams: PageProps<"/coach">["searchParams"]): Promise<EventContext | null> {
+  const id = parseEventId(await searchParams);
+  if (!id) {
+    return null;
+  }
+  try {
+    const found = await getEvent(id);
+    return found ? eventContext(found) : null;
+  } catch (error) {
+    console.error("Could not look up the event for the coach", error);
+    return null;
+  }
+}
+
+export default function CoachPage({ searchParams }: PageProps<"/coach">) {
   return (
     <>
       <SiteHeader />
@@ -24,7 +43,9 @@ export default function CoachPage() {
             enter and what to submit, and turns the judging weights into where to spend your time.
           </p>
         </header>
-        <Coach />
+        {/* Not awaited: the coach renders at once, and only the parts that name the event wait for
+            it, so nothing typed before the lookup lands is lost to a remount. */}
+        <Coach event={lookUpEvent(searchParams)} />
       </main>
       <SiteFooter />
     </>
