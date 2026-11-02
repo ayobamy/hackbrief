@@ -76,22 +76,19 @@ They collect data. None of them is a coach that turns a rubric and past winners 
 which is where hackr differs. A proper review of existing hackathon finders and coaching tools is
 one of the first steps.
 
-## Open questions for Ahmed
+## Questions answered
 
-1. Which data route: C, B, A, or a mix (above)?
-2. Stack. A suggestion for speed: one Next.js (TypeScript) app with Postgres, or a Python
-   FastAPI backend with a Next.js frontend if the parsing and analysis side should be Python.
-3. Hosting: Vercel, Fly.io, Render, or another.
-4. Licence for the public repository: MIT, Apache-2.0, or another.
-5. Language model for summaries and briefs: the Claude API, with the key kept out of the repo.
-6. Sign-in: GitHub OAuth, email links, or none for the first version.
+Ahmed answered all six open questions on 2 November 2026: the coach from pasted rules first, one
+Next.js app with Postgres, Vercel with Neon, MIT, free OpenRouter models later (no model in the
+first coach), and no sign-in yet. The reasons and the plan limits are in
+[decisions.md](decisions.md).
 
 ## First steps, in order
 
-1. Settle the data route and the stack (one issue, decisions recorded in `docs/decisions.md`).
+1. Settle the data route and the stack: issue #3 ([decisions.md](decisions.md)).
 2. `docs/sources.md`: each source's terms and robots.txt read and cited, with what may be
    collected.
-3. Scaffold the app, extend `make check` with the linters and tests, and run it in CI.
+3. Scaffold the app, extend `make check` with the linters and tests, and run it in CI: issue #3.
 4. The data model, with fixtures of fictional events, rubrics and winners.
 5. The coach from pasted rules: extract dates, eligibility, deliverables and judging criteria
    with weights; build the brief, the checklist and rubric-weighted strategy notes, with tests.
