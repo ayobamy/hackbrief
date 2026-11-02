@@ -56,3 +56,8 @@ export function prizeLine(text: string | null): string | null {
   const trimmed = text?.trim() ?? "";
   return trimmed && !isPlaceholder(trimmed) ? trimmed : null;
 }
+
+/** Whether a stored URL may be drawn as a link: http(s) only, never javascript: or other schemes. */
+export function isWebUrl(url: string): boolean {
+  return /^https?:\/\//i.test(url);
+}
