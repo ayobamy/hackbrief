@@ -12,10 +12,17 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Vercel sets the production domain; locally, links in shared cards point at the dev server.
+const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "hackr",
+  metadataBase: new URL(siteUrl),
+  title: { default: "hackr: pick the right hackathon, then play to win", template: "%s · hackr" },
   description:
-    "A hackathon finder and coach: which hackathons to join, and how to win them, without reading ten pages of rules.",
+    "A hackathon finder and coach: upcoming hackathons from sources that allow it, and any event's rules turned into a plan. Open source.",
+  openGraph: { siteName: "hackr", type: "website" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -24,7 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col bg-paper text-ink">{children}</body>
     </html>
   );
 }

@@ -53,8 +53,10 @@ blocker on data sources, the open questions and the first steps.
 ## Layout
 
 ```text
-src/app/                Next.js App Router: pages (/, /coach, /events), route handlers (api/health,
-                        api/cron/import)
+src/app/                Next.js App Router: pages (/ landing, /coach, /events), route handlers
+                        (api/health, api/cron/import), icon, apple-icon, opengraph-image
+src/app/theme.css       colour tokens, the only place raw colours live (docs/brand.md)
+src/components/         the logo, site header and footer, the landing page's brief preview
 src/lib/                logic with unit tests beside it (*.test.ts); *.db.test.ts need Postgres
 src/lib/coach/          the coach: parsers for pasted rules, strategy, plan (docs/coach.md)
 src/lib/sources/        one adapter per allowed source (docs/sources.md), pure and tested
