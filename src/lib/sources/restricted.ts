@@ -2,8 +2,8 @@ import { hostOf } from "./url";
 
 // Platforms whose terms forbid collection or say to ask first (docs/sources.md, "Ask permission"
 // and "Do not collect"). An entry that an open list took from one of them is left out, so hackbrief
-// never collects their listings second-hand. Kaggle and DrivenData are here too: hackbrief reads them
-// only through their own API or GitHub repository.
+// never collects their listings second-hand. DrivenData is here too: hackbrief reads only its
+// winners, from their GitHub repository.
 const RESTRICTED_DOMAINS = [
   "devpost.com",
   "mlh.io",

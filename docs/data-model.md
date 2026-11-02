@@ -35,7 +35,7 @@ One row per site in [sources.md](sources.md) that hackbrief collects from.
 | Column | Type | Notes |
 | --- | --- | --- |
 | `id` | serial | |
-| `slug` | text, unique | `hackclub`, `kaggle`, `hackster`, `nasa-space-apps` |
+| `slug` | text, unique | `hackclub`, `hackster`, `hackhq`, `openagenda` |
 | `name`, `url` | text | Shown with every event, linked |
 | `channel` | enum: `api`, `feed`, `repository`, `manual` | How hackbrief reads it |
 | `attribution` | text | The credit the source asks for, shown as written |

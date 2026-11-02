@@ -38,7 +38,8 @@ Playwright end-to-end tests of the home page and the coach run in `make check` a
 The tables the import needs (sources, events, their links and import runs), the first migration,
 adapters for Hack Club, Hackster and HackHQ, and `/api/cron/import` with a daily schedule. Still
 open from M2 and M3: the remaining tables (criteria, prizes, projects), fictional seed data, the
-Kaggle adapter, revalidating cached pages after a run, and batching the import's queries.
+Kaggle adapter (waiting on Kaggle's permission, issue #47), revalidating cached pages after a run,
+and batching the import's queries.
 
 ## M2. The data model (START-HERE step 4)
 
@@ -62,8 +63,10 @@ Kaggle adapter, revalidating cached pages after a run, and batching the import's
 2. Hack Club adapter, with the credit shown as Hack Club asks. Tests use fictional events in Hack
    Club's response format. Done when its tests pass.
 3. Hackster contests adapter for the Atom feed (title, link, dates only). Done when its tests pass.
-4. Kaggle adapter through the official API, with the token in Vercel's environment settings. Done
-   when its tests pass and a run against the API lists competitions.
+4. Kaggle adapter through the official API, with the token in Vercel's environment settings, only
+   once Kaggle agrees in writing: its terms limit the API to personal, non-commercial use
+   ([sources.md](sources.md), "Ask permission"). Done when its tests pass and a run against the
+   API lists competitions.
 5. `/api/cron/import`, protected by `CRON_SECRET`, recording `import_runs` and `import_results`,
    and a daily schedule in `vercel.json`. Done when a production run imports events and the run
    table shows the counts.
