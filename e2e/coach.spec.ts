@@ -120,3 +120,23 @@ test("pasted rules without weights or a deadline say what is missing", async ({
     page.getByText("No submission deadline found", { exact: false }),
   ).toBeVisible();
 });
+
+test("the logo takes you to the top of the home page from anywhere", async ({ page }) => {
+  const scrolled = () => page.evaluate(() => window.scrollY);
+  const logo = page.getByRole("link", { name: "hackbrief, home" });
+
+  await page.goto("/events");
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect.poll(scrolled).toBeGreaterThan(0);
+  await logo.click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect.poll(scrolled).toBe(0);
+  await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+
+  // Already home, part-way down: the logo goes back up to the hero.
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect.poll(scrolled).toBeGreaterThan(0);
+  await logo.click();
+  await expect.poll(scrolled).toBe(0);
+  await expect(page.getByRole("heading", { level: 1 })).toBeInViewport();
+});

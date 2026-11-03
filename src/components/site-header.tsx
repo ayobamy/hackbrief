@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { HomeLink } from "./home-link";
 import { Logo } from "./logo";
 
 export const REPOSITORY_URL = "https://github.com/ayobamy/hackbrief";
@@ -12,13 +13,12 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/80 backdrop-blur-md">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-        <Link
-          href="/"
-          aria-label="hackbrief, home"
+        <HomeLink
+          label="hackbrief, home"
           className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
         >
           <Logo />
-        </Link>
+        </HomeLink>
         <nav aria-label="Main" className="flex items-center gap-1 sm:gap-3">
           <Link href="/events" className={LINK}>
             Hackathons
