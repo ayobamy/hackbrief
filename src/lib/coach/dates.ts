@@ -20,6 +20,8 @@ export interface KeyDate {
   yearAssumed: boolean;
   /** The line of the rules the date came from. */
   source: string;
+  /** Not in the rules: hackbrief took it from its listing of the event (`withListingDates`). */
+  fromListing?: true;
 }
 
 const MONTHS = [
@@ -49,13 +51,15 @@ const ISO = /\b(\d{4})-(\d{2})-(\d{2})\b/g;
 const MONTH_FIRST = new RegExp(`\\b${MONTH}\\s+${DAY}\\b(?:,?\\s+${YEAR})?`, "gi");
 const DAY_FIRST = new RegExp(`\\b${DAY}\\s+(?:of\\s+)?${MONTH}(?:,?\\s+${YEAR})?`, "gi");
 const RANGE_GAP = /^\s*(?:–|—|-|to|until|through|thru)\s*$/i;
-const TIME =
+/** A time of day as rules write it: "11:59 PM PT", "18:00 UTC", "9 AM". */
+export const TIME =
   /\b(?:\d{1,2}(?::\d{2})?\s?[aApP]\.?[mM]\.?|\d{1,2}:\d{2})(?:\s?(?:(?:UTC|GMT)(?:[+-]\d{1,2}(?::?\d{2})?)?|[A-Z]{2,5}\b))?/;
 
 const KIND_RULES: ReadonlyArray<readonly [DateKind, RegExp]> = [
   ["results", /\b(?:winners?|results|announce\w*|awards? ceremony)\b/i],
   ["judging", /\b(?:judging|judges? (?:will|review)|evaluation period)\b/i],
-  ["registration", /\b(?:regist\w*|sign[- ]?ups?|applications?|apply)\b/i],
+  // A priority or early-bird deadline is for applying, not for handing in the project.
+  ["registration", /\b(?:regist\w*|sign[- ]?ups?|applications?|apply|priority deadline|early[- ]?bird|early deadline)\b/i],
   ["submission", /\b(?:submi\w*|deadline|due|closes?|final day)\b/i],
   ["start", /\b(?:starts?|begins?|kick[- ]?off|opening|launch|hacking period|hackathon dates?|runs from|takes place|event dates?)\b/i],
   ["end", /\b(?:ends?|closing)\b/i],

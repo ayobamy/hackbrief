@@ -2,6 +2,7 @@ import { extractCriteria, type CriteriaResult } from "./criteria";
 import { daysBetween, eventStart, extractDates, submissionDeadline, type KeyDate } from "./dates";
 import { extractDeliverables, type Deliverable } from "./deliverables";
 import { extractEligibility } from "./eligibility";
+import { withListingDates, type ListingDates } from "./listing";
 import { buildPlan, type PlanStep } from "./plan";
 import { extractPrizes, largestPrizes, type Amount, type PrizeLine } from "./prizes";
 import { buildStrategy, type StrategyNote } from "./strategy";
@@ -42,7 +43,11 @@ function warningsFor(brief: Omit<Brief, "warnings">, truncated: boolean): string
   } else if (judging.unit === "percent" && judging.statedTotal !== 100) {
     warnings.push(`The stated weights add up to ${judging.statedTotal}%, so hackbrief scaled them to 100%.`);
   }
-  if (!brief.deadline) {
+  if (brief.deadline?.fromListing) {
+    warnings.push(
+      "The rules give no submission deadline, so hackbrief uses the last day of the event from its listing. Check the exact time with the organisers.",
+    );
+  } else if (!brief.deadline) {
     warnings.push("No submission deadline found, so there is no countdown or prep plan.");
   } else if (brief.daysLeft !== null && brief.daysLeft < 0) {
     warnings.push("The submission deadline has passed.");
@@ -54,12 +59,14 @@ function warningsFor(brief: Omit<Brief, "warnings">, truncated: boolean): string
 }
 
 /** Everything the coach shows, built from pasted rules. `today` is YYYY-MM-DD. */
-export function buildBrief(input: string, today: string): Brief {
+export function buildBrief(input: string, today: string, listing?: ListingDates): Brief {
   const truncated = input.length > MAX_INPUT_LENGTH;
   const text = truncated ? input.slice(0, MAX_INPUT_LENGTH) : input;
 
   const judging = extractCriteria(text);
-  const dates = extractDates(text, today);
+  const pageDates = extractDates(text, today);
+  // A listed event's own dates fill in what its rules leave out (`withListingDates`).
+  const dates = listing ? withListingDates(text, pageDates, listing) : pageDates;
   const deadline = submissionDeadline(dates);
   const checklist = extractDeliverables(text);
   const prizes = extractPrizes(text);
@@ -90,9 +97,10 @@ export function localToday(now: Date = new Date()): string {
 /** Whether a text gave the brief anything to show: a deadline, judging criteria, a team size, something to hand in or a prize. */
 export function hasFindings(brief: Brief): boolean {
   return (
-    brief.deadline !== null ||
+    (brief.deadline !== null && !brief.deadline.fromListing) ||
     brief.judging.criteria.length > 0 ||
     brief.team !== null ||
+    brief.eligibility.length > 0 ||
     brief.checklist.length > 0 ||
     brief.topPrizes.length > 0
   );

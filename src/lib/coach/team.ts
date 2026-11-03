@@ -33,6 +33,8 @@ const RANGE_PATTERNS = [
 ];
 const MAX_PATTERNS = [
   new RegExp(`\\bteams?\\s+of\\s+(?:up to|at most|no more than|a maximum of|maximum|max\\.?)\\s+${N}\\b`, "i"),
+  // "A team of four (or fewer)".
+  new RegExp(`\\bteams?\\s+of\\s+${N}\\s*\\(?\\s*or\\s+(?:fewer|less|smaller)\\b`, "i"),
   new RegExp(`\\b(?:up to|maximum of|max(?:imum)?\\.?|no more than|at most)\\s+${N}\\s+${PEOPLE}`, "i"),
   new RegExp(`\\bteam size\\b[^.\\d]*?(?:up to|max(?:imum)?\\.?|at most)?\\s*${N}\\b`, "i"),
 ];

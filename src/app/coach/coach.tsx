@@ -4,6 +4,7 @@ import { Suspense, use, useCallback, useEffect, useId, useRef, useState, type Fo
 
 import { buildBrief, hasFindings, localToday, type Brief } from "@/lib/coach/brief";
 import { formatAmount, formatDate, formatDaysLeft, formatSolo, formatTeamSize } from "@/lib/coach/format";
+import type { ListingDates } from "@/lib/coach/listing";
 import { SAMPLES } from "@/lib/coach/samples";
 import type { Emphasis } from "@/lib/coach/strategy";
 import { Footnote, LABEL, SHEET } from "@/components/sheet";
@@ -54,7 +55,11 @@ function Summary({ brief }: { brief: Brief }) {
       <Fact
         label="Submission deadline"
         value={deadline && daysLeft !== null ? formatDaysLeft(daysLeft) : "Not found"}
-        detail={deadline ? `${formatDate(deadline.date)}${deadline.time ? `, ${deadline.time}` : ""}` : null}
+        detail={
+          deadline
+            ? `${formatDate(deadline.date)}${deadline.time ? `, ${deadline.time}` : ""}${deadline.fromListing ? " (from the listing)" : ""}`
+            : null
+        }
       />
       <Fact label="Team" value={team ? formatTeamSize(team) : "Not stated"} detail={team ? formatSolo(team) : null} />
       <Fact
@@ -255,18 +260,20 @@ const SKIPPED: Readonly<Record<Exclude<SkipReason, "off">, (host: string) => str
 function RulesStatus({
   result,
   host,
+  listing,
   onRead,
 }: {
   result: ReadResult | null;
   host: string;
-  onRead: (text: string) => void;
+  listing: ListingDates;
+  onRead: (text: string, listing: ListingDates) => void;
 }) {
   const found = result?.status === "read" && hasFindings(buildBrief(result.text, FINDINGS_DAY));
   useEffect(() => {
     if (found && result?.status === "read") {
-      onRead(result.text);
+      onRead(result.text, listing);
     }
-  }, [found, result, onRead]);
+  }, [found, result, listing, onRead]);
 
   if (!result) {
     return null;
@@ -343,6 +350,14 @@ function EventPanel({ event, reading }: { event: EventContext; reading: ReactNod
   );
 }
 
+/** Hands the listed event's dates to the coach once the lookup lands, for briefs built from pasted rules. */
+function RememberListing({ dates, onDates }: { dates: ListingDates; onDates: (dates: ListingDates) => void }) {
+  useEffect(() => {
+    onDates(dates);
+  }, [dates, onDates]);
+  return null;
+}
+
 /** Waits for the reading of the event's own page, inside its own Suspense boundary. */
 function WithRules({
   rules,
@@ -378,6 +393,12 @@ export function Coach({
   const [text, setText] = useState("");
   const [page, setPage] = useState("");
   const [brief, setBrief] = useState<Brief | null>(null);
+  // The listed event's dates, which fill in what its rules leave out (`withListingDates`).
+  const listing = useRef<ListingDates | undefined>(undefined);
+  const rememberListing = useCallback((dates: ListingDates) => {
+    listing.current = dates;
+  }, []);
+
   const resultsHeading = useRef<HTMLHeadingElement>(null);
   const textareaId = useId();
   const hintId = useId();
@@ -392,12 +413,12 @@ export function Coach({
 
   // The event's own page held its rules: fill the box and build the brief at once, unless the visitor
   // has already started typing their own.
-  const acceptRules = useCallback((rules: string) => {
+  const acceptRules = useCallback((rules: string, dates: ListingDates) => {
     if (typed.current.trim()) {
       return;
     }
     setText(rules);
-    setBrief(buildBrief(rules, localToday()));
+    setBrief(buildBrief(rules, localToday(), dates));
   }, []);
 
   // After each new brief renders, move focus to it so keyboard and screen-reader users land on it.
@@ -408,7 +429,7 @@ export function Coach({
   }, [brief]);
 
   function build(input: string) {
-    setBrief(buildBrief(input, localToday()));
+    setBrief(buildBrief(input, localToday(), listing.current));
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -429,22 +450,27 @@ export function Coach({
         <WithEvent event={eventLookup}>
           {(event) =>
             event ? (
-              <EventPanel
-                event={event}
-                reading={
-                  <Suspense
-                    fallback={
-                      <p className="text-sm text-muted motion-safe:animate-pulse">
-                        Reading its rules on {event.host ?? "its site"}…
-                      </p>
-                    }
-                  >
-                    <WithRules rules={rulesLookup}>
-                      {(result) => <RulesStatus result={result} host={event.host ?? "its site"} onRead={acceptRules} />}
-                    </WithRules>
-                  </Suspense>
-                }
-              />
+              <>
+                <RememberListing dates={event.dates} onDates={rememberListing} />
+                <EventPanel
+                  event={event}
+                  reading={
+                    <Suspense
+                      fallback={
+                        <p className="text-sm text-muted motion-safe:animate-pulse">
+                          Reading its rules on {event.host ?? "its site"}…
+                        </p>
+                      }
+                    >
+                      <WithRules rules={rulesLookup}>
+                        {(result) => (
+                          <RulesStatus result={result} host={event.host ?? "its site"} listing={event.dates} onRead={acceptRules} />
+                        )}
+                      </WithRules>
+                    </Suspense>
+                  }
+                />
+              </>
             ) : null
           }
         </WithEvent>

@@ -4,7 +4,7 @@ import { buildBrief } from "@/lib/coach/brief";
 
 import { isPublicAddress, publicOnlyLookup } from "./address";
 import { htmlToText, rulesLinks } from "./html";
-import { readEventPage, type Fetcher } from "./read";
+import { cacheProfileFor, readEventPage, type Fetcher } from "./read";
 import { robotsAllows } from "./robots";
 
 describe("robotsAllows", () => {
@@ -140,6 +140,15 @@ function network(pages: Record<string, { status?: number; type?: string; body?: 
   };
   return { fetch, calls };
 }
+
+describe("cacheProfileFor", () => {
+  it("keeps a page read, or a refusal, for hours, but a site that did not answer only for minutes", () => {
+    expect(cacheProfileFor({ status: "read", text: "Rules", pages: ["https://hack.example/"] })).toBe("hours");
+    expect(cacheProfileFor({ status: "skipped", reason: "robots" })).toBe("hours");
+    expect(cacheProfileFor({ status: "skipped", reason: "empty" })).toBe("hours");
+    expect(cacheProfileFor({ status: "skipped", reason: "unreachable" })).toBe("minutes");
+  });
+});
 
 describe("readEventPage", () => {
   const RULES_PAGE = "<h2>Rules</h2><p>Each team must provide a demo video of no more than 3 minutes and a public repository.</p>";

@@ -26,11 +26,18 @@ titled with the event. The id is checked to be a well-formed UUID before it reac
 
 Since issue #41 (decision D11) the server also reads that hackathon's own page, and up to two
 same-site pages whose path names its rules, FAQ or judging. When the coach finds anything in them
-(a deadline, criteria, a team size, something to hand in or a prize), it fills the box and builds the
-brief at once, and says which pages it read; anything still missing can be pasted in. When it finds
-nothing, or may not read the page, it says why and asks for a paste as before. If the visitor has
-already started typing, their text is left alone. How the page is read is in
-[sources.md](sources.md#reading-an-events-own-page).
+(a deadline, criteria, a team size, who can enter, something to hand in or a prize), it fills the
+box and builds the brief at once, and says which pages it read; anything still missing can be
+pasted in. When it finds nothing, or may not read the page, it says why and asks for a paste as
+before. If the visitor has already started typing, their text is left alone. How the page is read
+is in [sources.md](sources.md#reading-an-events-own-page).
+
+Since issue #51 a brief opened from a listing also uses the listing's own dates where the rules give
+none (`src/lib/coach/listing.ts`). A deadline written as a weekday, such as "submitted by 9 AM on
+Sunday", goes on the listing's only Sunday; without one, the listing's first and last days stand in
+for the start and the deadline, labelled "from the listing" and warned about under "Check these",
+so the countdown and the prep plan still work. Dates taken from the listing never count as found in
+the rules.
 
 For a hackathon hackbrief does not list, an optional field takes the link to its page. The link
 only labels the brief and links back; hackbrief never opens or reads it, and it stays in the
@@ -48,7 +55,7 @@ language model is involved.
 | Equal weights | When the judging section lists criteria without numbers, each gets an equal share, and the brief says the weights were not stated. |
 | Focus, keep steady, light touch | The heaviest criterion and any at 25% or more are a focus; 10% or less is a light touch; the rest keep steady. |
 | Days left | Whole calendar days from the viewer's own date to the deadline's date as written. |
-| Deadline | The latest date marked as a submission date. |
+| Deadline | The latest date marked as a submission date. Priority, early-bird and registration deadlines are for applying, so they never count. For a listed event whose rules give none, a weekday deadline on the listing's matching day, or else the listing's last day, marked as such. |
 | Team size | The first sentence about teams that states a size. A stated minimum of 1 allows solo entries and 2 or more rules them out; otherwise the brief follows what the rules say about entering alone, or says they do not mention it. |
 | Top prize | The largest amount in each currency mentioned in a sentence about prizes or under a prizes heading. |
 | Prep plan dates | Fixed offsets: 14 and 3 days before the start, the start, the day before the deadline and the deadline. Without a start date, the steps before the event count back from two days before the deadline. |
@@ -59,6 +66,8 @@ language model is involved.
   prose. The samples on the page cover one of each; they are fictional.
 - **Dates:** `2027-03-14`, `March 14, 2027`, `14th March 2027`, ranges such as `March 12–14,
   2027` and `February 26 - March 7, 2027`, and times such as `11:59 PM PT` or `18:00 UTC`.
+- **Where to submit:** "submit on Devpost" or "submit your game on itch.io" adds "Submit on …" to the
+  checklist, for a fixed list of platforms, so "submit on our website" adds nothing.
 - **Section context:** a line under a "Prizes" heading is read as a prize, one under "What to
   submit" as a deliverable, and words like "students" count towards eligibility only under an
   eligibility heading.

@@ -20,6 +20,14 @@ export type ReadResult =
   | { status: "read"; text: string; pages: string[] }
   | { status: "skipped"; reason: SkipReason };
 
+/**
+ * How long to keep a read: hours, so an organiser's site sees a few requests a day, except when the
+ * site did not answer, which may pass in a minute and should not leave every visitor without a brief.
+ */
+export function cacheProfileFor(result: ReadResult): "minutes" | "hours" {
+  return result.status === "skipped" && result.reason === "unreachable" ? "minutes" : "hours";
+}
+
 const TIMEOUT_MS = 8_000;
 const MAX_REDIRECTS = 3;
 const MAX_BYTES = 2_000_000;

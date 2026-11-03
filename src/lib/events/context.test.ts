@@ -49,6 +49,7 @@ describe("eventContext", () => {
       details: "Sat, 7 Nov – Sun, 8 Nov 2026 · In person · Lagos, Nigeria",
       organiser: "Harbour Dev Club",
       listedBy: ["Hack Club Hackathons"],
+      dates: { startsOn: "2026-11-07", endsOn: "2026-11-08" },
     });
   });
 
@@ -61,6 +62,7 @@ describe("eventContext", () => {
     expect(context.host).toBeNull();
     expect(context.details).toBe("");
     expect(context.organiser).toBeNull();
+    expect(context.dates).toEqual({ startsOn: null, endsOn: null });
   });
 
   it("credits a licensor and its last update where the source's licence asks", () => {
