@@ -1,4 +1,4 @@
-import { addDays, type KeyDate, TIME } from "./dates";
+import { addDays, type KeyDate, kindAt, TIME } from "./dates";
 import { toSentences } from "./text";
 
 /** The dates hackbrief's listing gives an event, used only where its rules give none. */
@@ -9,7 +9,6 @@ export interface ListingDates {
 
 const WEEKDAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
 const WEEKDAY = /\b(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/i;
-const SUBMITTING = /\b(?:submi\w*|due|deadline|closes?)\b/i;
 // Longer than this, a listing is a season or a programme, and "Sunday" no longer means one day.
 const MAX_DAYS = 14;
 
@@ -31,20 +30,33 @@ function daysOf({ startsOn, endsOn }: ListingDates): string[] {
   return days.length > MAX_DAYS ? [] : days;
 }
 
+/** A sentence's weekday on the listing's only day of that name, as a submission date. */
+// Read as extractDates reads a date, so "the priority deadline to apply is Saturday" or "winners are announced on
+// Sunday" gives no deadline, while "projects are due on Sunday, and winners are announced at noon" does.
+function weekdayDate(sentence: string, days: readonly string[]): KeyDate | null {
+  const found = WEEKDAY.exec(sentence);
+  const name = found && kindAt(sentence, found.index) === "submission" ? found[1]?.toLowerCase() : undefined;
+  const matching = name ? days.filter((day) => WEEKDAYS[weekdayOf(day)] === name) : [];
+  const [date] = matching;
+  return matching.length === 1 && date
+    ? { label: "Submission deadline", kind: "submission", date, time: TIME.exec(sentence)?.[0] ?? null, yearAssumed: false, source: sentence }
+    : null;
+}
+
 /** A deadline the rules give as a weekday ("by 9 AM on Sunday"), on the listing's only day of that name. */
 function weekdayDeadline(input: string, days: readonly string[]): KeyDate | null {
   for (const { text } of toSentences(input)) {
-    const name = WEEKDAY.exec(text)?.[1]?.toLowerCase();
-    if (!name || !SUBMITTING.test(text)) {
-      continue;
-    }
-    const matching = days.filter((day) => WEEKDAYS[weekdayOf(day)] === name);
-    const [date] = matching;
-    if (matching.length === 1 && date) {
-      return { label: "Submission deadline", kind: "submission", date, time: TIME.exec(text)?.[0] ?? null, yearAssumed: false, source: text };
+    const found = weekdayDate(text, days);
+    if (found) {
+      return found;
     }
   }
   return null;
+}
+
+/** The weekday in a sentence the page marks as the deadline, on the listing's day of that name. */
+export function weekdayOnListing(sentence: string, listing: ListingDates): KeyDate | null {
+  return weekdayDate(sentence, daysOf(listing));
 }
 
 function fromListing(date: string, kind: "start" | "submission", label: string): KeyDate {

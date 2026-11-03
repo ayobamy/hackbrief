@@ -209,3 +209,31 @@ changes keeps its entry, with a note pointing at the one that replaces it.
   a full brief from three pages.
 - **What it does not change:** links that visitors type are still never fetched, and Devpost is
   still not read without its permission.
+
+## D12. A language model may point to facts on an organiser's page
+
+- **Decided:** 3 November 2026, by Ahmed. Goes beyond D5, which allowed a model only to word
+  computed summaries.
+- **Decision:** when "Build my brief" (D11) reads a listed hackathon's own page and the coach's
+  parser leaves the deadline, team size, eligibility or checklist empty, a free model is asked to
+  copy, word for word, the sentences on the page that give them. Code keeps a quote only when it
+  is on the page, reads the dates, sizes and amounts from it with the coach's own parsers, and
+  fills only what the parser left empty (`src/lib/coach/locate.ts`). The brief and the coach say
+  which facts a model pointed to. Rules a visitor pastes are never sent to a model.
+- **Routers:** [OpenRouter](https://openrouter.ai) first, with every request limited to providers
+  that do not collect data (`provider.data_collection: "deny"`, from
+  [provider routing](https://openrouter.ai/docs/features/provider-routing)) and to providers that
+  support the JSON schema; then [Requesty](https://docs.requesty.ai/quickstart.md), which "does
+  not train on your requests or responses", with a model or a fallback policy of free models
+  whose providers do not train on data. Each is used only when its key (and Requesty's model) is
+  set (`src/lib/model/routers.ts`).
+- **Why:** the parser misses facts organisers phrase in their own way, and a model finds those
+  sentences far better than it reports what they say. Letting it point, not answer, keeps every
+  figure computed by tested code (START-HERE, "What is decided"), and a quote that is not on the
+  page, from a model's mistake or from text planted in a page, adds nothing.
+- **Limits:** free models allow 50 requests a day on OpenRouter and 200 on Requesty. A page's
+  answer is cached for a day and asked for only when facts are missing, about one request per
+  listed event a day; after a failure it is retried within minutes, and meanwhile the brief is
+  the parser's alone.
+- **What it does not change:** the advice, the weights and the plan still come only from code; no
+  model writes text that a visitor reads as hackbrief's own.

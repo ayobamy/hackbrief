@@ -71,6 +71,18 @@ function sizeIn(sentence: string): Omit<TeamSize, "soloAllowed" | "source"> | nu
   return min === null ? null : { min, max: null };
 }
 
+function withSolo(size: Omit<TeamSize, "soloAllowed" | "source">, soloStated: boolean | null, source: string): TeamSize {
+  // A stated minimum settles it: 1 allows solo entries, 2 or more rules them out.
+  const soloAllowed = size.min === null ? soloStated : size.min === 1;
+  return { min: size.min ?? (soloAllowed ? 1 : null), max: size.max, soloAllowed, source };
+}
+
+/** The team size one sentence states, whatever it calls a team ("squads of up to four people"). */
+export function teamSizeIn(sentence: string): TeamSize | null {
+  const size = sizeIn(sentence);
+  return size ? withSolo(size, SOLO.test(sentence) ? !NEGATION.test(sentence) : null, sentence) : null;
+}
+
 /** The team size the rules allow, or null when they do not say. */
 export function extractTeamSize(input: string): TeamSize | null {
   const sentences = toSentences(input)
@@ -82,9 +94,7 @@ export function extractTeamSize(input: string): TeamSize | null {
   for (const sentence of sentences) {
     const size = sizeIn(sentence);
     if (size) {
-      // A stated minimum settles it: 1 allows solo entries, 2 or more rules them out.
-      const soloAllowed = size.min === null ? soloStated : size.min === 1;
-      return { min: size.min ?? (soloAllowed ? 1 : null), max: size.max, soloAllowed, source: sentence };
+      return withSolo(size, soloStated, sentence);
     }
   }
   if (soloSentence === undefined) {

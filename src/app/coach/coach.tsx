@@ -5,6 +5,7 @@ import { Suspense, use, useCallback, useEffect, useId, useLayoutEffect, useRef, 
 import { buildBrief, hasFindings, localToday, type Brief } from "@/lib/coach/brief";
 import { formatAmount, formatDate, formatDaysLeft, formatSolo, formatTeamSize } from "@/lib/coach/format";
 import type { ListingDates } from "@/lib/coach/listing";
+import type { Located } from "@/lib/coach/locate";
 import { SAMPLES } from "@/lib/coach/samples";
 import type { Emphasis } from "@/lib/coach/strategy";
 import { Footnote, LABEL, SHEET } from "@/components/sheet";
@@ -266,12 +267,13 @@ function RulesStatus({
   result: ReadResult | null;
   host: string;
   listing: ListingDates;
-  onRead: (text: string, listing: ListingDates) => void;
+  onRead: (text: string, listing: ListingDates, located: Located | undefined) => void;
 }) {
-  const found = result?.status === "read" && hasFindings(buildBrief(result.text, FINDINGS_DAY));
+  const read = result?.status === "read" ? buildBrief(result.text, FINDINGS_DAY, { located: result.located }) : null;
+  const found = read !== null && hasFindings(read);
   useEffect(() => {
     if (found && result?.status === "read") {
-      onRead(result.text, listing);
+      onRead(result.text, listing, result.located);
     }
   }, [found, result, listing, onRead]);
 
@@ -296,6 +298,9 @@ function RulesStatus({
       </a>
       {more > 0 ? ` and ${more} more ${more === 1 ? "page" : "pages"}` : ""}. Your brief is below; anything it
       misses was not on {more > 0 ? "those pages" : "that page"}, so paste it here to fill it in.
+      {read && read.modelFound.length > 0
+        ? " A language model pointed to some of it; each fact is quoted from the page and checked by hackbrief."
+        : ""}
     </p>
   );
 }
@@ -399,6 +404,8 @@ export function Coach({
   const [brief, setBrief] = useState<Brief | null>(null);
   // The listed event's dates, which fill in what its rules leave out (`withListingDates`).
   const listing = useRef<ListingDates | undefined>(undefined);
+  // Sentences a language model pointed to in the event's page; checked again against the box on each build.
+  const located = useRef<Located | undefined>(undefined);
   // The event the coach last showed: "" for the plain coach, null before the first lookup lands.
   const shown = useRef<string | null>(null);
 
@@ -422,6 +429,7 @@ export function Coach({
       setText("");
       setPage("");
       setBrief(null);
+      located.current = undefined;
     }
     shown.current = id;
     listing.current = event?.dates;
@@ -429,12 +437,13 @@ export function Coach({
 
   // The event's own page held its rules: fill the box and build the brief at once, unless the visitor
   // has already started typing their own.
-  const acceptRules = useCallback((rules: string, dates: ListingDates) => {
+  const acceptRules = useCallback((rules: string, dates: ListingDates, found: Located | undefined) => {
     if (typed.current.trim()) {
       return;
     }
+    located.current = found;
     setText(rules);
-    setBrief(buildBrief(rules, localToday(), dates));
+    setBrief(buildBrief(rules, localToday(), { listing: dates, located: found }));
   }, []);
 
   // After each new brief renders, move focus to it so keyboard and screen-reader users land on it.
@@ -445,7 +454,7 @@ export function Coach({
   }, [brief]);
 
   function build(input: string) {
-    setBrief(buildBrief(input, localToday(), listing.current));
+    setBrief(buildBrief(input, localToday(), { listing: listing.current, located: located.current }));
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {

@@ -48,6 +48,11 @@ describe("extractDates", () => {
     ]);
   });
 
+  it("reads a time at the end of a sentence without the full stop, and keeps a.m. whole", () => {
+    expect(summary("Projects are due March 14, 2027 at 10:00 AM.")[0]?.time).toBe("10:00 AM");
+    expect(summary("Projects are due March 14, 2027 at 9 a.m.")[0]?.time).toBe("9 a.m.");
+  });
+
   it("reads day-first dates with ordinals", () => {
     expect(summary("Winners announced on 24th April 2027").map(({ date, kind }) => [date, kind])).toEqual([
       ["2027-04-24", "results"],

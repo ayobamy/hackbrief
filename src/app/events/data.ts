@@ -1,9 +1,12 @@
 import { cacheLife, cacheTag } from "next/cache";
 
+import { buildBrief, missesFacts } from "@/lib/coach/brief";
+import { locateFacts, type Located } from "@/lib/coach/locate";
 import { getDatabase } from "@/lib/db";
 import type { EventFilters } from "@/lib/events/filters";
 import { findEvent, listUpcomingEvents, type EventListing } from "@/lib/events/query";
 import { guardedFetch } from "@/lib/rules/fetcher";
+import { askInTurn, routersFrom } from "@/lib/model/routers";
 import { cacheProfileFor, readEventPage, type ReadResult } from "@/lib/rules/read";
 
 /** The tag the import revalidates after each run. */
@@ -50,5 +53,36 @@ export async function getEventRules(id: string): Promise<ReadResult> {
   } else {
     cacheLife("hours");
   }
+  // A model is asked only for what the coach's own reading of the page leaves out (decision D12).
+  if (result.status === "read" && missesFacts(buildBrief(result.text, ANY_DAY))) {
+    const located = await locatedOnPage(result.text);
+    return located ? { ...result, located } : result;
+  }
   return result;
+}
+
+// Whether the coach's reading leaves facts out does not depend on the day.
+const ANY_DAY = "2026-01-01";
+
+/**
+ * Sentences a language model points to on an event's page (decision D12): OpenRouter, then Requesty,
+ * each only when its key is set. Cached for a day, so a page costs about one request a day of the
+ * free limits; after a failure only for minutes, and the brief falls back to the coach's own reading.
+ */
+async function locatedOnPage(text: string): Promise<Located | null> {
+  "use cache";
+  const routers = routersFrom(process.env);
+  if (routers.length === 0) {
+    cacheLife("hours");
+    return null;
+  }
+  try {
+    const located = await locateFacts(text, (messages, schema) => askInTurn(routers, messages, schema));
+    cacheLife("days");
+    return located;
+  } catch (error) {
+    console.error("No language model could point to facts on the event's page", error instanceof Error ? error.message : error);
+    cacheLife("minutes");
+    return null;
+  }
 }

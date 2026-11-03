@@ -3,6 +3,7 @@ import { daysBetween, eventStart, extractDates, submissionDeadline, type KeyDate
 import { extractDeliverables, type Deliverable } from "./deliverables";
 import { extractEligibility } from "./eligibility";
 import { withListingDates, type ListingDates } from "./listing";
+import { locatedFacts, verifyLocated, type Located, type ModelFact } from "./locate";
 import { buildPlan, type PlanStep } from "./plan";
 import { extractPrizes, largestPrizes, type Amount, type PrizeLine } from "./prizes";
 import { buildStrategy, type StrategyNote } from "./strategy";
@@ -24,8 +25,30 @@ export interface Brief {
   prizes: PrizeLine[];
   topPrizes: Amount[];
   plan: PlanStep[];
+  /** The parts a language model's quotes filled in (decision D12); empty without one. */
+  modelFound: ModelFact[];
   /** What hackbrief could not find or had to assume, in plain words. */
   warnings: string[];
+}
+
+/** What a brief can use besides the text itself. */
+export interface BriefExtras {
+  /** A listed event's own dates, which fill in what its rules leave out (`withListingDates`). */
+  listing?: ListingDates | undefined;
+  /** Sentences a language model pointed to in the text (D12); each is checked against it again. */
+  located?: Located | undefined;
+}
+
+const FACT_NAMES: Readonly<Record<ModelFact, string>> = {
+  deadline: "the deadline",
+  team: "the team size",
+  eligibility: "who can enter",
+  checklist: "the checklist",
+  prizes: "the prizes",
+};
+
+function inWords(names: readonly string[]): string {
+  return names.length < 2 ? names.join("") : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
 }
 
 function warningsFor(brief: Omit<Brief, "warnings">, truncated: boolean): string[] {
@@ -55,21 +78,53 @@ function warningsFor(brief: Omit<Brief, "warnings">, truncated: boolean): string
   if (brief.dates.some((date) => date.yearAssumed)) {
     warnings.push("Some dates had no year; hackbrief assumed the next one that keeps them upcoming.");
   }
+  if (brief.modelFound.length > 0) {
+    warnings.push(
+      `A language model pointed to the sentences behind ${inWords(brief.modelFound.map((fact) => FACT_NAMES[fact]))}. hackbrief checked each sentence is in the rules and read the values itself; check them against the rules.`,
+    );
+  }
   return warnings;
 }
 
+function byDate(dates: readonly KeyDate[]): KeyDate[] {
+  return [...dates].sort((a, b) => a.date.localeCompare(b.date));
+}
+
 /** Everything the coach shows, built from pasted rules. `today` is YYYY-MM-DD. */
-export function buildBrief(input: string, today: string, listing?: ListingDates): Brief {
+export function buildBrief(input: string, today: string, { listing, located }: BriefExtras = {}): Brief {
   const truncated = input.length > MAX_INPUT_LENGTH;
   const text = truncated ? input.slice(0, MAX_INPUT_LENGTH) : input;
 
   const judging = extractCriteria(text);
   const pageDates = extractDates(text, today);
-  // A listed event's own dates fill in what its rules leave out (`withListingDates`).
-  const dates = listing ? withListingDates(text, pageDates, listing) : pageDates;
-  const deadline = submissionDeadline(dates);
-  const checklist = extractDeliverables(text);
-  const prizes = extractPrizes(text);
+  const ownDates = listing ? withListingDates(text, pageDates, listing) : pageDates;
+  const ownDeadline = submissionDeadline(ownDates);
+  const ownTeam = extractTeamSize(text);
+  const ownEligibility = extractEligibility(text);
+  const ownChecklist = extractDeliverables(text);
+  const ownPrizes = extractPrizes(text);
+
+  // A model's quotes fill only what the coach's own reading left empty, and only while the text holds them.
+  const extra = located ? locatedFacts(verifyLocated(located, text), today, listing) : null;
+  const modelDeadline = extra?.deadline && (!ownDeadline || ownDeadline.fromListing) ? extra.deadline : null;
+  const modelTeam = ownTeam ? null : (extra?.team ?? null);
+  const modelEligibility = ownEligibility.length > 0 ? [] : (extra?.eligibility ?? []);
+  const modelItems = (extra?.checklist ?? []).filter((item) => !ownChecklist.some((own) => own.id === item.id));
+  const modelPrizes = ownPrizes.length > 0 ? [] : (extra?.prizes ?? []);
+
+  const dates = modelDeadline
+    ? byDate([...ownDates.filter((date) => !(date.fromListing && date.kind === "submission")), modelDeadline])
+    : ownDates;
+  const deadline = modelDeadline ?? ownDeadline;
+  const checklist = [...ownChecklist, ...modelItems];
+  const prizes = ownPrizes.length > 0 ? ownPrizes : modelPrizes;
+  const modelFound: ModelFact[] = [
+    modelDeadline ? "deadline" : null,
+    modelTeam ? "team" : null,
+    modelEligibility.length > 0 ? "eligibility" : null,
+    modelItems.length > 0 ? "checklist" : null,
+    modelPrizes.length > 0 ? "prizes" : null,
+  ].filter((fact): fact is ModelFact => fact !== null);
 
   const brief = {
     judging,
@@ -77,12 +132,13 @@ export function buildBrief(input: string, today: string, listing?: ListingDates)
     dates,
     deadline,
     daysLeft: deadline ? daysBetween(today, deadline.date) : null,
-    team: extractTeamSize(text),
-    eligibility: extractEligibility(text),
+    team: ownTeam ?? modelTeam,
+    eligibility: ownEligibility.length > 0 ? ownEligibility : modelEligibility,
     checklist,
     prizes,
     topPrizes: largestPrizes(prizes),
     plan: buildPlan(eventStart(dates), deadline, checklist, today),
+    modelFound,
   };
   return { ...brief, warnings: warningsFor(brief, truncated) };
 }
@@ -94,7 +150,7 @@ export function localToday(now: Date = new Date()): string {
   return `${now.getFullYear()}-${month}-${day}`;
 }
 
-/** Whether a text gave the brief anything to show: a deadline, judging criteria, a team size, something to hand in or a prize. */
+/** Whether a text gave the brief anything to show: a deadline, criteria, a team size, who can enter, something to hand in or a prize. */
 export function hasFindings(brief: Brief): boolean {
   return (
     (brief.deadline !== null && !brief.deadline.fromListing) ||
@@ -103,5 +159,16 @@ export function hasFindings(brief: Brief): boolean {
     brief.eligibility.length > 0 ||
     brief.checklist.length > 0 ||
     brief.topPrizes.length > 0
+  );
+}
+
+/** Whether the brief still lacks a deadline, a team size, who can enter or a checklist: when a model is worth asking. */
+export function missesFacts(brief: Brief): boolean {
+  return (
+    !brief.deadline ||
+    Boolean(brief.deadline.fromListing) ||
+    !brief.team ||
+    brief.eligibility.length === 0 ||
+    brief.checklist.length === 0
   );
 }
