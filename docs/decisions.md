@@ -49,7 +49,8 @@ changes keeps its entry, with a note pointing at the one that replaces it.
 
 ## D5. Language model: none in the first coach; free OpenRouter models later
 
-- **Decided:** 2 November 2026, by Ahmed.
+- **Decided:** 2 November 2026, by Ahmed. Changed on 3 November 2026 by D13, under which a paid
+  model also writes the coaching, from facts code has checked.
 - **Decision:** the first coach parses dates, eligibility, deliverables and rubric weights in
   tested code, with no language model and no API key. Plain-language summaries come later, in
   their own issue, through free models on [OpenRouter](https://openrouter.ai) rather than the
@@ -213,7 +214,8 @@ changes keeps its entry, with a note pointing at the one that replaces it.
 ## D12. A language model may point to facts on an organiser's page
 
 - **Decided:** 3 November 2026, by Ahmed. Goes beyond D5, which allowed a model only to word
-  computed summaries.
+  computed summaries. Changed the same day by D13, under which the model fills the whole brief,
+  with proof, rather than only what the parser missed.
 - **Decision:** when "Build my brief" (D11) reads a listed hackathon's own page and the coach's
   parser leaves the deadline, team size, eligibility or checklist empty, a free model is asked to
   copy, word for word, the sentences on the page that give them. Code keeps a quote only when it
@@ -237,3 +239,37 @@ changes keeps its entry, with a note pointing at the one that replaces it.
   the parser's alone.
 - **What it does not change:** the advice, the weights and the plan still come only from code; no
   model writes text that a visitor reads as hackbrief's own.
+
+## D13. The model builds each brief, and code keeps the proof
+
+- **Decided:** 3 November 2026, by Ahmed (#58). Changes D5 and D12.
+- **Decision:** a language model reads a listed event's pages and fills the whole brief: key dates,
+  team size, who can enter, what to hand in, judging criteria, tracks, prizes and rules that change
+  how to compete. Every fact carries the sentence, or two, it came from. Code keeps a fact only when
+  each sentence is on its page word for word and code reads the same value from it; dates, times,
+  sizes, amounts and weights are still computed by tested code (#59). The model then writes the
+  coaching from the checked facts alone, never from page text, and code still sets the weights,
+  hours and dates in the plan (#61). Rules a visitor pastes are never sent to a model.
+- **How it runs:** the daily import builds each listed event's brief and stores it (#60): code
+  reads the event's page under D11, the model picks up to three more of the site's own pages
+  likely to hold rules, FAQ, schedule, judging or prizes, code fetches them under the same rules,
+  then the model extracts and code checks. Pages are read daily and the model is asked again only
+  when their text changed. A run stops starting new events before the function's time limit (300 s
+  by default, [duration limits](https://vercel.com/docs/functions/configuring-functions/duration))
+  and carries on the next day. A listed event opens on its brief at `/events/<id>` (#62).
+- **Model and privacy:** a paid model through OpenRouter, set by `OPENROUTER_MODEL`. On eleven
+  listed events' pages `anthropic/claude-haiku-5.5` found whole, correct sentences on every page,
+  where `meta-llama/llama-3.3-70b-instruct` returned fragments,
+  `mistralai/mistral-small-3.2-24b-instruct` quoted headers as deadlines and `openai/gpt-oss-120b`
+  timed out on four of nine. Every request sets `provider.zdr: true`, so only endpoints that keep
+  no data serve it, as well as `data_collection: "deny"`
+  ([provider routing](https://openrouter.ai/docs/features/provider-routing)).
+- **Why:** organisers phrase facts in endless ways, and a brief built from the parser and a few
+  quoted gaps reads like a form. A model reads pages far better than patterns do, but can be
+  wrong about what a sentence says; tying every fact to a sentence that code has checked keeps the
+  numbers visitors rely on computed and tested (house rule 8), and lets them see where each came
+  from. Building in advance means visitors never wait for a model, and slower, better models fit.
+- **Cost:** about $0.002 of model use per page read, spent only when an event's pages change,
+  from OpenRouter credits bought for hackbrief and capped by a spending limit on its key.
+- **What it does not change:** the coach still works with no model: without a key, or when the
+  model fails, the brief is the parser's, as before. Pasted rules stay on the visitor's side.
