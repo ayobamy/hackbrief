@@ -33,12 +33,20 @@ export async function getEvent(id: string): Promise<EventListing | null> {
 }
 
 
-/** An event's stored brief (#60), read again every few minutes so one built since then shows soon. */
+/**
+ * An event's stored brief (#60). A stored one is kept for minutes; "nothing stored" only for seconds,
+ * since a brief built on a visitor's click is saved moments later, and a server that remembered the
+ * gap for minutes would build it again (#73).
+ */
 export async function getStoredBrief(id: string): Promise<typeof eventBriefs.$inferSelect | null> {
   "use cache";
-  cacheLife("minutes");
   cacheTag(EVENTS_TAG);
   const [row] = await getDatabase().select().from(eventBriefs).where(eq(eventBriefs.eventId, id));
+  if (row) {
+    cacheLife("minutes");
+  } else {
+    cacheLife("seconds");
+  }
   return row ?? null;
 }
 
