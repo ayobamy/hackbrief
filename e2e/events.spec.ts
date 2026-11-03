@@ -70,6 +70,23 @@ test("a listing opens the coach for that hackathon, and the brief carries its na
   await expect(page.getByRole("heading", { level: 2, name: "Brief: Fictional Hack 01" })).toBeFocused();
 });
 
+test("opening another listing's brief starts fresh, whatever the last one held", async ({ page }) => {
+  await page.goto("/events");
+  await page.getByRole("link", { name: "Build my brief for Fictional Hack 01" }).click();
+  await page.getByLabel("Hackathon rules and judging text").fill(RULES);
+  await page.getByRole("button", { name: "Build my brief" }).click();
+  await expect(page.getByRole("heading", { level: 2, name: "Brief: Fictional Hack 01" })).toBeVisible();
+
+  // Back to the list and on to another hackathon, as a visitor comparing them does. Pages left behind
+  // stay in the document, hidden, so only what is visible counts.
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Hackathons" }).click();
+  await page.getByRole("link", { name: "Build my brief for Fictional Hack 02" }).click();
+
+  await expect(page.getByRole("heading", { level: 2, name: "Fictional Hack 02", exact: true })).toBeVisible();
+  await expect(page.getByLabel("Hackathon rules and judging text").filter({ visible: true })).toHaveValue("");
+  await expect(page.getByRole("heading", { level: 2, name: /^Brief:/ })).toHaveCount(0);
+});
+
 test("a malformed event id gives the plain coach, where a typed page link labels the brief", async ({ page }) => {
   await page.goto("/coach?event=not-an-id");
   await expect(page.getByText("Building a brief for")).toHaveCount(0);

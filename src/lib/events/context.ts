@@ -27,6 +27,8 @@ function hostOf(url: URL): string {
 }
 
 export interface EventContext {
+  /** The listing's id, which tells the coach when it is showing a different event. */
+  id: string;
   name: string;
   /** The event's own page, where its rules are, when it is a web page. */
   rulesUrl: string | null;
@@ -43,6 +45,7 @@ export interface EventContext {
 export function eventContext(event: EventListing): EventContext {
   const page = webUrl(event.url);
   return {
+    id: event.id,
     name: event.name,
     rulesUrl: page ? event.url : null,
     host: page ? hostOf(page) : null,

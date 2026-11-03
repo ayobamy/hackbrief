@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, use, useCallback, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { Suspense, use, useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 
 import { buildBrief, hasFindings, localToday, type Brief } from "@/lib/coach/brief";
 import { formatAmount, formatDate, formatDaysLeft, formatSolo, formatTeamSize } from "@/lib/coach/format";
@@ -350,11 +350,15 @@ function EventPanel({ event, reading }: { event: EventContext; reading: ReactNod
   );
 }
 
-/** Hands the listed event's dates to the coach once the lookup lands, for briefs built from pasted rules. */
-function RememberListing({ dates, onDates }: { dates: ListingDates; onDates: (dates: ListingDates) => void }) {
-  useEffect(() => {
-    onDates(dates);
-  }, [dates, onDates]);
+/**
+ * Tells the coach which event the page shows once the lookup lands. The router keeps a page it leaves
+ * hidden rather than unmounted (React's Activity), so the coach must start again itself when a different
+ * event's brief opens. A layout effect, so the reset runs before the page reader hands over new rules.
+ */
+function ShowingEvent({ event, onEvent }: { event: EventContext | null; onEvent: (event: EventContext | null) => void }) {
+  useLayoutEffect(() => {
+    onEvent(event);
+  }, [event, onEvent]);
   return null;
 }
 
@@ -395,9 +399,8 @@ export function Coach({
   const [brief, setBrief] = useState<Brief | null>(null);
   // The listed event's dates, which fill in what its rules leave out (`withListingDates`).
   const listing = useRef<ListingDates | undefined>(undefined);
-  const rememberListing = useCallback((dates: ListingDates) => {
-    listing.current = dates;
-  }, []);
+  // The event the coach last showed: "" for the plain coach, null before the first lookup lands.
+  const shown = useRef<string | null>(null);
 
   const resultsHeading = useRef<HTMLHeadingElement>(null);
   const textareaId = useId();
@@ -410,6 +413,19 @@ export function Coach({
   useEffect(() => {
     typed.current = text;
   }, [text]);
+
+  // A different event's brief starts empty; the same one keeps what was typed and built.
+  const showEvent = useCallback((event: EventContext | null) => {
+    const id = event?.id ?? "";
+    if (shown.current !== null && shown.current !== id) {
+      typed.current = "";
+      setText("");
+      setPage("");
+      setBrief(null);
+    }
+    shown.current = id;
+    listing.current = event?.dates;
+  }, []);
 
   // The event's own page held its rules: fill the box and build the brief at once, unless the visitor
   // has already started typing their own.
@@ -448,10 +464,10 @@ export function Coach({
     <div className="flex flex-col gap-10">
       <Suspense fallback={null}>
         <WithEvent event={eventLookup}>
-          {(event) =>
-            event ? (
-              <>
-                <RememberListing dates={event.dates} onDates={rememberListing} />
+          {(event) => (
+            <>
+              <ShowingEvent event={event} onEvent={showEvent} />
+              {event ? (
                 <EventPanel
                   event={event}
                   reading={
@@ -470,9 +486,9 @@ export function Coach({
                     </Suspense>
                   }
                 />
-              </>
-            ) : null
-          }
+              ) : null}
+            </>
+          )}
         </WithEvent>
       </Suspense>
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
