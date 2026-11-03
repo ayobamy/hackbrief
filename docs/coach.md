@@ -32,6 +32,10 @@ pasted in. When it finds nothing, or may not read the page, it says why and asks
 before. If the visitor has already started typing, their text is left alone. How the page is read
 is in [sources.md](sources.md#reading-an-events-own-page).
 
+The router keeps a page it leaves hidden rather than unmounted (React's Activity, with Cache
+Components), so the coach clears its box, link and brief itself when it is opened for a different
+event, and keeps them when it is opened for the same one again (issue #55).
+
 Since issue #51 a brief opened from a listing also uses the listing's own dates where the rules give
 none (`src/lib/coach/listing.ts`). A deadline written as a weekday, such as "submitted by 9 AM on
 Sunday", goes on the listing's only Sunday; without one, the listing's first and last days stand in

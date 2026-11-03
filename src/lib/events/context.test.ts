@@ -43,6 +43,7 @@ describe("parseEventId", () => {
 describe("eventContext", () => {
   it("says what the coach needs to show about a listed event", () => {
     expect(eventContext(listing())).toEqual({
+      id: ID,
       name: "Fictional Harbour Hack",
       rulesUrl: "https://www.harbour-hack.example/2027",
       host: "harbour-hack.example",
