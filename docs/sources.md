@@ -47,8 +47,13 @@ hackathon's own page for them, so the brief can be built at once. The bounds:
 - **Cached for hours, never stored.** The result sits in the server's cache for hours, so an
   organiser's site sees at most a few requests a day; a site that did not answer is kept for
   minutes only, so a slow moment does not leave every visitor without a brief (issue #51). Nothing
-  is written to the database. The text
-  is shown to the visitor who asked, in the coach's box, and the brief keeps facts, not copies.
+  is written to the database. The text is shown to the visitor who asked, in the coach's box, and
+  the brief keeps facts, not copies.
+- **A model sees the page only when facts are missing** (decision D12). The page's text, which is
+  public, goes to a free model on OpenRouter, limited to providers that do not collect data, or
+  else on Requesty, which does not train on requests, with models whose providers do not either.
+  Only the quotes the model returns travel back, kept when they are on the page, and the answer is
+  cached for a day. Rules a visitor pastes are never sent.
 
 Unlike a source in the tables below, an organiser's own site is not checked against its terms
 first: hackbrief reads it once on a visitor's behalf, the way their browser would, identified by its

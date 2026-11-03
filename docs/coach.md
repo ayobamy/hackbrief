@@ -51,7 +51,8 @@ event up.
 ## How each number is computed
 
 Every figure comes from code in `src/lib/coach/`, covered by tests in the same folder. No
-language model is involved.
+language model computes a figure; a model may only point to the sentences they are read from (see
+"Facts a model points to" below).
 
 | Figure | How |
 | --- | --- |
@@ -86,5 +87,23 @@ language model is involved.
   are marked "year assumed".
 - **Text longer than 100,000 characters** is cut, and the brief says so.
 
-Plain-language summaries from a language model come later, through free OpenRouter models (D5),
-and will only word what this code has already computed.
+## Facts a model points to
+
+When "Build my brief" reads a listed hackathon's page and this code leaves the deadline, the team
+size, who can enter or the checklist empty, a free language model is asked to copy the sentences
+that give them, word for word (decision D12, `src/lib/coach/locate.ts`):
+
+- A quote is kept only when it is in the page's text, after evening out spaces and curly quotes;
+  anything else is dropped, so a model's mistake, or an instruction planted in a page, adds nothing.
+- The values are read from the quotes by the parsers above. A quote said to give the deadline is
+  read from the start of its sentence on the page, and gives the deadline only where the date
+  rules above mark a date in it, or its weekday, as the submission deadline: a model that quotes
+  "October 3" from "Priority deadline October 3", or the bare first day of the event, adds nothing.
+- The quotes fill only what this code left empty, and are checked again against the box each time
+  the brief is rebuilt, so editing them out of the text removes them.
+- The brief lists the facts a model pointed to under "Check these", and the coach says a model
+  helped. Rules a visitor pastes are never sent to a model.
+
+The request goes to OpenRouter, then to Requesty if OpenRouter fails, each only when its key is
+set; without one, or when both fail, the brief is this code's alone. Plain-language summaries
+(D5) are still to come and will only word what this code has computed.

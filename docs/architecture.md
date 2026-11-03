@@ -2,7 +2,7 @@
 
 hackbrief is one Next.js 16 application on Vercel, with a Neon Postgres database, a daily import job
 for the sources whose terms allow it, and the coach running in the visitor's browser. The
-decisions behind each piece are in [decisions.md](decisions.md) (D1 to D8).
+decisions behind each piece are in [decisions.md](decisions.md) (D1 to D12).
 
 ## The system
 
@@ -16,7 +16,7 @@ flowchart LR
   end
   db[("Neon Postgres 18<br/>aws-us-east-1")]
   sources[["Allowed sources<br/>Hack Club API · OpenAgenda API<br/>Hackster feed · GitHub repositories"]]
-  llm[["OpenRouter free models<br/>(later)"]]
+  llm[["Free models<br/>OpenRouter, then Requesty"]]
 
   user -- HTTPS --> pages
   pages -- "cached reads" --> db
@@ -24,7 +24,7 @@ flowchart LR
   cron --> routes
   routes -- "identified, rate-limited" --> sources
   routes -- "upsert" --> db
-  routes -. "summaries of computed facts" .-> llm
+  pages -. "public page text, when facts are missing (D12)" .-> llm
 ```
 
 Today the coach, the home page, the health route and the daily import exist; the rest is planned in
@@ -133,12 +133,14 @@ src/lib/fit/             the fit score (planned)
 | --- | --- | --- |
 | Vercel Hobby | Non-commercial use only; cron once a day, started within the hour; functions up to 300 s; 1,000,000 invocations and 4 active CPU-hours a month | Daily imports; static and cached pages; move to Pro before taking money in any form |
 | Neon Free | 1 GB per project; 100 CU-hours a month; compute pauses after 5 idle minutes; 10 branches per project | Facts only, no copied pages; cached reads so the compute can sleep; clean up preview branches (#7) |
-| OpenRouter free models | 20 requests a minute; 50 a day, or 1,000 a day after buying 10 credits | Summaries generated once per event and cached; the app works without them |
+| OpenRouter free models | 20 requests a minute; 50 a day, or 1,000 a day after buying 10 credits | Asked only when the parser misses facts on an event's page; each answer cached a day; the app works without them (D12) |
+| Requesty free models | 200 requests a day | The fallback when OpenRouter fails; the same cache and the same fallback to the parser |
 
 ## Security and privacy
 
 - **No accounts and no personal data** in the first version. The coach's text stays in the browser.
-- **Secrets** (`DATABASE_URL`, `CRON_SECRET`, later the OpenRouter key) live in `.env.local` and
+- **Secrets** (`DATABASE_URL`, `CRON_SECRET`, `OPENAGENDA_API_KEY`, `OPENROUTER_API_KEY`,
+  `REQUESTY_API_KEY`) live in `.env.local` and
   Vercel's environment settings, never in the repository.
 - **Public routes reveal nothing internal and cannot keep the database awake:** the health check
   answers "app is up" to everyone and checks the database only for requests carrying

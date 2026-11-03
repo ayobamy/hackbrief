@@ -53,7 +53,7 @@ const DAY_FIRST = new RegExp(`\\b${DAY}\\s+(?:of\\s+)?${MONTH}(?:,?\\s+${YEAR})?
 const RANGE_GAP = /^\s*(?:–|—|-|to|until|through|thru)\s*$/i;
 /** A time of day as rules write it: "11:59 PM PT", "18:00 UTC", "9 AM". */
 export const TIME =
-  /\b(?:\d{1,2}(?::\d{2})?\s?[aApP]\.?[mM]\.?|\d{1,2}:\d{2})(?:\s?(?:(?:UTC|GMT)(?:[+-]\d{1,2}(?::?\d{2})?)?|[A-Z]{2,5}\b))?/;
+  /\b(?:\d{1,2}(?::\d{2})?\s?(?:[aApP]\.[mM]\.|[aApP][mM]\b)|\d{1,2}:\d{2})(?:\s?(?:(?:UTC|GMT)(?:[+-]\d{1,2}(?::?\d{2})?)?|[A-Z]{2,5}\b))?/;
 
 const KIND_RULES: ReadonlyArray<readonly [DateKind, RegExp]> = [
   ["results", /\b(?:winners?|results|announce\w*|awards? ceremony)\b/i],
@@ -255,7 +255,8 @@ interface Entry {
 
 const SENTENCE_BREAK = /[.!?;]\s+(?=\p{Lu})/gu;
 
-function lastSentenceBreak(text: string, before: number): number {
+/** Where the sentence holding position `before` starts in a line of text. */
+export function lastSentenceBreak(text: string, before: number): number {
   let start = 0;
   for (const match of text.slice(0, before).matchAll(SENTENCE_BREAK)) {
     start = match.index + match[0].length;
@@ -269,6 +270,15 @@ function sentenceAround(text: string, index: number): string {
   const rest = text.slice(index);
   const end = rest.search(/[.!?;]\s+(?=\p{Lu})/u);
   return text.slice(start, end === -1 ? text.length : index + end);
+}
+
+/**
+ * What a date at `index` in a line marks: read from the words before it in its sentence (back to `from`),
+ * or, when those name nothing, from the whole sentence.
+ */
+export function kindAt(text: string, index: number, from = 0): DateKind {
+  const ownKind = classify(text.slice(Math.max(from, lastSentenceBreak(text, index)), index));
+  return ownKind === "other" ? classify(sentenceAround(text, index)) : ownKind;
 }
 
 /**
@@ -290,8 +300,7 @@ export function extractDates(input: string, today: string): KeyDate[] {
       // The words before the date, back to the previous date or the start of its sentence.
       const sentenceStart = lastSentenceBreak(text, entry.first.index);
       const context = text.slice(Math.max(previousEnd, sentenceStart), entry.first.index);
-      const ownKind = classify(context);
-      const kind = ownKind === "other" ? classify(sentenceAround(text, entry.first.index)) : ownKind;
+      const kind = kindAt(text, entry.first.index, previousEnd);
       const end = (entry.last ?? entry.first).end;
       const nextStart = entries[position + 1]?.first.index ?? text.length;
       const after = text.slice(end, nextStart);

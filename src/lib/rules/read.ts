@@ -1,5 +1,6 @@
 import { isIP } from "node:net";
 
+import type { Located } from "@/lib/coach/locate";
 import { isWebUrl } from "@/lib/events/format";
 import { USER_AGENT } from "@/lib/sources";
 import { isFeedOnlyUrl, isRestrictedUrl } from "@/lib/sources/restricted";
@@ -17,7 +18,13 @@ export type Fetcher = (
 export type SkipReason = "restricted" | "robots" | "unreachable" | "not-html" | "empty" | "off";
 
 export type ReadResult =
-  | { status: "read"; text: string; pages: string[] }
+  | {
+      status: "read";
+      text: string;
+      pages: string[];
+      /** Sentences a language model pointed to in the text (decision D12), when one was asked. */
+      located?: Located;
+    }
   | { status: "skipped"; reason: SkipReason };
 
 /**
