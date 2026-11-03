@@ -59,6 +59,14 @@ export function weekdayOnListing(sentence: string, listing: ListingDates): KeyDa
   return weekdayDate(sentence, daysOf(listing));
 }
 
+// The event's last day as its own page states it (the latest date marked as an end), which stands in for
+// a deadline the rules do not give before the listing's last day does: the organiser's page is the
+// better word on when its event runs (#76).
+function lastDayOnPage(dates: readonly KeyDate[]): KeyDate | null {
+  const last = dates.filter((date) => date.kind === "end").at(-1);
+  return last ? { ...last, kind: "submission", label: "Last day of the event, from its page", standIn: true } : null;
+}
+
 function fromListing(date: string, kind: "start" | "submission", label: string): KeyDate {
   return { label, kind, date, time: null, yearAssumed: false, source: "hackbrief's listing of this event", fromListing: true };
 }
@@ -80,7 +88,9 @@ export function withListingDates(input: string, dates: readonly KeyDate[], listi
     added.push(fromListing(first, "start", "First day of the event, from the listing"));
   }
   if (!dates.some((date) => date.kind === "submission")) {
-    added.push(weekdayDeadline(input, days) ?? fromListing(last, "submission", "Last day of the event, from the listing"));
+    added.push(
+      weekdayDeadline(input, days) ?? lastDayOnPage(dates) ?? fromListing(last, "submission", "Last day of the event, from the listing"),
+    );
   }
   return [...dates, ...added].sort((a, b) => a.date.localeCompare(b.date));
 }

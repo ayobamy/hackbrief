@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
 import { getBuiltBrief, getEvent, getStoredBrief, refreshBrief, saveBuiltBrief } from "@/app/events/data";
-import { isStale, type ShownBrief } from "@/lib/briefs/build";
+import { onOpen, type ShownBrief } from "@/lib/briefs/build";
 import { eventContext, parseEventId, type EventContext } from "@/lib/events/context";
 
 import { Coach } from "./coach";
@@ -43,13 +43,13 @@ async function lookUpBrief(searchParams: PageProps<"/coach">["searchParams"]): P
     return null;
   }
   try {
-    const stored = await getStoredBrief(id);
     const now = new Date();
-    if (stored?.facts) {
-      if (isStale(stored.checkedAt, now)) {
+    const opened = onOpen(await getStoredBrief(id), now);
+    if ("show" in opened) {
+      if (opened.refresh) {
         after(() => refreshBrief(id));
       }
-      return { status: "built", facts: stored.facts, pages: stored.pages };
+      return opened.show;
     }
     const built = await getBuiltBrief(id, now.toISOString().slice(0, 10));
     if (built.status === "built") {

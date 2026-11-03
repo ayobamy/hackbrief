@@ -1,9 +1,11 @@
+import { createHash } from "node:crypto";
+
 import { describe, expect, it } from "vitest";
 
 import { NOTHING_FILLED, type FillAnswer } from "@/lib/coach/fill";
 import type { ReadResult } from "@/lib/rules/read";
 
-import { buildEventBrief, hashText, isStale, type BuildDeps, type StoredBrief } from "./build";
+import { buildEventBrief, hashText, isStale, onOpen, type BuildDeps, type StoredBrief } from "./build";
 
 const TODAY = "2026-11-03";
 const NOW = new Date("2026-11-03T05:00:00Z");
@@ -122,5 +124,43 @@ describe("isStale", () => {
 
     expect(isStale(checked, new Date("2026-11-04T00:59:00Z"))).toBe(false);
     expect(isStale(checked, new Date("2026-11-04T01:00:00Z"))).toBe(true);
+  });
+});
+
+describe("onOpen", () => {
+  const NOW_OPEN = new Date("2026-11-04T05:00:00Z");
+  const FACTS = {} as never;
+
+  it("shows a stored brief, and asks for a fresh look once it is a day old", () => {
+    const row = { facts: FACTS, pages: ["https://harbor-hacks.example/"], failure: null, failedAt: null };
+
+    expect(onOpen({ ...row, checkedAt: new Date("2026-11-04T01:00:00Z") }, NOW_OPEN)).toEqual({
+      show: { status: "built", facts: FACTS, pages: ["https://harbor-hacks.example/"] },
+      refresh: false,
+    });
+    expect(onOpen({ ...row, checkedAt: new Date("2026-11-03T05:00:00Z") }, NOW_OPEN)).toMatchObject({ refresh: true });
+  });
+
+  it("leaves a site that refused or disallows hackbrief alone for a week, even on a visitor's click", () => {
+    const refused = { facts: null, pages: [], failure: "refused", failedAt: new Date("2026-11-02T05:00:00Z"), checkedAt: new Date("2026-11-02T05:00:00Z") };
+
+    expect(onOpen(refused, NOW_OPEN)).toEqual({ show: { status: "skipped", reason: "refused" }, refresh: false });
+    expect(onOpen({ ...refused, failure: "robots" }, NOW_OPEN)).toEqual({ show: { status: "skipped", reason: "robots" }, refresh: false });
+    expect(onOpen({ ...refused, failedAt: new Date("2026-10-27T05:00:00Z") }, NOW_OPEN)).toEqual({ build: true });
+  });
+
+  it("builds now when nothing is stored, or the last try failed for a passing reason", () => {
+    expect(onOpen(null, NOW_OPEN)).toEqual({ build: true });
+    const unreachable = { facts: null, pages: [], failure: "unreachable", failedAt: NOW_OPEN, checkedAt: NOW_OPEN };
+    expect(onOpen(unreachable, NOW_OPEN)).toEqual({ build: true });
+  });
+});
+
+describe("hashText", () => {
+  it("changes with the reading's version, so stored briefs are read again when hackbrief reads differently", () => {
+    const textOnly = createHash("sha256").update(TEXT).digest("hex");
+
+    expect(hashText(TEXT)).not.toBe(textOnly);
+    expect(hashText(TEXT)).toBe(hashText(TEXT));
   });
 });

@@ -22,6 +22,8 @@ export interface KeyDate {
   source: string;
   /** Not in the rules: hackbrief took it from its listing of the event (`withListingDates`). */
   fromListing?: true;
+  /** Not a stated deadline: the event's last day on its own page, standing in for one. */
+  standIn?: true;
 }
 
 const MONTHS = [

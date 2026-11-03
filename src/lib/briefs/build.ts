@@ -42,12 +42,53 @@ export function isStale(checkedAt: Date, now: Date): boolean {
   return now.getTime() - checkedAt.getTime() >= CHECKED_WITHIN_MS;
 }
 
+// A site that turned hackbrief away, or disallows it, is not read again for a week: by the daily build or
+// on a visitor's click (a polite crawler, #60).
+export const WAIT_AFTER_REFUSAL_MS = 7 * 24 * 3_600_000;
+const REFUSALS: ReadonlySet<string> = new Set<SkipReason>(["refused", "robots", "restricted"]);
+
+/** Whether the event's site refused hackbrief, or disallows it, within the last week. */
+export function refusedRecently(failure: string | null, failedAt: Date | null, now: Date): boolean {
+  return failure !== null && REFUSALS.has(failure) && failedAt !== null && now.getTime() - failedAt.getTime() < WAIT_AFTER_REFUSAL_MS;
+}
+
+/** What is stored for an event, as the coach page reads it. */
+export interface StoredRow {
+  facts: BriefFacts | null;
+  pages: string[];
+  failure: string | null;
+  failedAt: Date | null;
+  checkedAt: Date;
+}
+
+/**
+ * What opening an event's brief does with what is stored (#60): show a stored brief, rebuilding it after
+ * the response once it is a day old; show why there is none when the site refused hackbrief this week;
+ * otherwise build one now.
+ */
+export function onOpen(row: StoredRow | null, now: Date): { show: ShownBrief; refresh: boolean } | { build: true } {
+  if (row?.facts) {
+    return { show: { status: "built", facts: row.facts, pages: row.pages }, refresh: isStale(row.checkedAt, now) };
+  }
+  if (row && refusedRecently(row.failure, row.failedAt, now)) {
+    return { show: { status: "skipped", reason: row.failure as SkipReason }, refresh: false };
+  }
+  return { build: true };
+}
+
 // A brief is rebuilt at least weekly, so the days and assumed years in it stay current.
 const REBUILD_AFTER_DAYS = 7;
 
-/** A fingerprint of the pages' text: while it is unchanged, no model is asked again. */
+/**
+ * The version of how hackbrief reads a brief. Bump it whenever the coach's parsers, the checks or the
+ * playbook change what a page gives: every stored brief's fingerprint then differs, and the next daily
+ * build reads them all again (#76).
+ */
+export const READING_VERSION = "2026-11-04";
+
+/** A fingerprint of the pages' text and the reading's version: while it is unchanged, no model is asked again. */
 export function hashText(text: string): string {
-  return createHash("sha256").update(text).digest("hex");
+  return createHash("sha256").update(`${READING_VERSION}\n`).update(text).digest("hex");
 }
 
 /**

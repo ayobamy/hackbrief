@@ -4,7 +4,7 @@ import { eventBriefs } from "@/db/schema";
 import type { Database } from "@/lib/db";
 import { listUpcomingEvents } from "@/lib/events/query";
 
-import { buildEventBrief, isStale, type BuildDeps, type BuildOutcome, type StoredBrief } from "./build";
+import { buildEventBrief, isStale, refusedRecently, type BuildDeps, type BuildOutcome, type StoredBrief } from "./build";
 
 export interface BriefsSummary {
   built: number;
@@ -15,20 +15,13 @@ export interface BriefsSummary {
   left: number;
 }
 
-// A site that turned hackbrief away, or disallows it, is not read again for a week.
-const WAIT_AFTER_REFUSAL_MS = 7 * 24 * 3_600_000;
-const REFUSALS = new Set(["refused", "robots", "restricted"]);
-
 type Row = typeof eventBriefs.$inferSelect;
 
 function isDue(row: Row | undefined, now: Date): boolean {
   if (!row) {
     return true;
   }
-  if (row.failure && REFUSALS.has(row.failure) && row.failedAt && now.getTime() - row.failedAt.getTime() < WAIT_AFTER_REFUSAL_MS) {
-    return false;
-  }
-  return isStale(row.checkedAt, now);
+  return !refusedRecently(row.failure, row.failedAt, now) && isStale(row.checkedAt, now);
 }
 
 /** An event's stored brief as the builder takes it. */

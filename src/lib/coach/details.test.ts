@@ -104,6 +104,12 @@ Entrants must be a resident of Canada.`),
     ).toEqual(["You must be enrolled at a university to take part.", "Entrants must be a resident of Canada."]);
   });
 
+  it("skips a FAQ's question and keeps its answer", () => {
+    expect(extractEligibility("Am I eligible to attend?\nAny 13-18 year old can attend, and you must be enrolled at a school.")).toEqual([
+      "Any 13-18 year old can attend, and you must be enrolled at a school.",
+    ]);
+  });
+
   it("does not read 'open tools' as 'open to'", () => {
     expect(extractEligibility("We invite students to build open tools for clinics.")).toEqual([]);
   });
@@ -183,6 +189,23 @@ describe("extractDeliverables", () => {
 });
 
 describe("extractPrizes and largestPrizes", () => {
+  it("reads millions and decimals, so '$1M+ prizes' is a million dollars, not one", () => {
+    const amounts = extractPrizes(`Prizes
+$1M+ prizes
+Grand prize: $2.5 million in credits.
+Best hack: $1.5k each.
+Runner-up: 2.5m EUR.`).flatMap((line) => line.amounts);
+
+    expect(amounts).toEqual([
+      { currency: "USD", value: 1_000_000 },
+      { currency: "USD", value: 2_500_000 },
+      { currency: "USD", value: 1500 },
+      { currency: "EUR", value: 2_500_000 },
+    ]);
+    // "m" that starts a word is not a million.
+    expect(extractPrizes("Prizes\nWin $50 more in swag.").flatMap((line) => line.amounts)).toEqual([{ currency: "USD", value: 50 }]);
+  });
+
   it("reads amounts written with symbols, codes before or after, and k", () => {
     const prizes = extractPrizes(`Prizes
 First place: $3,000
@@ -196,7 +219,8 @@ Bring a laptop worth $1,000.`);
       [{ currency: "EUR", value: 4000 }],
       [
         { currency: "NGN", value: 500000 },
-        { currency: "GBP", value: 2000 },
+        // £2.5k is £2,500: the decimal counts.
+        { currency: "GBP", value: 2500 },
       ],
       [{ currency: "USD", value: 1000 }],
     ]);

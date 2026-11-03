@@ -15,7 +15,9 @@ export function extractEligibility(input: string): string[] {
   const seen = new Set<string>();
   const found: string[] = [];
   for (const { text, section } of toSentences(input)) {
+    // A FAQ's question ("Am I eligible?") says nothing about who may enter; its answer does.
     const relevant =
+      !text.trimEnd().endsWith("?") &&
       !PRIZE_SECTION.test(section) &&
       (STRONG.test(text) || (WEAK.test(text) && ELIGIBILITY_SECTION.test(section)));
     const key = text.toLowerCase();
