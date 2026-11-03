@@ -53,12 +53,17 @@ export async function getEventRules(id: string): Promise<ReadResult> {
   } else {
     cacheLife("hours");
   }
-  // A model is asked only for what the coach's own reading of the page leaves out (decision D12).
-  if (result.status === "read" && missesFacts(buildBrief(result.text, ANY_DAY))) {
-    const located = await locatedOnPage(result.text);
-    return located ? { ...result, located } : result;
-  }
   return result;
+}
+
+/**
+ * Sentences a language model points to on a listed event's page, asked only for what the coach's own
+ * reading of it leaves out (decision D12). Cached apart from the page reading and combined outside it:
+ * an outer cache keeps its own lifetime whatever its inner ones say, so a failure kept inside the
+ * page's cache would last hours rather than minutes.
+ */
+export async function getLocated(text: string): Promise<Located | null> {
+  return missesFacts(buildBrief(text, ANY_DAY)) ? locatedOnPage(text) : null;
 }
 
 // Whether the coach's reading leaves facts out does not depend on the day.
