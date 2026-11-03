@@ -75,6 +75,11 @@ const PAGE = `<!doctype html>
 describe("htmlToText", () => {
   const text = htmlToText(PAGE);
 
+  it("leaves out the page's doctype, which the parser would read as text", () => {
+    expect(htmlToText("<!DOCTYPE HTML>\n<html><body><p>Teams of up to 4.</p></body></html>")).toBe("Teams of up to 4.");
+    expect(htmlToText('<!doctype html PUBLIC "-//W3C//DTD HTML 4.01//EN"><p>Hi there</p>')).toBe("Hi there");
+  });
+
   it("keeps headings, list items and table rows in the forms the coach reads", () => {
     expect(text).toContain("# Fictional Harbour Hack 2027");
     expect(text).toContain("## Judging");

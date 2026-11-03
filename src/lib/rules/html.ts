@@ -18,7 +18,8 @@ function squeeze(text: string): string {
  * "| a | b |" table rows, one block per line. Scripts, styles and navigation are dropped.
  */
 export function htmlToText(html: string): string {
-  const root = parse(html, { comment: false, blockTextElements: { script: false, style: false, noscript: false, pre: true } });
+  // The parser reads a doctype as text, which would then open every page hackbrief reads (#71).
+  const root = parse(html.replace(/^\s*<!doctype[^>]*>/i, ""), { comment: false, blockTextElements: { script: false, style: false, noscript: false, pre: true } });
   const lines: string[] = [];
   let line = "";
   const flush = () => {
