@@ -76,6 +76,12 @@ Which source listed which event, so one event found in two places stays one even
 | `credit_name`, `credit_url` | text, nullable | Who else to credit for this listing, where the source's licence names each listing's licensor (OpenAgenda) |
 | `credit_updated_on` | date, nullable | When that licensor last updated the listing, which the licence asks to show |
 
+### Briefs (built, #60)
+
+| Table | Columns | Notes |
+| --- | --- | --- |
+| `event_briefs` | `event_id` (key), `pages` (text[]), `text_hash`, `facts` (jsonb, the coach's `BriefFacts`), `model`, `built_at`, `checked_at`, `failed_at`, `failure` | Built by the daily import (D13). Facts with their short source sentences, never the pages' text; `text_hash` lets an unchanged page skip the model |
+
 ### Rules and judging
 
 | Table | Columns | Notes |

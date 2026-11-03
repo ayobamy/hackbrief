@@ -1,6 +1,5 @@
 import { isIP } from "node:net";
 
-import type { FillAnswer } from "@/lib/coach/fill";
 import { isWebUrl } from "@/lib/events/format";
 import { USER_AGENT } from "@/lib/sources";
 import { isFeedOnlyUrl, isRestrictedUrl } from "@/lib/sources/restricted";
@@ -15,25 +14,15 @@ export type Fetcher = (
   init: { headers: Record<string, string>; redirect: "manual"; signal: AbortSignal },
 ) => Promise<Response>;
 
-export type SkipReason = "restricted" | "robots" | "unreachable" | "not-html" | "empty" | "off";
+export type SkipReason = "restricted" | "robots" | "refused" | "unreachable" | "not-html" | "empty" | "off";
 
 export type ReadResult =
   | {
       status: "read";
       text: string;
       pages: string[];
-      /** A language model's reading of the text (decision D13), its facts checked against it, when one was asked. */
-      filled?: FillAnswer;
     }
   | { status: "skipped"; reason: SkipReason };
-
-/**
- * How long to keep a read: hours, so an organiser's site sees a few requests a day, except when the
- * site did not answer, which may pass in a minute and should not leave every visitor without a brief.
- */
-export function cacheProfileFor(result: ReadResult): "minutes" | "hours" {
-  return result.status === "skipped" && result.reason === "unreachable" ? "minutes" : "hours";
-}
 
 const TIMEOUT_MS = 8_000;
 const MAX_REDIRECTS = 3;
@@ -188,6 +177,10 @@ async function readPage(url: string, fetch: Fetcher, robots: Map<string, string>
     throw new Skip("robots");
   }
   const { response, url: finalUrl } = await get(url, fetch);
+  // A site that forbids hackbrief or asks it to slow down is left alone (a polite crawler, #60).
+  if (response.status === 403 || response.status === 429) {
+    throw new Skip("refused");
+  }
   if (!response.ok) {
     throw new Skip("unreachable");
   }

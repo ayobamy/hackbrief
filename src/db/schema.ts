@@ -5,6 +5,7 @@ import {
   date,
   index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   serial,
@@ -13,6 +14,8 @@ import {
   unique,
   uuid,
 } from "drizzle-orm/pg-core";
+
+import type { BriefFacts } from "@/lib/coach/brief";
 
 export const eventFormat = pgEnum("event_format", [
   "online",
@@ -119,4 +122,31 @@ export const importResults = pgTable("import_results", {
   saved: integer("saved").notNull().default(0),
   skipped: integer("skipped").notNull().default(0),
   error: text("error"),
+});
+
+/**
+ * Each listed event's brief, built ahead of visitors (decision D13, #60): the facts read from the
+ * event's pages and the short sentences they rest on, never the pages' text ("facts only, no copied
+ * pages", docs/architecture.md).
+ */
+export const eventBriefs = pgTable("event_briefs", {
+  eventId: uuid("event_id")
+    .primaryKey()
+    .references(() => events.id, { onDelete: "cascade" }),
+  /** The pages read, so the next build reads the same ones without asking a model to choose. */
+  pages: text("pages").array().notNull().default([]),
+  /** A hash of the pages' text: while it is unchanged, the model is not asked again. */
+  textHash: text("text_hash"),
+  /** The brief's facts (`BriefFacts`); null until a first build succeeds. */
+  facts: jsonb("facts").$type<BriefFacts>(),
+  /** The model that read the pages, or null when the brief is the coach's own reading. */
+  model: text("model"),
+  builtAt: timestamp("built_at", { withTimezone: true }),
+  /** When the pages were last read, even when nothing had changed. */
+  checkedAt: timestamp("checked_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  /** The last failure, kept until the next success; a site that refused (403, 429) waits a week. */
+  failedAt: timestamp("failed_at", { withTimezone: true }),
+  failure: text("failure"),
 });

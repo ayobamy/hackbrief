@@ -4,7 +4,7 @@ import { buildBrief } from "@/lib/coach/brief";
 
 import { isPublicAddress, publicOnlyLookup } from "./address";
 import { htmlToText, rulesLinks, siteLinks } from "./html";
-import { cacheProfileFor, readEventPage, type Fetcher } from "./read";
+import { readEventPage, type Fetcher } from "./read";
 import { robotsAllows } from "./robots";
 
 describe("robotsAllows", () => {
@@ -184,15 +184,6 @@ const RULES_PDF = pdfOf([
   "Entry is open to students aged 16 and over, in any country.",
 ]);
 
-describe("cacheProfileFor", () => {
-  it("keeps a page read, or a refusal, for hours, but a site that did not answer only for minutes", () => {
-    expect(cacheProfileFor({ status: "read", text: "Rules", pages: ["https://hack.example/"] })).toBe("hours");
-    expect(cacheProfileFor({ status: "skipped", reason: "robots" })).toBe("hours");
-    expect(cacheProfileFor({ status: "skipped", reason: "empty" })).toBe("hours");
-    expect(cacheProfileFor({ status: "skipped", reason: "unreachable" })).toBe("minutes");
-  });
-});
-
 describe("readEventPage", () => {
   const RULES_PAGE = "<h2>Rules</h2><p>Each team must provide a demo video of no more than 3 minutes and a public repository.</p>";
 
@@ -287,12 +278,17 @@ describe("readEventPage", () => {
       "https://thin.example/": { body: '<div id="root"></div><script src="/app.js"></script>' },
       "https://down.example/": new Error("connect ECONNREFUSED"),
       "https://gone.example/": { status: 500, body: "oops" },
+      "https://guarded.example/": { status: 403, body: "Forbidden" },
+      "https://busy.example/": { status: 429, body: "Slow down" },
     });
 
     expect(await readEventPage("https://pdf.example/", { fetch })).toEqual({ status: "skipped", reason: "not-html" });
     expect(await readEventPage("https://thin.example/", { fetch })).toEqual({ status: "skipped", reason: "empty" });
     expect(await readEventPage("https://down.example/", { fetch })).toEqual({ status: "skipped", reason: "unreachable" });
     expect(await readEventPage("https://gone.example/", { fetch })).toEqual({ status: "skipped", reason: "unreachable" });
+    // A site that turns hackbrief away is left alone, not asked again within minutes.
+    expect(await readEventPage("https://guarded.example/", { fetch })).toEqual({ status: "skipped", reason: "refused" });
+    expect(await readEventPage("https://busy.example/", { fetch })).toEqual({ status: "skipped", reason: "refused" });
   });
 
   it("reads no more than its size limit of a long page", async () => {

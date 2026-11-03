@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { after } from "next/server";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
-import { getEvent, getEventRules, getFilled } from "@/app/events/data";
+import { getBuiltBrief, getEvent, getStoredBrief, refreshBrief, saveBuiltBrief } from "@/app/events/data";
+import { isStale, type ShownBrief } from "@/lib/briefs/build";
 import { eventContext, parseEventId, type EventContext } from "@/lib/events/context";
-import type { ReadResult } from "@/lib/rules/read";
 
 import { Coach } from "./coach";
 
@@ -31,20 +32,31 @@ async function lookUpEvent(searchParams: PageProps<"/coach">["searchParams"]): P
   }
 }
 
-// The event's own pages, read so the brief can be built at once (decision D11), with a model's reading
-// of them (D13), each from its own cache; null without an event.
-async function lookUpRules(searchParams: PageProps<"/coach">["searchParams"]): Promise<ReadResult | null> {
+/**
+ * The event's brief (#60): the stored one at once, rebuilt after the response when it is a day old; or,
+ * when none is stored yet, built now from its pages (decisions D11, D13) and saved after the response,
+ * so every later visitor gets it at once. Null without an event.
+ */
+async function lookUpBrief(searchParams: PageProps<"/coach">["searchParams"]): Promise<ShownBrief | null> {
   const id = parseEventId(await searchParams);
   if (!id) {
     return null;
   }
   try {
-    const rules = await getEventRules(id);
-    if (rules.status !== "read") {
-      return rules;
+    const stored = await getStoredBrief(id);
+    const now = new Date();
+    if (stored?.facts) {
+      if (isStale(stored.checkedAt, now)) {
+        after(() => refreshBrief(id));
+      }
+      return { status: "built", facts: stored.facts, pages: stored.pages };
     }
-    const filled = await getFilled(rules.text);
-    return filled ? { ...rules, filled } : rules;
+    const built = await getBuiltBrief(id, now.toISOString().slice(0, 10));
+    if (built.status === "built") {
+      after(() => saveBuiltBrief(id, built));
+      return { status: "built", facts: built.facts, pages: built.pages };
+    }
+    return built.status === "skipped" ? built : null;
   } catch (error) {
     console.error("Could not read the event's page for the coach", error);
     return { status: "skipped", reason: "unreachable" };
@@ -66,7 +78,7 @@ export default function CoachPage({ searchParams }: PageProps<"/coach">) {
         </header>
         {/* Not awaited: the coach renders at once, and only the parts that name the event wait for
             it, so nothing typed before the lookup lands is lost to a remount. */}
-        <Coach event={lookUpEvent(searchParams)} rules={lookUpRules(searchParams)} />
+        <Coach event={lookUpEvent(searchParams)} rules={lookUpBrief(searchParams)} />
       </main>
       <SiteFooter />
     </>

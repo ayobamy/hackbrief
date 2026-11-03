@@ -127,8 +127,30 @@ function byDate(dates: readonly KeyDate[]): KeyDate[] {
   return [...dates].sort((a, b) => a.date.localeCompare(b.date));
 }
 
-/** Everything the coach shows, built from pasted rules. `today` is YYYY-MM-DD. */
-export function buildBrief(input: string, today: string, { listing, filled }: BriefExtras = {}): Brief {
+/**
+ * What a brief reads from the rules, before the day it is shown matters: the daily build stores these
+ * (#60) and `briefFromFacts` turns them into a brief on the day it is opened. Plain data, so it survives
+ * being stored as JSON.
+ */
+export interface BriefFacts {
+  judging: CriteriaResult;
+  dates: KeyDate[];
+  deadline: KeyDate | null;
+  team: TeamSize | null;
+  eligibility: string[];
+  checklist: Deliverable[];
+  prizes: PrizeLine[];
+  tracks: Array<{ name: string; source: string }>;
+  rules: string[];
+  modelFound: ModelFact[];
+  /** A different submission date the coach's own reading found, when a model's deadline won. */
+  otherDeadline: KeyDate | null;
+  /** The text was cut at MAX_INPUT_LENGTH. */
+  truncated: boolean;
+}
+
+/** Reads the brief's facts from pasted or fetched rules. `today` resolves dates written without a year. */
+export function readFacts(input: string, today: string, { listing, filled }: BriefExtras = {}): BriefFacts {
   const truncated = input.length > MAX_INPUT_LENGTH;
   const text = truncated ? input.slice(0, MAX_INPUT_LENGTH) : input;
 
@@ -175,23 +197,38 @@ export function buildBrief(input: string, today: string, { listing, filled }: Br
     rules.length > 0 ? "rules" : null,
   ].filter((fact): fact is ModelFact => fact !== null);
 
-  const brief = {
+  return {
     judging,
-    strategy: buildStrategy(judging),
     dates,
     deadline,
-    daysLeft: deadline ? daysBetween(today, deadline.date) : null,
     team: modelTeam ?? ownTeam,
     eligibility,
     checklist,
     prizes,
-    topPrizes: largestPrizes(prizes),
     tracks,
     rules,
-    plan: buildPlan(eventStart(dates), deadline, checklist, today),
     modelFound,
+    otherDeadline,
+    truncated,
+  };
+}
+
+/** The brief as shown on `today`: the days left, the plan and the warnings depend on the day. */
+export function briefFromFacts(facts: BriefFacts, today: string): Brief {
+  const { otherDeadline, truncated, ...kept } = facts;
+  const brief = {
+    ...kept,
+    strategy: buildStrategy(facts.judging),
+    daysLeft: facts.deadline ? daysBetween(today, facts.deadline.date) : null,
+    topPrizes: largestPrizes(facts.prizes),
+    plan: buildPlan(eventStart(facts.dates), facts.deadline, facts.checklist, today),
   };
   return { ...brief, warnings: warningsFor(brief, truncated, otherDeadline) };
+}
+
+/** Everything the coach shows, built from pasted rules. `today` is YYYY-MM-DD. */
+export function buildBrief(input: string, today: string, extras: BriefExtras = {}): Brief {
+  return briefFromFacts(readFacts(input, today, extras), today);
 }
 
 /** Today's date in the viewer's own calendar, YYYY-MM-DD. */

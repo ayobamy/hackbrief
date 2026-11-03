@@ -15,6 +15,13 @@
       "when": 1793653093532,
       "tag": "0001_listing_credit",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793746589868,
+      "tag": "0002_event_briefs",
+      "breakpoints": true
     }
   ]
 }

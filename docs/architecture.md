@@ -70,6 +70,12 @@ sequenceDiagram
   of up to 300 seconds. If the import grows past that, each source gets its own daily job.
 - **Protected:** the route answers only requests carrying the `CRON_SECRET` that Vercel sends, and
   refuses everything when no secret is configured.
+- **Briefs after the import** (D13, #60, `src/lib/briefs/`): the same run then builds the upcoming
+  listed events' briefs, never-built first, four at a time, and starts none after 220 seconds, so
+  the slowest (about 70 s) ends inside the 300-second limit; the rest wait for the next day. An
+  unchanged page skips the model; a site that refused waits a week. A visitor who opens an event
+  with no stored brief gets one built then and saved after the response; a stored brief a day old
+  is shown at once and rebuilt after the response.
 - **Measured** on 2 November 2026: 51 events from three sources. Each listing takes about four
   database round trips in turn, so a run took 90 to 120 seconds from a laptop 240 ms from the
   database, and should take seconds on Vercel in the same region. Batching those queries is the
@@ -127,6 +133,7 @@ src/lib/health.ts        the health check
 src/db/schema.ts         the Drizzle schema
 src/lib/sources/         one adapter per source
 src/lib/import/          the daily import
+src/lib/briefs/          building and storing each listed event's brief (#60)
 src/lib/events/          querying and formatting events
 src/lib/fit/             the fit score (planned)
 ```

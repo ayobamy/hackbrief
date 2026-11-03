@@ -27,8 +27,9 @@ the same day and are to be re-read before hackbrief relies on them.
 
 ## Reading an event's own page
 
-Decision D11 (issue #41): when a visitor clicks **Build my brief** on a listing, hackbrief reads that
-hackathon's own page for them, so the brief can be built at once. The bounds:
+Decisions D11 and D13 (issues #41, #60): hackbrief reads each listed hackathon's own pages once a
+day, ahead of visitors, so its brief opens at once; an event whose brief is not built yet is read
+when a visitor opens it. The bounds:
 
 - **Listed events only.** The address comes from hackbrief's database, never from what a visitor
   types; the coach's optional link field is a label and is never fetched.
@@ -40,25 +41,31 @@ hackathon's own page for them, so the brief can be built at once. The bounds:
 - **The fetch is hardened** (`src/lib/rules/`). Only http(s) is read. Every connection must reach a
   public IP address: the DNS answer is checked as the connection is made, and an address written as
   an IP is checked before. Redirects are followed by hand (at most 3) and checked like the first
-  request. Each request has an 8-second limit, at most 2 MB is read, and only HTML or plain text is
-  used.
-- **One page plus at most two.** The event's page, and at most two pages on the same site whose path
-  names its rules, FAQ, judging, criteria or guidelines.
-- **Cached for hours, never stored.** The result sits in the server's cache for hours, so an
-  organiser's site sees at most a few requests a day; a site that did not answer is kept for
-  minutes only, so a slow moment does not leave every visitor without a brief (issue #51). Nothing
-  is written to the database. The text is shown to the visitor who asked, in the coach's box, and
-  the brief keeps facts, not copies.
+  request. Each request has an 8-second limit, at most 2 MB is read, and only HTML, plain text or a
+  PDF (at most 40 pages) is used.
+- **One page plus at most five.** The event's page, at most two pages on the same site whose path
+  names its rules, FAQ, judging, criteria or guidelines, and at most three more of the site's own
+  pages a model chose from its links.
+- **Once a day, as a polite crawler** (#60). Each listed event's site is read at most once a day,
+  identified as `hackbrief`. A site that answers 403 or 429 is left alone for a week; one that
+  disallows hackbrief in robots.txt loses its stored brief at the next run.
+- **Facts stored, never the text.** `event_briefs` keeps each brief's facts with the short sentences
+  they rest on and links to the pages read, plus a hash of the text so unchanged pages are not
+  read by a model again. The pages' text is never written to the database, and the brief keeps
+  facts, not copies.
 - **A model reads the pages** (decision D13). Their text, which is public, goes to a model on
   OpenRouter, only to endpoints that keep no data and do not train on it (`provider.zdr`), or else
   on Requesty, which does not train on requests. The model may pick up to three more of the site's
   own pages from its links, read under the same rules as the first. Its facts are kept only when
-  their sentences are on the pages, and its answer is cached for a day. Rules a visitor pastes are
-  never sent.
+  their sentences are on the pages, and it is asked again only when the pages' text changed, or
+  after a week. Rules a visitor pastes are never sent.
 
-Unlike a source in the tables below, an organiser's own site is not checked against its terms
-first: hackbrief reads it once on a visitor's behalf, the way their browser would, identified by its
-user agent. A site that objects can disallow `hackbrief` in its robots.txt, and it is no longer read.
+Unlike a source in the tables below, an organiser's own site is not checked against its terms one
+by one (decided by Ahmed, 4 November 2026, #60): it is a page the organiser publishes for entrants,
+and hackbrief reads it as a polite crawler, within the bounds above, keeping only facts with short
+quotes and a link back to the page. A site that objects can disallow `hackbrief` in its robots.txt,
+and its brief is removed at the next run, or ask on
+[GitHub](https://github.com/ayobamy/hackbrief/issues).
 
 ## Use now
 
