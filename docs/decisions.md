@@ -196,7 +196,9 @@ changes keeps its entry, with a note pointing at the one that replaces it.
 
 ## D11. Read an event's own page when a visitor asks
 
-- **Decided:** 2 November 2026, by Ahmed. Changes D10.
+- **Decided:** 2 November 2026, by Ahmed. Changes D10. Changed on 4 November 2026 by D13 (#60):
+  pages are read once a day ahead of visitors, and on a visitor's click only when no brief is
+  stored.
 - **Decision:** when a visitor clicks "Build my brief" on a listing, hackbrief reads that
   hackathon's own page (and up to two same-site rules pages) and builds the brief at once when it
   finds anything; otherwise the guided paste of D10 still applies. The bounds are in

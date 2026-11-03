@@ -3,8 +3,12 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
-import { eventSources, events, importResults, importRuns, sources } from "../src/db/schema";
+import { eventBriefs, eventSources, events, importResults, importRuns, sources } from "../src/db/schema";
+import { readFacts } from "../src/lib/coach/brief";
 import { SOURCES } from "../src/lib/sources";
+
+/** The listing whose brief the daily build has already stored (#60), so it opens at once. */
+export const STORED_BRIEF = "Fictional Hack 03";
 
 /** How many fictional hackathons the list starts with: three pages of twelve, the last of two. */
 export const SEEDED = 26;
@@ -79,6 +83,19 @@ export default async function seed() {
         };
       }),
     );
+
+    // Fictional rules, read as the daily build reads an event's page; only the facts are stored.
+    const stored = eventRows[3];
+    if (stored) {
+      const rules = `Submissions close on ${daysFromToday(12)} at 9:00 AM.\nTeams of up to 4 people.\nThe hackathon is open to students aged 16 and over.`;
+      await db.insert(eventBriefs).values({
+        eventId: stored.id,
+        pages: ["https://example.org/fictional-hack-03"],
+        textHash: "seeded",
+        facts: readFacts(rules, daysFromToday(0)),
+        builtAt: new Date(),
+      });
+    }
   } finally {
     await client.end();
   }

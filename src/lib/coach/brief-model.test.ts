@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { buildBrief, hasFindings } from "./brief";
+import { briefFromFacts, buildBrief, hasFindings, readFacts } from "./brief";
 import { NOTHING_FILLED, type FillAnswer } from "./fill";
+import { SAMPLES } from "./samples";
 
 const TODAY = "2026-11-03";
 // A fictional weekend hackathon's site, as hackbrief reads it (decision D13).
@@ -113,5 +114,28 @@ describe("buildBrief with a model's reading", () => {
   it("changes nothing with nothing filled", () => {
     expect(buildBrief(PAGE, TODAY, { filled: NOTHING_FILLED })).toEqual(buildBrief(PAGE, TODAY));
     expect(buildBrief(PAGE, TODAY).modelFound).toEqual([]);
+  });
+});
+
+describe("readFacts and briefFromFacts", () => {
+  it("give the same brief as buildBrief, even after the facts are stored as JSON and read back", () => {
+    const cases: Array<[string, Parameters<typeof buildBrief>[2]]> = [
+      [PAGE, { filled: FILLED }],
+      [`${PAGE}\nSubmission deadline: 1 March 2027.`, { filled: FILLED }],
+      [PAGE, { listing: { startsOn: "2027-03-13", endsOn: "2027-03-14" } }],
+      ...SAMPLES.map((sample): [string, undefined] => [sample.text, undefined]),
+    ];
+
+    for (const [text, extras] of cases) {
+      const stored = JSON.parse(JSON.stringify(readFacts(text, TODAY, extras))) as ReturnType<typeof readFacts>;
+      expect(briefFromFacts(stored, TODAY)).toEqual(buildBrief(text, TODAY, extras));
+    }
+  });
+
+  it("works the day out when the brief is shown, not when the facts were read", () => {
+    const facts = readFacts(PAGE, TODAY, { filled: FILLED });
+
+    expect(briefFromFacts(facts, "2027-03-10").daysLeft).toBe(4);
+    expect(briefFromFacts(facts, "2027-03-15").warnings).toContain("The submission deadline has passed.");
   });
 });

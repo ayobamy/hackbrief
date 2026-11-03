@@ -113,4 +113,6 @@ every fact of the brief with the sentence, or two, it rests on (decision D13,
 
 The request goes to OpenRouter (by default `anthropic/claude-haiku-5.5`, only on endpoints that
 keep no data), then to Requesty if OpenRouter fails, each only when its key is set; without one, or
-when both fail, the brief is this code's alone.
+when both fail, the brief is this code's alone. A listed event's brief is built by the daily import
+and stored as facts (`event_briefs`, #60), so it opens at once; the coach turns the stored facts
+into the brief for the day it is opened.

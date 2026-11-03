@@ -2,15 +2,15 @@
 
 import { Suspense, use, useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 
-import { buildBrief, hasFindings, localToday, type Brief } from "@/lib/coach/brief";
+import type { ShownBrief } from "@/lib/briefs/build";
+import { briefFromFacts, buildBrief, hasFindings, localToday, type Brief, type BriefFacts } from "@/lib/coach/brief";
 import { formatAmount, formatDate, formatDaysLeft, formatSolo, formatTeamSize } from "@/lib/coach/format";
 import type { ListingDates } from "@/lib/coach/listing";
-import type { FillAnswer } from "@/lib/coach/fill";
 import { SAMPLES } from "@/lib/coach/samples";
 import type { Emphasis } from "@/lib/coach/strategy";
 import { Footnote, LABEL, SHEET } from "@/components/sheet";
 import { pageLink, type EventContext } from "@/lib/events/context";
-import type { ReadResult, SkipReason } from "@/lib/rules/read";
+import type { SkipReason } from "@/lib/rules/read";
 
 const FOCUS_RING =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
@@ -259,6 +259,7 @@ function pageLabel(url: string): string {
 const SKIPPED: Readonly<Record<Exclude<SkipReason, "off">, (host: string) => string>> = {
   restricted: (host) => `Its rules are on ${host}, which asks to be asked first, so hackbrief does not read it.`,
   robots: (host) => `${host} asks automated readers to leave this page alone, so hackbrief does.`,
+  refused: (host) => `${host} turned hackbrief away, so it leaves the site alone for now.`,
   unreachable: (host) => `hackbrief could not reach ${host} just now.`,
   "not-html": (host) => `${host} gives its rules in a form hackbrief cannot read yet.`,
   empty: (host) => `${host} draws its page with JavaScript or keeps its rules elsewhere, so hackbrief found nothing to read.`,
@@ -271,21 +272,19 @@ const SKIPPED: Readonly<Record<Exclude<SkipReason, "off">, (host: string) => str
 function RulesStatus({
   result,
   host,
-  listing,
   onRead,
 }: {
-  result: ReadResult | null;
+  result: ShownBrief | null;
   host: string;
-  listing: ListingDates;
-  onRead: (text: string, listing: ListingDates, filled: FillAnswer | undefined) => void;
+  onRead: (facts: BriefFacts) => void;
 }) {
-  const read = result?.status === "read" ? buildBrief(result.text, FINDINGS_DAY, { filled: result.filled }) : null;
+  const read = result?.status === "built" ? briefFromFacts(result.facts, FINDINGS_DAY) : null;
   const found = read !== null && hasFindings(read);
   useEffect(() => {
-    if (found && result?.status === "read") {
-      onRead(result.text, listing, result.filled);
+    if (found && result?.status === "built") {
+      onRead(result.facts);
     }
-  }, [found, result, listing, onRead]);
+  }, [found, result, onRead]);
 
   if (!result) {
     return null;
@@ -382,8 +381,8 @@ function WithRules({
   rules,
   children,
 }: {
-  rules: Promise<ReadResult | null>;
-  children: (result: ReadResult | null) => ReactNode;
+  rules: Promise<ShownBrief | null>;
+  children: (result: ShownBrief | null) => ReactNode;
 }) {
   return children(use(rules));
 }
@@ -407,15 +406,13 @@ export function Coach({
   rules: rulesLookup,
 }: {
   event: Promise<EventContext | null>;
-  rules: Promise<ReadResult | null>;
+  rules: Promise<ShownBrief | null>;
 }) {
   const [text, setText] = useState("");
   const [page, setPage] = useState("");
   const [brief, setBrief] = useState<Brief | null>(null);
   // The listed event's dates, which fill in what its rules leave out (`withListingDates`).
   const listing = useRef<ListingDates | undefined>(undefined);
-  // A language model's reading of the event's pages; its facts are checked again against the box on each build.
-  const filled = useRef<FillAnswer | undefined>(undefined);
   // The event the coach last showed: "" for the plain coach, null before the first lookup lands.
   const shown = useRef<string | null>(null);
 
@@ -439,21 +436,18 @@ export function Coach({
       setText("");
       setPage("");
       setBrief(null);
-      filled.current = undefined;
     }
     shown.current = id;
     listing.current = event?.dates;
   }, []);
 
-  // The event's own page held its rules: fill the box and build the brief at once, unless the visitor
-  // has already started typing their own.
-  const acceptRules = useCallback((rules: string, dates: ListingDates, found: FillAnswer | undefined) => {
+  // The event's brief, built ahead or on this visit (#60): shown at once, unless the visitor has already
+  // started typing rules of their own.
+  const acceptRules = useCallback((facts: BriefFacts) => {
     if (typed.current.trim()) {
       return;
     }
-    filled.current = found;
-    setText(rules);
-    setBrief(buildBrief(rules, localToday(), { listing: dates, filled: found }));
+    setBrief(briefFromFacts(facts, localToday()));
   }, []);
 
   // After each new brief renders, move focus to it so keyboard and screen-reader users land on it.
@@ -464,7 +458,7 @@ export function Coach({
   }, [brief]);
 
   function build(input: string) {
-    setBrief(buildBrief(input, localToday(), { listing: listing.current, filled: filled.current }));
+    setBrief(buildBrief(input, localToday(), { listing: listing.current }));
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -493,13 +487,14 @@ export function Coach({
                     <Suspense
                       fallback={
                         <p className="text-sm text-muted motion-safe:animate-pulse">
-                          Reading its rules on {event.host ?? "its site"}…
+                          Building your brief from {event.host ?? "its site"}… The first brief for an event takes a few
+                          seconds; after that it opens at once.
                         </p>
                       }
                     >
                       <WithRules rules={rulesLookup}>
                         {(result) => (
-                          <RulesStatus result={result} host={event.host ?? "its site"} listing={event.dates} onRead={acceptRules} />
+                          <RulesStatus result={result} host={event.host ?? "its site"} onRead={acceptRules} />
                         )}
                       </WithRules>
                     </Suspense>

@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { STORED_BRIEF } from "./seed";
+
 // The list holds the 26 fictional hackathons from e2e/seed.ts: pages of 12, 12 and 2. Nine are
 // online, three of those listed by Hack Club Hackathons.
 
@@ -68,6 +70,16 @@ test("a listing opens the coach for that hackathon, and the brief carries its na
   await page.getByLabel("Hackathon rules and judging text").fill(RULES);
   await page.getByRole("button", { name: "Build my brief" }).click();
   await expect(page.getByRole("heading", { level: 2, name: "Brief: Fictional Hack 01" })).toBeFocused();
+});
+
+test("a listing whose brief is already built opens on it at once, with nothing to paste", async ({ page }) => {
+  await page.goto("/events");
+  await page.getByRole("link", { name: `Build my brief for ${STORED_BRIEF}` }).click();
+
+  await expect(page.getByRole("heading", { level: 2, name: `Brief: ${STORED_BRIEF}` })).toBeFocused();
+  await expect(page.getByText("Read its rules from")).toBeVisible();
+  await expect(page.getByText("The hackathon is open to students aged 16 and over.")).toBeVisible();
+  await expect(page.getByLabel("Hackathon rules and judging text")).toHaveValue("");
 });
 
 test("opening another listing's brief starts fresh, whatever the last one held", async ({ page }) => {
