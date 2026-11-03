@@ -1,13 +1,13 @@
 import { cacheLife, cacheTag } from "next/cache";
 
-import { buildBrief, missesFacts } from "@/lib/coach/brief";
-import { locateFacts, type Located } from "@/lib/coach/locate";
+import { chooseLinks } from "@/lib/coach/choose";
+import { fillFacts, type FillAnswer } from "@/lib/coach/fill";
 import { getDatabase } from "@/lib/db";
 import type { EventFilters } from "@/lib/events/filters";
 import { findEvent, listUpcomingEvents, type EventListing } from "@/lib/events/query";
 import { guardedFetch } from "@/lib/rules/fetcher";
 import { askInTurn, routersFrom } from "@/lib/model/routers";
-import { cacheProfileFor, readEventPage, type ReadResult } from "@/lib/rules/read";
+import { cacheProfileFor, readEventPage, type Chooser, type ReadResult } from "@/lib/rules/read";
 
 /** The tag the import revalidates after each run. */
 export const EVENTS_TAG = "events";
@@ -46,7 +46,7 @@ export async function getEventRules(id: string): Promise<ReadResult> {
   }
   const event = await findEvent(getDatabase(), id);
   const result: ReadResult = event
-    ? await readEventPage(event.url, { fetch: guardedFetch })
+    ? await readEventPage(event.url, { fetch: guardedFetch, choose: chooser() })
     : { status: "skipped", reason: "unreachable" };
   if (cacheProfileFor(result) === "minutes") {
     cacheLife("minutes");
@@ -56,25 +56,25 @@ export async function getEventRules(id: string): Promise<ReadResult> {
   return result;
 }
 
-/**
- * Sentences a language model points to on a listed event's page, asked only for what the coach's own
- * reading of it leaves out (decision D12). Cached apart from the page reading and combined outside it:
- * an outer cache keeps its own lifetime whatever its inner ones say, so a failure kept inside the
- * page's cache would last hours rather than minutes.
- */
-export async function getLocated(text: string): Promise<Located | null> {
-  return missesFacts(buildBrief(text, ANY_DAY)) ? locatedOnPage(text) : null;
+// A model picks the site's pages worth reading in a few seconds; reading them takes longer (decision D13).
+const CHOOSE_TIMEOUT_MS = 15_000;
+const FILL_TIMEOUT_MS = 45_000;
+
+// Which of the site's pages to read besides the listed one, when a model is set up; none otherwise.
+function chooser(): Chooser | undefined {
+  const routers = routersFrom(process.env);
+  return routers.length === 0
+    ? undefined
+    : (links) => chooseLinks(links, (messages, schema) => askInTurn(routers, messages, schema, { timeoutMs: CHOOSE_TIMEOUT_MS }));
 }
 
-// Whether the coach's reading leaves facts out does not depend on the day.
-const ANY_DAY = "2026-01-01";
-
 /**
- * Sentences a language model points to on an event's page (decision D12): OpenRouter, then Requesty,
- * each only when its key is set. Cached for a day, so a page costs about one request a day of the
- * free limits; after a failure only for minutes, and the brief falls back to the coach's own reading.
+ * A language model's reading of a listed event's pages (decision D13): every fact with the sentences it
+ * came from, checked against the text. Cached apart from the page reading and combined outside it, as an
+ * outer cache keeps its own lifetime whatever its inner ones say: for a day after an answer, for minutes
+ * after a failure, when the brief is the coach's own reading.
  */
-async function locatedOnPage(text: string): Promise<Located | null> {
+export async function getFilled(text: string): Promise<FillAnswer | null> {
   "use cache";
   const routers = routersFrom(process.env);
   if (routers.length === 0) {
@@ -82,11 +82,11 @@ async function locatedOnPage(text: string): Promise<Located | null> {
     return null;
   }
   try {
-    const located = await locateFacts(text, (messages, schema) => askInTurn(routers, messages, schema));
+    const filled = await fillFacts(text, (messages, schema) => askInTurn(routers, messages, schema, { timeoutMs: FILL_TIMEOUT_MS }));
     cacheLife("days");
-    return located;
+    return filled;
   } catch (error) {
-    console.error("No language model could point to facts on the event's page", error instanceof Error ? error.message : error);
+    console.error("No language model could read the event's pages", error instanceof Error ? error.message : error);
     cacheLife("minutes");
     return null;
   }

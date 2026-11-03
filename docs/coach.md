@@ -87,23 +87,30 @@ language model computes a figure; a model may only point to the sentences they a
   are marked "year assumed".
 - **Text longer than 100,000 characters** is cut, and the brief says so.
 
-## Facts a model points to
+## Facts a model reads
 
-When "Build my brief" reads a listed hackathon's page and this code leaves the deadline, the team
-size, who can enter or the checklist empty, a free language model is asked to copy the sentences
-that give them, word for word (decision D12, `src/lib/coach/locate.ts`):
+When "Build my brief" reads a listed hackathon's pages, a language model reads them too and gives
+every fact of the brief with the sentence, or two, it rests on (decision D13,
+`src/lib/coach/fill.ts`):
 
-- A quote is kept only when it is in the page's text, after evening out spaces and curly quotes;
-  anything else is dropped, so a model's mistake, or an instruction planted in a page, adds nothing.
-- The values are read from the quotes by the parsers above. A quote said to give the deadline is
-  read from the start of its sentence on the page, and gives the deadline only where the date
-  rules above mark a date in it, or its weekday, as the submission deadline: a model that quotes
-  "October 3" from "Priority deadline October 3", or the bare first day of the event, adds nothing.
-- The quotes fill only what this code left empty, and are checked again against the box each time
-  the brief is rebuilt, so editing them out of the text removes them.
-- The brief lists the facts a model pointed to under "Check these", and the coach says a model
-  helped. Rules a visitor pastes are never sent to a model.
+- **More pages.** Besides the listed page and the rules links this code finds, the model picks up
+  to three more of the site's own pages from its links (`choose.ts`), including a rules PDF; each
+  is read under the same rules: same site, robots.txt, size limits, never a restricted platform.
+- **Checked by code.** A fact is kept only when each of its sentences is in the pages' text, after
+  evening out spaces and curly quotes, and this code reads the same value from them: the deadline's
+  date and time with the date rules above (read from the start of its sentence, so "Priority
+  deadline October 3" is an application date, not the deadline), the team size, the judging weights
+  (one wrong weight drops the model's judging), track names and prize amounts. Two sentences are
+  allowed only when the second closely follows the first, as a schedule's line follows its day.
+- **The model's checked facts come first;** this code's own reading fills whatever the model did
+  not find, and a different deadline found by this code is shown as a warning. Facts are checked
+  again against the box each time the brief is rebuilt, so editing them out of the text removes them.
+- **Labelled.** The brief lists the facts a model read under "Check these", and the coach says a
+  model read the page. Rules a visitor pastes are never sent to a model.
+- **The playbook.** The model's instructions are the hackathon-reading playbook (`playbook.ts`):
+  what to find, how organisers phrase it, and what is not a deadline. Each change to it, or to the
+  model, is scored on fictional test pages (`eval/`, `pnpm exec tsx scripts/score-fill.ts`).
 
-The request goes to OpenRouter, then to Requesty if OpenRouter fails, each only when its key is
-set; without one, or when both fail, the brief is this code's alone. Plain-language summaries
-(D5) are still to come and will only word what this code has computed.
+The request goes to OpenRouter (by default `anthropic/claude-haiku-5.5`, only on endpoints that
+keep no data), then to Requesty if OpenRouter fails, each only when its key is set; without one, or
+when both fail, the brief is this code's alone.

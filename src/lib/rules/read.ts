@@ -1,12 +1,12 @@
 import { isIP } from "node:net";
 
-import type { Located } from "@/lib/coach/locate";
+import type { FillAnswer } from "@/lib/coach/fill";
 import { isWebUrl } from "@/lib/events/format";
 import { USER_AGENT } from "@/lib/sources";
 import { isFeedOnlyUrl, isRestrictedUrl } from "@/lib/sources/restricted";
 
 import { isPublicAddress } from "./address";
-import { htmlToText, rulesLinks } from "./html";
+import { htmlToText, rulesLinks, siteLinks, type SiteLink } from "./html";
 import { robotsAllows } from "./robots";
 
 /** A fetch that is handed every request: tests pass a fake, the server passes the guarded one. */
@@ -22,8 +22,8 @@ export type ReadResult =
       status: "read";
       text: string;
       pages: string[];
-      /** Sentences a language model pointed to in the text (decision D12), when one was asked. */
-      located?: Located;
+      /** A language model's reading of the text (decision D13), its facts checked against it, when one was asked. */
+      filled?: FillAnswer;
     }
   | { status: "skipped"; reason: SkipReason };
 
@@ -90,31 +90,78 @@ async function get(url: string, fetch: Fetcher): Promise<{ response: Response; u
   throw new Skip("unreachable");
 }
 
-/** The body as text, cut off at MAX_BYTES so a huge page cannot exhaust memory. */
-async function readBody(response: Response): Promise<string> {
+/** The body's bytes, cut off at MAX_BYTES so a huge page cannot exhaust memory, and whether it was cut. */
+async function readBytes(response: Response): Promise<{ bytes: Uint8Array; cut: boolean }> {
   const reader = response.body?.getReader();
   if (!reader) {
-    return "";
+    return { bytes: new Uint8Array(), cut: false };
   }
-  const decoder = new TextDecoder();
-  let text = "";
-  let bytes = 0;
+  const chunks: Uint8Array[] = [];
+  let size = 0;
   for (;;) {
     const { done, value } = await reader.read();
     if (done || !value) {
       break;
     }
     // A chunk can be large, so cut the last one to the limit rather than stopping after it.
-    const room = MAX_BYTES - bytes;
+    const room = MAX_BYTES - size;
     const chunk = value.byteLength > room ? value.subarray(0, room) : value;
-    bytes += chunk.byteLength;
-    text += decoder.decode(chunk, { stream: true });
-    if (bytes >= MAX_BYTES) {
+    chunks.push(chunk);
+    size += chunk.byteLength;
+    if (size >= MAX_BYTES) {
       await reader.cancel();
-      break;
+      return { bytes: joined(chunks, size), cut: true };
     }
   }
-  return text + decoder.decode();
+  return { bytes: joined(chunks, size), cut: false };
+}
+
+function joined(chunks: readonly Uint8Array[], size: number): Uint8Array {
+  const bytes = new Uint8Array(size);
+  let at = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, at);
+    at += chunk.byteLength;
+  }
+  return bytes;
+}
+
+/** The body as text, cut off at MAX_BYTES. */
+async function readBody(response: Response): Promise<string> {
+  return new TextDecoder().decode((await readBytes(response)).bytes);
+}
+
+const MAX_PDF_PAGES = 40;
+const PDF_TIMEOUT_MS = 10_000;
+// A single image a PDF declares cannot ask for more than about 16 megapixels (unpdf's own advice).
+const MAX_PDF_IMAGE = 16_777_216;
+
+/**
+ * The text of a rules PDF (decision D13), with unpdf, loaded only when a PDF turns up: at most 40 pages
+ * and 10 seconds, since parsing runs on the event loop. A PDF it cannot read is skipped like any other
+ * page in a form hackbrief cannot use.
+ */
+async function pdfText(bytes: Uint8Array): Promise<string> {
+  const { extractText, getDocumentProxy } = await import("unpdf");
+  const read = async () => {
+    const pdf = await getDocumentProxy(bytes, { maxImageSize: MAX_PDF_IMAGE });
+    if (pdf.numPages > MAX_PDF_PAGES) {
+      throw new Skip("not-html");
+    }
+    const { text } = await extractText(pdf, { mergePages: true });
+    return text;
+  };
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const late = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Skip("not-html")), PDF_TIMEOUT_MS);
+  });
+  try {
+    return await Promise.race([read(), late]);
+  } catch {
+    throw new Skip("not-html");
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /**
@@ -145,6 +192,13 @@ async function readPage(url: string, fetch: Fetcher, robots: Map<string, string>
     throw new Skip("unreachable");
   }
   const type = response.headers.get("content-type") ?? "";
+  if (type.includes("application/pdf")) {
+    const { bytes, cut } = await readBytes(response);
+    if (cut) {
+      throw new Skip("not-html");
+    }
+    return { url: finalUrl, body: "", text: await pdfText(bytes), html: false };
+  }
   const html = type.includes("text/html");
   if (!html && !type.includes("text/plain")) {
     throw new Skip("not-html");
@@ -162,12 +216,31 @@ async function readExtra(url: string, fetch: Fetcher, robots: Map<string, string
   }
 }
 
+/** Picks the site's pages worth reading besides the event's own (decision D13), from its links. */
+export type Chooser = (links: SiteLink[]) => Promise<string[]>;
+
+const MAX_CHOSEN = 3;
+
+// Only pages from the list offered, at most three; a chooser that fails leaves the rules links alone.
+async function chosenFrom(choose: Chooser, offered: SiteLink[]): Promise<string[]> {
+  if (offered.length === 0) {
+    return [];
+  }
+  try {
+    const allowed = new Set(offered.map(({ url }) => url));
+    return [...new Set(await choose(offered))].filter((link) => allowed.has(link)).slice(0, MAX_CHOSEN);
+  } catch {
+    return [];
+  }
+}
+
 /**
- * Reads a listed hackathon's own page for the coach, at a visitor's request: never a restricted or
- * feed-only platform, only where robots.txt allows, plus up to two same-site pages whose path names
- * the rules, FAQ or judging. Nothing here is stored; the caller caches the result for a few hours.
+ * Reads a listed hackathon's own page for the coach: never a restricted or feed-only platform, only
+ * where robots.txt allows, plus up to two same-site pages whose path names the rules, FAQ or judging,
+ * and up to three more of the site's pages a language model chose from its links (`choose`), each read
+ * under the same rules. Nothing here is stored; the caller caches the result.
  */
-export async function readEventPage(url: string, { fetch }: { fetch: Fetcher }): Promise<ReadResult> {
+export async function readEventPage(url: string, { fetch, choose }: { fetch: Fetcher; choose?: Chooser }): Promise<ReadResult> {
   if (!mayRead(url)) {
     return { status: "skipped", reason: "restricted" };
   }
@@ -176,7 +249,9 @@ export async function readEventPage(url: string, { fetch }: { fetch: Fetcher }):
     const main = await readPage(url, fetch, robots);
     const texts = [main.text];
     const pages = [main.url];
-    for (const link of main.html ? rulesLinks(main.body, main.url) : []) {
+    const rules = main.html ? rulesLinks(main.body, main.url) : [];
+    const chosen = main.html && choose ? await chosenFrom(choose, siteLinks(main.body, main.url)) : [];
+    for (const link of [...new Set([...rules, ...chosen])]) {
       const more = await readExtra(link, fetch, robots);
       if (more) {
         texts.push(more.text);

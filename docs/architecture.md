@@ -16,7 +16,7 @@ flowchart LR
   end
   db[("Neon Postgres 18<br/>aws-us-east-1")]
   sources[["Allowed sources<br/>Hack Club API · OpenAgenda API<br/>Hackster feed · GitHub repositories"]]
-  llm[["Free models<br/>OpenRouter, then Requesty"]]
+  llm[["Language model<br/>OpenRouter, then Requesty"]]
 
   user -- HTTPS --> pages
   pages -- "cached reads" --> db
@@ -108,22 +108,26 @@ zone, online or in person, experience) from 0 to 100, with each part of the scor
 (CLAUDE.md rule 8). Without sign-in (D6) the profile stays in the visitor's browser and the score
 is computed there; with sign-in it is saved on the server.
 
-### Summaries from a language model (later)
+### A language model reads the pages, code keeps the proof
 
-A summary is generated once per event from the facts hackbrief has already computed, through a free
-OpenRouter model, stored with the event, and labelled as written by a model. When the model is
-unavailable or over its limit, the page shows the computed facts without a summary (D5).
+A model reads a listed event's pages and gives each fact of the brief with the sentence it rests on;
+code keeps a fact only when that sentence is on the page and code reads the same value there
+(D13, `src/lib/coach/fill.ts`). Coaching written by a model from the checked facts comes in #61.
+When the model is unavailable, the brief is the coach's own reading.
 
 ## Code layout
 
 ```text
 src/app/                 pages and route handlers
-src/lib/coach/           the coach: parsers, strategy, plan (built)
-src/lib/db.ts            the database client (built)
-src/lib/health.ts        the health check (built)
-src/db/schema.ts         the Drizzle schema (planned; see data-model.md)
-src/lib/sources/         one adapter per source (planned)
-src/lib/events/          normalising and querying events (planned)
+src/lib/coach/           the coach: parsers, strategy, plan, the model's checked facts (D13)
+src/lib/model/           the language-model routers: OpenRouter, then Requesty
+src/lib/rules/           reading an event's own pages: robots.txt, HTML, PDFs
+src/lib/db.ts            the database client
+src/lib/health.ts        the health check
+src/db/schema.ts         the Drizzle schema
+src/lib/sources/         one adapter per source
+src/lib/import/          the daily import
+src/lib/events/          querying and formatting events
 src/lib/fit/             the fit score (planned)
 ```
 
@@ -133,8 +137,8 @@ src/lib/fit/             the fit score (planned)
 | --- | --- | --- |
 | Vercel Hobby | Non-commercial use only; cron once a day, started within the hour; functions up to 300 s; 1,000,000 invocations and 4 active CPU-hours a month | Daily imports; static and cached pages; move to Pro before taking money in any form |
 | Neon Free | 1 GB per project; 100 CU-hours a month; compute pauses after 5 idle minutes; 10 branches per project | Facts only, no copied pages; cached reads so the compute can sleep; clean up preview branches (#7) |
-| OpenRouter free models | 20 requests a minute; 50 a day, or 1,000 a day after buying 10 credits | Asked only when the parser misses facts on an event's page; each answer cached a day; the app works without them (D12) |
-| Requesty free models | 200 requests a day | The fallback when OpenRouter fails; the same cache and the same fallback to the parser |
+| OpenRouter, paid model | No platform cap on paid models (read 3 November 2026); the key's monthly credit limit | Asked when an event's pages are read; each answer cached a day; the app works without it (D13) |
+| Requesty free models | 200 requests a day; concurrent requests scale with the balance | The fallback when OpenRouter fails; the same cache and the same fallback to the parser |
 
 ## Security and privacy
 

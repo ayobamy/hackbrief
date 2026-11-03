@@ -20,12 +20,16 @@ interface Sent {
 
 type Answer = { status: number; body: unknown };
 
-/** A fake network: each endpoint answers with its own status and body, and every request is kept. */
-function fakeFetch(answers: Record<string, Answer>): { fetchImpl: typeof fetch; sent: Sent[] } {
+/** A fake network: each endpoint answers with its own status and body (a list answers in turn), and every request is kept. */
+function fakeFetch(answers: Record<string, Answer | Answer[]>): { fetchImpl: typeof fetch; sent: Sent[] } {
   const sent: Sent[] = [];
   const fetchImpl = (async (url: string, init: RequestInit) => {
     sent.push({ url, init });
-    const answer = answers[new URL(url).host] ?? { status: 404, body: { error: { message: "Not found" } } };
+    const given = answers[new URL(url).host];
+    const answer = (Array.isArray(given) ? (given.length > 1 ? given.shift() : given[0]) : given) ?? {
+      status: 404,
+      body: { error: { message: "Not found" } },
+    };
     return new Response(typeof answer.body === "string" ? answer.body : JSON.stringify(answer.body), { status: answer.status });
   }) as typeof fetch;
   return { fetchImpl, sent };
@@ -52,7 +56,8 @@ describe("routersFrom", () => {
       ["OpenRouter", "other/model:free"],
       ["Requesty", "policy/p"],
     ]);
-    expect(OPENROUTER_DEFAULT_MODEL).toMatch(/:free$/);
+    // The model D13 chose from live runs; OPENROUTER_MODEL names another.
+    expect(OPENROUTER_DEFAULT_MODEL).toBe("anthropic/claude-haiku-5.5");
   });
 });
 
@@ -70,7 +75,8 @@ describe("chatJson", () => {
       model: OPENROUTER_DEFAULT_MODEL,
       messages: MESSAGES,
       response_format: { type: "json_schema", json_schema: { strict: true, schema: SCHEMA } },
-      provider: { data_collection: "deny", require_parameters: true },
+      // Only endpoints that keep no data (zdr) and do not train on it, and that take the JSON schema (D13).
+      provider: { zdr: true, data_collection: "deny", require_parameters: true },
     });
     expect(`${request?.url} ${String(request?.init.body)}`).not.toContain("or-test-key");
   });
@@ -137,8 +143,20 @@ describe("askInTurn", () => {
       "router.requesty.ai": content('{"from": "requesty"}'),
     });
 
-    await expect(askInTurn([OPENROUTER, REQUESTY], MESSAGES, SCHEMA, { fetchImpl })).resolves.toEqual({ from: "requesty" });
-    expect(sent.map(({ url }) => new URL(url).host)).toEqual(["openrouter.ai", "router.requesty.ai"]);
+    await expect(askInTurn([OPENROUTER, REQUESTY], MESSAGES, SCHEMA, { fetchImpl, retryDelayMs: 0 })).resolves.toEqual({ from: "requesty" });
+    // A rate limit is tried once more before moving on.
+    expect(sent.map(({ url }) => new URL(url).host)).toEqual(["openrouter.ai", "openrouter.ai", "router.requesty.ai"]);
+  });
+
+  it("tries a router once more after a rate limit or a server error, but not after a refusal", async () => {
+    const busy = { status: 429, body: { error: { message: "Provider returned error" } } };
+    const { fetchImpl, sent } = fakeFetch({ "openrouter.ai": [busy, content('{"from": "openrouter"}')] });
+
+    await expect(askInTurn([OPENROUTER], MESSAGES, SCHEMA, { fetchImpl, retryDelayMs: 0 })).resolves.toEqual({ from: "openrouter" });
+    expect(sent).toHaveLength(2);
+    const refused = fakeFetch({ "openrouter.ai": { status: 401, body: { error: { message: "Invalid key" } } } });
+    await expect(askInTurn([OPENROUTER], MESSAGES, SCHEMA, { fetchImpl: refused.fetchImpl, retryDelayMs: 0 })).rejects.toThrow("Invalid key");
+    expect(refused.sent).toHaveLength(1);
   });
 
   it("fails with every router's reason when all fail, and when none is set up", async () => {
@@ -147,7 +165,7 @@ describe("askInTurn", () => {
       "router.requesty.ai": { status: 401, body: { error: { message: "Invalid key" } } },
     });
 
-    await expect(askInTurn([OPENROUTER, REQUESTY], MESSAGES, SCHEMA, { fetchImpl })).rejects.toThrow(
+    await expect(askInTurn([OPENROUTER, REQUESTY], MESSAGES, SCHEMA, { fetchImpl, retryDelayMs: 0 })).rejects.toThrow(
       "Every model failed: OpenRouter answered HTTP 503: Unavailable; Requesty answered HTTP 401: Invalid key",
     );
     await expect(askInTurn([], MESSAGES, SCHEMA, { fetchImpl })).rejects.toThrow("No language model is set up");

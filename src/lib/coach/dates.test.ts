@@ -59,6 +59,13 @@ describe("extractDates", () => {
     ]);
   });
 
+  it("does not read the hour of a time after a month as a day", () => {
+    // A schedule's "14 March 10:00 AM" is 14 March at 10:00 AM, not 10 March.
+    for (const text of ["Sunday, 14 March 10:00 AM Final submission deadline", "Final submission deadline Sunday, 14 March 10.00 AM"]) {
+      expect(extractDates(text, "2026-11-03").map(({ date, time }) => [date, time]), text).toEqual([["2027-03-14", expect.stringMatching(/^10[:.]00 AM$/)]]);
+    }
+  });
+
   it("splits ranges into a first and a last day", () => {
     expect(
       summary(`Hacking period: February 26 - March 7, 2027

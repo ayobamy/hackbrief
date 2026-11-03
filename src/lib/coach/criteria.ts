@@ -43,6 +43,11 @@ function findWeights(text: string): WeightMatch[] {
   }));
 }
 
+/** The weights a piece of text states ("40%", "25 points"), in the order they appear. */
+export function weightsIn(text: string): Array<{ value: number; unit: "percent" | "points" }> {
+  return findWeights(text).map(({ value, unit }) => ({ value, unit }));
+}
+
 function trimName(text: string): string {
   return text
     .replace(/^[\s()[\]{}:–—\-|,.&]+|[\s()[\]{}:–—\-|,.&]+$/g, "")

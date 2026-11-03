@@ -95,7 +95,8 @@ const RULES: readonly Rule[] = [
   },
   {
     id: "pitch",
-    pattern: /\b(?:pitch to|present live|live presentation|demo day|present to the judges)\b/i,
+    // "Pitch to", "pitching to a panel of judges", "pitch their ideas to the judges".
+    pattern: /\b(?:pitch(?:es|ing)?(?: \w+){0,3} to(?: \w+){0,3} judges|pitch to|present live|live presentation|demo day|present to the judges)\b/i,
     label: () => "Live pitch to the judges",
     anywhere: true,
   },

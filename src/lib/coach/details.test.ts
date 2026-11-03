@@ -95,6 +95,15 @@ Best student team: USD 1,000.`),
     ]);
   });
 
+  it("reads 'must be' as a rule about who may enter only when it says what entrants must be", () => {
+    expect(
+      extractEligibility(`All projects must be on Devpost by 9 AM Sunday, and all coding must stop at 11 AM Sunday.
+All code must be written during the event.
+You must be enrolled at a university to take part.
+Entrants must be a resident of Canada.`),
+    ).toEqual(["You must be enrolled at a university to take part.", "Entrants must be a resident of Canada."]);
+  });
+
   it("does not read 'open tools' as 'open to'", () => {
     expect(extractEligibility("We invite students to build open tools for clinics.")).toEqual([]);
   });
@@ -168,6 +177,8 @@ describe("extractDeliverables", () => {
     );
 
     expect(items.map(({ id }) => id)).toEqual(["pitch"]);
+    expect(extractDeliverables("The day ends with your team pitching to a panel of judges.").map(({ id }) => id)).toEqual(["pitch"]);
+    expect(extractDeliverables("Teams pitch their ideas to the judges at 3 PM.").map(({ id }) => id)).toEqual(["pitch"]);
   });
 });
 
