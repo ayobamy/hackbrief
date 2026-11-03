@@ -52,6 +52,8 @@ describe("extractTeamSize", () => {
     ["Hack solo or with friends; teams are optional.", { min: 1, max: null, soloAllowed: true }],
     ["Teams of up to 3.", { min: null, max: 3, soloAllowed: null }],
     ["Solo entries are not accepted.", { min: null, max: null, soloAllowed: false }],
+    ["We encourage participants to form a team of four (or fewer).", { min: null, max: 4, soloAllowed: null }],
+    ["Teams can be 1 to 4 people, and going solo is completely fine.", { min: 1, max: 4, soloAllowed: true }],
   ])("reads %j", (text, expected) => {
     expect(extractTeamSize(text)).toMatchObject(expected);
   });
@@ -144,6 +146,20 @@ describe("extractDeliverables", () => {
       "Link to the code repository",
       "Demo video",
     ]);
+  });
+
+  it("names the platform to submit on, from a fixed list, first", () => {
+    expect(
+      extractDeliverables("All projects must be submitted to Devpost by 9 AM on Sunday. Include a demo video.").map(
+        ({ id, label }) => [id, label],
+      ),
+    ).toEqual([
+      ["platform", "Submit on Devpost"],
+      ["video", "Demo video"],
+    ]);
+    expect(extractDeliverables("- Submit your game on itch.io.").map(({ label }) => label)).toEqual(["Submit on itch.io"]);
+    expect(extractDeliverables("Submit your answers on our website.")).toEqual([]);
+    expect(extractDeliverables("Past winners are on Devpost.")).toEqual([]);
   });
 
   it("finds a live pitch anywhere, but other items only where the rules talk about submitting", () => {

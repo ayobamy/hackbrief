@@ -1,3 +1,5 @@
+import type { ListingDates } from "@/lib/coach/listing";
+
 import { FORMAT_LABELS } from "./filters";
 import { creditText, formatDateRange, formatLocation } from "./format";
 import type { EventListing } from "./query";
@@ -33,6 +35,8 @@ export interface EventContext {
   details: string;
   organiser: string | null;
   listedBy: string[];
+  /** The listing's dates, which fill in a brief whose rules give none (`withListingDates`). */
+  dates: ListingDates;
 }
 
 /** What the coach shows about a listed event while you paste its rules. */
@@ -51,6 +55,7 @@ export function eventContext(event: EventListing): EventContext {
       .join(" · "),
     organiser: event.organiser && event.organiser !== event.name ? event.organiser : null,
     listedBy: event.sources.map(creditText),
+    dates: { startsOn: event.startsOn, endsOn: event.endsOn },
   };
 }
 

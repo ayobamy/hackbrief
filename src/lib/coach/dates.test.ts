@@ -76,6 +76,23 @@ Registration: 4–10 January 2027`).map(({ date, kind, label }) => [date, kind, 
     ]);
   });
 
+  it("reads a priority or early deadline as a registration date, not the submission deadline", () => {
+    const dates = extractDates(
+      `Priority deadline · October 3, 2027
+Early-bird deadline: September 20, 2027
+Projects are due November 8, 2027 at 9:00 AM.`,
+      TODAY,
+    );
+
+    expect(dates.map(({ date, kind }) => [date, kind])).toEqual([
+      ["2027-09-20", "registration"],
+      ["2027-10-03", "registration"],
+      ["2027-11-08", "submission"],
+    ]);
+    expect(submissionDeadline(dates)?.date).toBe("2027-11-08");
+    expect(summary("Submissions close early, on March 8, 2027.")[0]?.kind).toBe("submission");
+  });
+
   it("reads each date in a sentence with the words just before it", () => {
     const dates = summary(
       "The sprint runs from 9th April 2027 to 11th April 2027, and the final submission deadline is 11 April 2027 at 17:00 UTC. Registration is open until 2nd April. Finalists will present live to the judges on 24th April.",

@@ -202,6 +202,8 @@ describe("hasFindings", () => {
     expect(hasFindings(buildBrief("Submission deadline: 2027-03-14", "2026-11-02"))).toBe(true);
     expect(hasFindings(buildBrief("Teams of up to 4 people.", "2026-11-02"))).toBe(true);
     expect(hasFindings(buildBrief("Judging\n- Impact (60%)\n- Design (40%)", "2026-11-02"))).toBe(true);
+    // Who can enter is worth showing on its own: it tells a visitor whether to read on.
+    expect(hasFindings(buildBrief("Am I eligible?\nIf you are aged 13 to 18, you are eligible!", "2026-11-02"))).toBe(true);
   });
 
   it("is false for a page with nothing the coach reads", () => {

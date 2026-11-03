@@ -45,7 +45,9 @@ hackathon's own page for them, so the brief can be built at once. The bounds:
 - **One page plus at most two.** The event's page, and at most two pages on the same site whose path
   names its rules, FAQ, judging, criteria or guidelines.
 - **Cached for hours, never stored.** The result sits in the server's cache for hours, so an
-  organiser's site sees at most a few requests a day; nothing is written to the database. The text
+  organiser's site sees at most a few requests a day; a site that did not answer is kept for
+  minutes only, so a slow moment does not leave every visitor without a brief (issue #51). Nothing
+  is written to the database. The text
   is shown to the visitor who asked, in the coach's box, and the brief keeps facts, not copies.
 
 Unlike a source in the tables below, an organiser's own site is not checked against its terms

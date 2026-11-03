@@ -1,6 +1,7 @@
 import { toSentences } from "./text";
 
 export type DeliverableId =
+  | "platform"
   | "repository"
   | "video"
   | "slides"
@@ -39,7 +40,29 @@ function repositoryLabel(sentence: string): string {
   return /\bpublic\b/i.test(sentence) ? "Link to a public code repository" : "Link to the code repository";
 }
 
+// Where entries are handed in, named only from this list so "submit on our website" names nothing.
+const PLATFORM_NAMES: Readonly<Record<string, string>> = {
+  devpost: "Devpost",
+  "itch.io": "itch.io",
+  dorahacks: "DoraHacks",
+  devfolio: "Devfolio",
+  taikai: "TAIKAI",
+  hackerearth: "HackerEarth",
+  unstop: "Unstop",
+  "lablab.ai": "lablab.ai",
+  hack2skill: "Hack2skill",
+  kaggle: "Kaggle",
+};
+const PLATFORM =
+  /\bsubmi\w*\b[^.]{0,60}?\b(?:on|to|via|through|at)\s+(?:the\s+)?(devpost|itch\.io|dorahacks|devfolio|taikai|hackerearth|unstop|lablab\.ai|hack2skill|kaggle)\b/i;
+
+function platformLabel(sentence: string): string {
+  const name = PLATFORM.exec(sentence)?.[1]?.toLowerCase() ?? "";
+  return `Submit on ${PLATFORM_NAMES[name] ?? name}`;
+}
+
 const RULES: readonly Rule[] = [
+  { id: "platform", pattern: PLATFORM, label: platformLabel, anywhere: true },
   { id: "repository", pattern: /\b(?:github|gitlab|bitbucket|repo(?:sitory)?|source code)\b/i, label: repositoryLabel },
   { id: "video", pattern: /\b(?:video|youtube|vimeo|screen recording)\b/i, label: videoLabel },
   { id: "slides", pattern: /\b(?:slides?|slide deck|pitch deck|deck)\b/i, label: () => "Slide deck" },
