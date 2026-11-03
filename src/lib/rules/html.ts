@@ -88,6 +88,46 @@ function site(host: string): string {
   return host.replace(/^www\./, "");
 }
 
+/** A link on an event's page to another page of its own site, with the words it shows. */
+export interface SiteLink {
+  text: string;
+  url: string;
+}
+
+const MAX_SITE_LINKS = 60;
+const MAX_LINK_TEXT = 80;
+// Files a page links to that hold no rules: images, styles, scripts, media and archives.
+const NOT_A_PAGE = /\.(?:png|jpe?g|gif|svg|webp|ico|css|js|mjs|json|xml|zip|mp3|mp4|mov|woff2?)$/i;
+
+/**
+ * The links on a page to other pages of its own site (www or not), with their text, for a language
+ * model to choose the ones worth reading (decision D13); never the page itself.
+ */
+export function siteLinks(html: string, pageUrl: string): SiteLink[] {
+  const page = new URL(pageUrl);
+  page.hash = "";
+  const found: SiteLink[] = [];
+  for (const anchor of parse(html).querySelectorAll("a[href]")) {
+    let link: URL;
+    try {
+      link = new URL(anchor.getAttribute("href") ?? "", page);
+    } catch {
+      continue;
+    }
+    link.hash = "";
+    const web = link.protocol === "https:" || link.protocol === "http:";
+    const seen = link.href === page.href || found.some(({ url }) => url === link.href);
+    if (!web || site(link.hostname) !== site(page.hostname) || NOT_A_PAGE.test(link.pathname) || seen) {
+      continue;
+    }
+    found.push({ text: anchor.text.replace(/\s+/g, " ").trim().slice(0, MAX_LINK_TEXT), url: link.href });
+    if (found.length === MAX_SITE_LINKS) {
+      break;
+    }
+  }
+  return found;
+}
+
 /**
  * Up to two pages on the same site (www or not) whose path names its rules, FAQ, judging or
  * guidelines, as absolute links without fragments; never the page itself.

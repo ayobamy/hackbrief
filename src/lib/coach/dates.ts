@@ -41,7 +41,8 @@ const MONTHS = [
 
 const MONTH =
   "(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\\.?";
-const DAY = "(\\d{1,2})(?:st|nd|rd|th)?";
+// Not an hour: "March 10:00" is a time after a month, not 10 March.
+const DAY = "(\\d{1,2})(?:st|nd|rd|th)?(?![:.]\\d)";
 const YEAR = "(\\d{4})";
 const DASH = "\\s*(?:–|—|-|to|until|through|thru)\\s*";
 
@@ -52,8 +53,9 @@ const MONTH_FIRST = new RegExp(`\\b${MONTH}\\s+${DAY}\\b(?:,?\\s+${YEAR})?`, "gi
 const DAY_FIRST = new RegExp(`\\b${DAY}\\s+(?:of\\s+)?${MONTH}(?:,?\\s+${YEAR})?`, "gi");
 const RANGE_GAP = /^\s*(?:–|—|-|to|until|through|thru)\s*$/i;
 /** A time of day as rules write it: "11:59 PM PT", "18:00 UTC", "9 AM". */
+// "10.00 AM" takes a dot only before AM or PM; "10.00" alone may be a price.
 export const TIME =
-  /\b(?:\d{1,2}(?::\d{2})?\s?(?:[aApP]\.[mM]\.|[aApP][mM]\b)|\d{1,2}:\d{2})(?:\s?(?:(?:UTC|GMT)(?:[+-]\d{1,2}(?::?\d{2})?)?|[A-Z]{2,5}\b))?/;
+  /\b(?:\d{1,2}(?:[:.]\d{2})?\s?(?:[aApP]\.[mM]\.|[aApP][mM]\b)|\d{1,2}:\d{2})(?:\s?(?:(?:UTC|GMT)(?:[+-]\d{1,2}(?::?\d{2})?)?|[A-Z]{2,5}\b))?/;
 
 const KIND_RULES: ReadonlyArray<readonly [DateKind, RegExp]> = [
   ["results", /\b(?:winners?|results|announce\w*|awards? ceremony)\b/i],

@@ -37,7 +37,7 @@ const STEPS = [
 const PRINCIPLES = [
   {
     title: "Every number is computed",
-    text: "Weights, dates and countdowns come from tested code. When a language model helps read an organiser's page, it only points to sentences there; hackbrief checks each one and reads the numbers itself.",
+    text: "Weights, dates and countdowns come from tested code. When a language model reads an organiser's pages, every fact it gives comes with the sentence it rests on; hackbrief checks that sentence is on the page and reads the numbers itself.",
   },
   {
     title: "Terms before data",
@@ -68,7 +68,7 @@ const QUESTIONS = [
   },
   {
     q: "Is the advice written by AI?",
-    a: "No. The advice, the weights and the plan come from tested code. When hackbrief reads a listed hackathon's page and misses something, a language model may point to the sentences that give the deadline, team size or what to submit; hackbrief checks each sentence is on the page, reads the values itself, and labels what the model found. Rules you paste are never sent to a model.",
+    a: "No. The advice, the weights and the plan come from tested code. When hackbrief reads a listed hackathon's pages, a language model reads them too and gives each fact with the sentence it rests on; hackbrief keeps a fact only when that sentence is on the page and it reads the same date or number there, and the brief says which facts a model read. Rules you paste are never sent to a model.",
   },
   {
     q: "What kinds of rules can it read?",

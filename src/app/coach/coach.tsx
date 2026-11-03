@@ -5,7 +5,7 @@ import { Suspense, use, useCallback, useEffect, useId, useLayoutEffect, useRef, 
 import { buildBrief, hasFindings, localToday, type Brief } from "@/lib/coach/brief";
 import { formatAmount, formatDate, formatDaysLeft, formatSolo, formatTeamSize } from "@/lib/coach/format";
 import type { ListingDates } from "@/lib/coach/listing";
-import type { Located } from "@/lib/coach/locate";
+import type { FillAnswer } from "@/lib/coach/fill";
 import { SAMPLES } from "@/lib/coach/samples";
 import type { Emphasis } from "@/lib/coach/strategy";
 import { Footnote, LABEL, SHEET } from "@/components/sheet";
@@ -218,6 +218,16 @@ function Results({ brief }: { brief: Brief }) {
       <Section title="Prizes">
         <SimpleList items={brief.prizes.map((line) => line.text)} empty="No prize amounts found." />
       </Section>
+      {brief.tracks.length > 0 ? (
+        <Section title="Tracks">
+          <SimpleList items={brief.tracks.map(({ source }) => source)} empty="" />
+        </Section>
+      ) : null}
+      {brief.rules.length > 0 ? (
+        <Section title="Rules that change how you compete">
+          <SimpleList items={brief.rules} empty="" />
+        </Section>
+      ) : null}
     </div>
   );
 }
@@ -267,13 +277,13 @@ function RulesStatus({
   result: ReadResult | null;
   host: string;
   listing: ListingDates;
-  onRead: (text: string, listing: ListingDates, located: Located | undefined) => void;
+  onRead: (text: string, listing: ListingDates, filled: FillAnswer | undefined) => void;
 }) {
-  const read = result?.status === "read" ? buildBrief(result.text, FINDINGS_DAY, { located: result.located }) : null;
+  const read = result?.status === "read" ? buildBrief(result.text, FINDINGS_DAY, { filled: result.filled }) : null;
   const found = read !== null && hasFindings(read);
   useEffect(() => {
     if (found && result?.status === "read") {
-      onRead(result.text, listing, result.located);
+      onRead(result.text, listing, result.filled);
     }
   }, [found, result, listing, onRead]);
 
@@ -299,7 +309,7 @@ function RulesStatus({
       {more > 0 ? ` and ${more} more ${more === 1 ? "page" : "pages"}` : ""}. Your brief is below; anything it
       misses was not on {more > 0 ? "those pages" : "that page"}, so paste it here to fill it in.
       {read && read.modelFound.length > 0
-        ? " A language model pointed to some of it; each fact is quoted from the page and checked by hackbrief."
+        ? " A language model read it with hackbrief; every fact comes from a sentence on the page that hackbrief checked."
         : ""}
     </p>
   );
@@ -404,8 +414,8 @@ export function Coach({
   const [brief, setBrief] = useState<Brief | null>(null);
   // The listed event's dates, which fill in what its rules leave out (`withListingDates`).
   const listing = useRef<ListingDates | undefined>(undefined);
-  // Sentences a language model pointed to in the event's page; checked again against the box on each build.
-  const located = useRef<Located | undefined>(undefined);
+  // A language model's reading of the event's pages; its facts are checked again against the box on each build.
+  const filled = useRef<FillAnswer | undefined>(undefined);
   // The event the coach last showed: "" for the plain coach, null before the first lookup lands.
   const shown = useRef<string | null>(null);
 
@@ -429,7 +439,7 @@ export function Coach({
       setText("");
       setPage("");
       setBrief(null);
-      located.current = undefined;
+      filled.current = undefined;
     }
     shown.current = id;
     listing.current = event?.dates;
@@ -437,13 +447,13 @@ export function Coach({
 
   // The event's own page held its rules: fill the box and build the brief at once, unless the visitor
   // has already started typing their own.
-  const acceptRules = useCallback((rules: string, dates: ListingDates, found: Located | undefined) => {
+  const acceptRules = useCallback((rules: string, dates: ListingDates, found: FillAnswer | undefined) => {
     if (typed.current.trim()) {
       return;
     }
-    located.current = found;
+    filled.current = found;
     setText(rules);
-    setBrief(buildBrief(rules, localToday(), { listing: dates, located: found }));
+    setBrief(buildBrief(rules, localToday(), { listing: dates, filled: found }));
   }, []);
 
   // After each new brief renders, move focus to it so keyboard and screen-reader users land on it.
@@ -454,7 +464,7 @@ export function Coach({
   }, [brief]);
 
   function build(input: string) {
-    setBrief(buildBrief(input, localToday(), { listing: listing.current, located: located.current }));
+    setBrief(buildBrief(input, localToday(), { listing: listing.current, filled: filled.current }));
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {

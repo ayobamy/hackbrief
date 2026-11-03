@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
-import { getEvent, getEventRules, getLocated } from "@/app/events/data";
+import { getEvent, getEventRules, getFilled } from "@/app/events/data";
 import { eventContext, parseEventId, type EventContext } from "@/lib/events/context";
 import type { ReadResult } from "@/lib/rules/read";
 
@@ -31,8 +31,8 @@ async function lookUpEvent(searchParams: PageProps<"/coach">["searchParams"]): P
   }
 }
 
-// The event's own page, read so the brief can be built at once (decision D11), with the sentences a
-// model pointed to in it (D12), each from its own cache; null without an event.
+// The event's own pages, read so the brief can be built at once (decision D11), with a model's reading
+// of them (D13), each from its own cache; null without an event.
 async function lookUpRules(searchParams: PageProps<"/coach">["searchParams"]): Promise<ReadResult | null> {
   const id = parseEventId(await searchParams);
   if (!id) {
@@ -43,8 +43,8 @@ async function lookUpRules(searchParams: PageProps<"/coach">["searchParams"]): P
     if (rules.status !== "read") {
       return rules;
     }
-    const located = await getLocated(rules.text);
-    return located ? { ...rules, located } : rules;
+    const filled = await getFilled(rules.text);
+    return filled ? { ...rules, filled } : rules;
   } catch (error) {
     console.error("Could not read the event's page for the coach", error);
     return { status: "skipped", reason: "unreachable" };
