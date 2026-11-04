@@ -180,12 +180,13 @@ function EventCard({ event, today }: { event: EventListing; today: string }) {
               </span>
             ))}
           </p>
+          {/* Every listing opens its own page (#62); a stored brief there opens at once. */}
           <Link
-            href={`/coach?event=${event.id}`}
-            aria-label={`Build my brief for ${event.name}`}
+            href={`/events/${event.id}`}
+            aria-label={`${event.briefReady ? "Open the brief" : "Build my brief"} for ${event.name}`}
             className={`border-b border-ink text-sm font-medium hover:border-accent ${FOCUS_RING}`}
           >
-            Build my brief <span aria-hidden="true">→</span>
+            {event.briefReady ? "Open the brief" : "Build my brief"} <span aria-hidden="true">→</span>
           </Link>
         </div>
       </article>

@@ -18,7 +18,9 @@ makes no network request carrying the text.
 
 ## Opening the coach from a listing
 
-Each card on `/events` has **Build my brief**, which opens `/coach?event=<id>` (issue #31, decision
+Each card on `/events` opens the event's own page, `/events/<id>` (issue #62): **Open the brief** when
+its brief is stored, **Build my brief** otherwise. The page opens on the brief, facts first with their
+sources; its link "Paste its rules into the coach" opens `/coach?event=<id>` (issue #31, decision
 D10). The coach then shows what the list knows about that hackathon (its name, dates, format, place
 and who listed it), a link to its own page to copy the rules from, and the paste box; the brief is
 titled with the event. The id is checked to be a well-formed UUID before it reaches the database

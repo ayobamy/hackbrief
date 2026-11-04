@@ -1,8 +1,9 @@
 import { and, eq, lt } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
+import { after, connection } from "next/server";
 
 import { eventBriefs } from "@/db/schema";
-import { buildEventBrief, CHECKED_WITHIN_MS, type BuildOutcome } from "@/lib/briefs/build";
+import { buildEventBrief, CHECKED_WITHIN_MS, onOpen, type BuildOutcome, type ShownBrief } from "@/lib/briefs/build";
 import { briefDepsFrom } from "@/lib/briefs/deps";
 import { saveBrief, storedFrom } from "@/lib/briefs/run";
 import { getDatabase } from "@/lib/db";
@@ -104,4 +105,33 @@ export async function refreshBrief(id: string): Promise<void> {
   }
   const deps = briefDepsFrom(process.env, { fetch: guardedFetch, today: now.toISOString().slice(0, 10), now });
   await saveBrief(db, id, await buildEventBrief(event, storedFrom(row), deps), now);
+}
+
+/**
+ * A listed event's brief as a page shows it (#60, #62): the stored one at once, rebuilt after the
+ * response when it is a day old; or, when none is stored yet, built now from its pages (decisions D11,
+ * D13) and saved after the response, so every later visitor gets it at once.
+ */
+export async function getShownBrief(id: string): Promise<ShownBrief | null> {
+  // It reads the clock and the database for this visit, never while the page is built ahead.
+  await connection();
+  try {
+    const now = new Date();
+    const opened = onOpen(await getStoredBrief(id), now);
+    if ("show" in opened) {
+      if (opened.refresh) {
+        after(() => refreshBrief(id));
+      }
+      return opened.show;
+    }
+    const built = await getBuiltBrief(id, now.toISOString().slice(0, 10));
+    if (built.status === "built") {
+      after(() => saveBuiltBrief(id, built));
+      return { status: "built", facts: built.facts, pages: built.pages };
+    }
+    return built.status === "skipped" ? built : null;
+  } catch (error) {
+    console.error("Could not read the event's page for its brief", error);
+    return { status: "skipped", reason: "unreachable" };
+  }
 }

@@ -27,6 +27,7 @@ function listing(overrides: Partial<EventListing> = {}): EventListing {
     startsOn: "2026-11-20",
     endsOn: "2026-11-21",
     prizeText: null,
+    briefReady: false,
     sources: [
       {
         slug: "hackclub",

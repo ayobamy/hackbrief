@@ -18,6 +18,7 @@ function listing(overrides: Partial<EventListing> = {}): EventListing {
     startsOn: "2026-11-07",
     endsOn: "2026-11-08",
     prizeText: null,
+    briefReady: false,
     sources: [
       { slug: "hackclub", name: "Hack Club Hackathons", attribution: "Hack Club Hackathons", url: "https://example.org/list", credit: null },
     ],
