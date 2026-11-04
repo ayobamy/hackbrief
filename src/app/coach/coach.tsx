@@ -365,9 +365,9 @@ function EventPanel({ event, reading }: { event: EventContext; reading: ReactNod
 }
 
 /**
- * Tells the coach which event the page shows once the lookup lands. The router keeps a page it leaves
- * hidden rather than unmounted (React's Activity), so the coach must start again itself when a different
- * event's brief opens. A layout effect, so the reset runs before the page reader hands over new rules.
+ * Tells the coach which event the page shows once the lookup lands, for its listing's dates. The page
+ * gives each event a coach of its own (keyed by the event, #78), so a different event never inherits this
+ * one's brief. A layout effect, so the dates are in place before the page reader hands over the brief.
  */
 function ShowingEvent({ event, onEvent }: { event: EventContext | null; onEvent: (event: EventContext | null) => void }) {
   useLayoutEffect(() => {
@@ -413,8 +413,6 @@ export function Coach({
   const [brief, setBrief] = useState<Brief | null>(null);
   // The listed event's dates, which fill in what its rules leave out (`withListingDates`).
   const listing = useRef<ListingDates | undefined>(undefined);
-  // The event the coach last showed: "" for the plain coach, null before the first lookup lands.
-  const shown = useRef<string | null>(null);
 
   const resultsHeading = useRef<HTMLHeadingElement>(null);
   const textareaId = useId();
@@ -428,16 +426,8 @@ export function Coach({
     typed.current = text;
   }, [text]);
 
-  // A different event's brief starts empty; the same one keeps what was typed and built.
+  // The event's listing dates, which fill in what pasted rules leave out.
   const showEvent = useCallback((event: EventContext | null) => {
-    const id = event?.id ?? "";
-    if (shown.current !== null && shown.current !== id) {
-      typed.current = "";
-      setText("");
-      setPage("");
-      setBrief(null);
-    }
-    shown.current = id;
     listing.current = event?.dates;
   }, []);
 
