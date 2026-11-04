@@ -1,7 +1,8 @@
 import { sql } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { eventSources, events, sources } from "@/db/schema";
+import { eventBriefs, eventSources, events, sources } from "@/db/schema";
+import { readFacts } from "@/lib/coach/brief";
 import { getDatabase } from "@/lib/db";
 
 import { findEvent, listUpcomingEvents } from "./query";
@@ -59,6 +60,22 @@ describe("listUpcomingEvents", () => {
     const listed = await listUpcomingEvents(db, NO_FILTERS, TODAY);
 
     expect(listed.map(({ name }) => name)).toEqual(["Under Way", "Soon Hack", "Undated Contest"]);
+  });
+
+  it("says which events' briefs are stored, so the list can open them at once", async () => {
+    const [underWay, soon] = await listUpcomingEvents(db, NO_FILTERS, TODAY);
+    await db.insert(eventBriefs).values([
+      { eventId: soon?.id ?? "", facts: readFacts("Teams of up to 4 people.", TODAY), pages: ["https://soon.example"] },
+      // A site that could not be read leaves a row without a brief.
+      { eventId: underWay?.id ?? "", failure: "empty", failedAt: new Date() },
+    ]);
+
+    const listed = await listUpcomingEvents(db, NO_FILTERS, TODAY);
+    expect(listed.map(({ name, briefReady }) => [name, briefReady])).toEqual([
+      ["Under Way", false],
+      ["Soon Hack", true],
+      ["Undated Contest", false],
+    ]);
   });
 
   it("attaches every source that lists an event, with its own link and any listing credit", async () => {

@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
-import { after } from "next/server";
 import { Suspense } from "react";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
-import { getBuiltBrief, getEvent, getStoredBrief, refreshBrief, saveBuiltBrief } from "@/app/events/data";
-import { onOpen, type ShownBrief } from "@/lib/briefs/build";
+import { getEvent, getShownBrief } from "@/app/events/data";
 import { eventContext, parseEventId, type EventContext } from "@/lib/events/context";
 
 import { Coach } from "./coach";
@@ -33,36 +31,6 @@ async function lookUpEvent(id: string | null): Promise<EventContext | null> {
 }
 
 /**
- * The event's brief (#60): the stored one at once, rebuilt after the response when it is a day old; or,
- * when none is stored yet, built now from its pages (decisions D11, D13) and saved after the response,
- * so every later visitor gets it at once. Null without an event.
- */
-async function lookUpBrief(id: string | null): Promise<ShownBrief | null> {
-  if (!id) {
-    return null;
-  }
-  try {
-    const now = new Date();
-    const opened = onOpen(await getStoredBrief(id), now);
-    if ("show" in opened) {
-      if (opened.refresh) {
-        after(() => refreshBrief(id));
-      }
-      return opened.show;
-    }
-    const built = await getBuiltBrief(id, now.toISOString().slice(0, 10));
-    if (built.status === "built") {
-      after(() => saveBuiltBrief(id, built));
-      return { status: "built", facts: built.facts, pages: built.pages };
-    }
-    return built.status === "skipped" ? built : null;
-  } catch (error) {
-    console.error("Could not read the event's page for the coach", error);
-    return { status: "skipped", reason: "unreachable" };
-  }
-}
-
-/**
  * The coach for the event in the address, keyed by it: opening another event's brief starts a fresh
  * coach at once, rather than showing the last event's brief until the new lookups land (#78). Reading
  * the address needs the request, so this sits in its own Suspense boundary and the page around it still
@@ -70,7 +38,7 @@ async function lookUpBrief(id: string | null): Promise<ShownBrief | null> {
  */
 async function CoachFor({ searchParams }: { searchParams: PageProps<"/coach">["searchParams"] }) {
   const id = parseEventId(await searchParams);
-  return <Coach key={id ?? ""} event={lookUpEvent(id)} rules={lookUpBrief(id)} />;
+  return <Coach key={id ?? ""} event={lookUpEvent(id)} rules={id ? getShownBrief(id) : Promise.resolve(null)} />;
 }
 
 export default function CoachPage({ searchParams }: PageProps<"/coach">) {

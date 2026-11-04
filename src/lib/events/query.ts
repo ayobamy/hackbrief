@@ -1,6 +1,6 @@
 import { and, asc, eq, exists, gte, inArray, isNull, or, sql } from "drizzle-orm";
 
-import { eventSources, events, sources } from "@/db/schema";
+import { eventBriefs, eventSources, events, sources } from "@/db/schema";
 import type { Database } from "@/lib/db";
 import type { EventFormat, ListingCredit } from "@/lib/sources/types";
 
@@ -27,6 +27,8 @@ export interface EventListing {
   startsOn: string | null;
   endsOn: string | null;
   prizeText: string | null;
+  /** The daily build has stored this event's brief (#60), so its page opens at once. */
+  briefReady: boolean;
   sources: ListingSource[];
 }
 
@@ -41,6 +43,7 @@ const EVENT_FIELDS = {
   startsOn: events.startsOn,
   endsOn: events.endsOn,
   prizeText: events.prizeText,
+  briefReady: sql<boolean>`exists (select 1 from ${eventBriefs} where ${eventBriefs.eventId} = ${events.id} and ${eventBriefs.facts} is not null)`,
 };
 
 /**

@@ -81,7 +81,7 @@ sequenceDiagram
   database, and should take seconds on Vercel in the same region. Batching those queries is the
   next step once sources grow.
 
-### Event list (built, issue #11) and event pages (next)
+### Event list (built, issue #11) and event pages (built, issue #62)
 
 `/events` reads Postgres through a cached function (`use cache` with a lifetime of hours, tagged
 `events`, keyed by the day), and the import calls `revalidateTag("events", "max")` when it
@@ -95,17 +95,20 @@ work without JavaScript; the Left and Right arrow keys turn pages too, except wh
 widgets that use arrows, or with a modifier key held, and focus then moves to the line naming the
 page (issue #25).
 
-`/coach?event=<id>` looks one event up through `getEvent`, cached and tagged like the list. The
-coach page does not await it: it passes the lookup to the coach as a promise, and only the parts
-that name the event (the event panel, the optional page field, the brief's title) read it with
-`use()` inside their own Suspense boundaries. The coach is therefore rendered once, in the static
-shell, and nothing typed before the lookup lands is lost to a remount (issue #31).
+`/events/<id>` is each listed hackathon's own page (issue #62): its name, dates, place and credits
+render at once from `getEvent` (cached and tagged like the list), and its brief in its own Suspense
+boundary from `getShownBrief`: the stored brief at once (#60), or one built on that visit and saved
+after the response. The brief comes first, as facts with the sentences they rest on; the days left
+follow the visitor's own calendar (`useSyncExternalStore`), the checklist's ticks are kept in the
+browser, and `/events/<id>/deadline.ics` gives the deadline as an RFC 5545 calendar file. Without a
+brief, the page says why and links the organiser's page and the coach. Pages are read with `undici`
+and a lookup that refuses non-public addresses at connection time (`src/lib/rules/`); the end-to-end
+tests run with `READ_EVENT_PAGES=off`, so they never reach the internet.
 
-The coach page also passes a second promise, the read of the event's own page (`getEventRules`,
-cached for hours; `src/lib/rules/`). The event panel shows "Reading its rules on…" until it lands,
-then either builds the brief from the page or says why it could not (issue #41, decision D11). The
-fetch uses `undici` with a lookup that refuses non-public addresses at connection time. The
-end-to-end tests run with `READ_EVENT_PAGES=off`, so they never reach the internet.
+`/coach?event=<id>` is the coach for pasting an event's rules, reached from its page. It reads the
+event from the address inside a Suspense boundary and keys the coach by it, so another event gets a
+fresh coach at once (#78); the event and its brief arrive as promises read with `use()`, so nothing
+typed is lost when they land.
 
 ### The fit score (later)
 
