@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { after } from "next/server";
+import { Suspense } from "react";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -18,8 +19,7 @@ export const metadata: Metadata = {
 
 // A brief opened from the list (`/coach?event=<id>`) shows that event; any other id, or none, gives the
 // plain coach. The lookup is cached like the list, and an unavailable database only loses the context.
-async function lookUpEvent(searchParams: PageProps<"/coach">["searchParams"]): Promise<EventContext | null> {
-  const id = parseEventId(await searchParams);
+async function lookUpEvent(id: string | null): Promise<EventContext | null> {
   if (!id) {
     return null;
   }
@@ -37,8 +37,7 @@ async function lookUpEvent(searchParams: PageProps<"/coach">["searchParams"]): P
  * when none is stored yet, built now from its pages (decisions D11, D13) and saved after the response,
  * so every later visitor gets it at once. Null without an event.
  */
-async function lookUpBrief(searchParams: PageProps<"/coach">["searchParams"]): Promise<ShownBrief | null> {
-  const id = parseEventId(await searchParams);
+async function lookUpBrief(id: string | null): Promise<ShownBrief | null> {
   if (!id) {
     return null;
   }
@@ -63,6 +62,17 @@ async function lookUpBrief(searchParams: PageProps<"/coach">["searchParams"]): P
   }
 }
 
+/**
+ * The coach for the event in the address, keyed by it: opening another event's brief starts a fresh
+ * coach at once, rather than showing the last event's brief until the new lookups land (#78). Reading
+ * the address needs the request, so this sits in its own Suspense boundary and the page around it still
+ * renders at once; the lookups themselves are not awaited, so nothing typed is lost when they land.
+ */
+async function CoachFor({ searchParams }: { searchParams: PageProps<"/coach">["searchParams"] }) {
+  const id = parseEventId(await searchParams);
+  return <Coach key={id ?? ""} event={lookUpEvent(id)} rules={lookUpBrief(id)} />;
+}
+
 export default function CoachPage({ searchParams }: PageProps<"/coach">) {
   return (
     <>
@@ -76,9 +86,9 @@ export default function CoachPage({ searchParams }: PageProps<"/coach">) {
             enter and what to submit, and turns the judging weights into where to spend your time.
           </p>
         </header>
-        {/* Not awaited: the coach renders at once, and only the parts that name the event wait for
-            it, so nothing typed before the lookup lands is lost to a remount. */}
-        <Coach event={lookUpEvent(searchParams)} rules={lookUpBrief(searchParams)} />
+        <Suspense fallback={null}>
+          <CoachFor searchParams={searchParams} />
+        </Suspense>
       </main>
       <SiteFooter />
     </>

@@ -128,3 +128,37 @@ test("a listing whose licence asks for it credits its licensor and last update, 
   await card.getByRole("link", { name: "Build my brief for Fictional Hack 09" }).click();
   await expect(page.getByText("Listed by Université Fictive on OpenAgenda (Licence Ouverte 2.0), updated 19 Oct 2026.")).toBeVisible();
 });
+
+test("another listing's brief never shows the last one's, not even while it loads", async ({ page }) => {
+  await page.goto("/events");
+  await page.getByRole("link", { name: `Build my brief for ${STORED_BRIEF}` }).click();
+  const stale = "The hackathon is open to students aged 16 and over.";
+  await expect(page.getByText(stale)).toBeVisible();
+
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Hackathons" }).click();
+  const next = page.getByRole("link", { name: "Build my brief for Fictional Hack 02" });
+  const target = new URL((await next.getAttribute("href")) ?? "", "http://hackbrief.test").search;
+  // Watch every change to the page from the click on, so even a moment's flash of the last brief counts.
+  await page.evaluate(
+    ({ search, text }) => {
+      const seen = window as typeof window & { staleSeen?: boolean };
+      seen.staleSeen = false;
+      const check = () => {
+        if (location.search !== search) {
+          return;
+        }
+        for (const element of document.querySelectorAll("li, p")) {
+          if (element.textContent?.includes(text) && element.checkVisibility()) {
+            seen.staleSeen = true;
+          }
+        }
+      };
+      new MutationObserver(check).observe(document.body, { subtree: true, childList: true, attributes: true, characterData: true });
+    },
+    { search: target, text: stale },
+  );
+  await next.click();
+
+  await expect(page.getByRole("heading", { level: 2, name: "Fictional Hack 02", exact: true })).toBeVisible();
+  expect(await page.evaluate(() => (window as typeof window & { staleSeen?: boolean }).staleSeen)).toBe(false);
+});
