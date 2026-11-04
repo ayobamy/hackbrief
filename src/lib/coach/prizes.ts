@@ -12,26 +12,29 @@ export interface PrizeLine {
 
 const SYMBOLS: Readonly<Record<string, string>> = { $: "USD", "€": "EUR", "£": "GBP", "₦": "NGN", "₹": "INR" };
 const CODES = "USD|EUR|GBP|NGN|INR|CAD|AUD|USDC";
-const BEFORE = new RegExp(`(?:([$€£₦₹])|\\b(${CODES})\\s?)(\\d{1,3}(?:,\\d{3})+|\\d+)(?:\\.\\d+)?\\s?([kK]\\b)?`, "g");
-const AFTER = new RegExp(`\\b(\\d{1,3}(?:,\\d{3})+|\\d+)(?:\\.\\d+)?\\s?([kK])?\\s?(${CODES})\\b`, "g");
+// "k" is a thousand, "m", "M" or "million" a million, "bn" a billion; a letter that starts a word ("more") is none.
+const SCALE = "(k|m|million|bn|billion)\\b";
+const BEFORE = new RegExp(`(?:([$€£₦₹])|\\b(${CODES})\\s?)(\\d{1,3}(?:,\\d{3})+|\\d+)(\\.\\d+)?(?:\\s?${SCALE})?`, "gi");
+const AFTER = new RegExp(`\\b(\\d{1,3}(?:,\\d{3})+|\\d+)(\\.\\d+)?(?:\\s?${SCALE})?\\s?(${CODES})\\b`, "gi");
+const SCALES: Readonly<Record<string, number>> = { k: 1e3, m: 1e6, million: 1e6, bn: 1e9, billion: 1e9 };
 const PRIZE_TOPIC = /\b(?:prizes?|awards?|winners?|winning|place|track|bounty|bounties|pool|grand|runner[- ]up|cash)\b/i;
 const PRIZE_SECTION = /\b(?:prizes?|awards?|bount\w*)\b/i;
 
-function toValue(digits: string, thousands: string | undefined): number {
-  const value = Number(digits.replace(/,/g, ""));
-  return thousands ? value * 1000 : value;
+function toValue(digits: string, decimals: string | undefined, scale: string | undefined): number {
+  const value = Number(`${digits.replace(/,/g, "")}${decimals ?? ""}`);
+  return Math.round(value * (scale ? (SCALES[scale.toLowerCase()] ?? 1) : 1));
 }
 
 function amountsIn(sentence: string): Amount[] {
   const amounts: Amount[] = [];
   for (const match of sentence.matchAll(BEFORE)) {
-    const [, symbol, code, digits = "", thousands] = match;
+    const [, symbol, code, digits = "", decimals, scale] = match;
     const currency = symbol ? (SYMBOLS[symbol] ?? symbol) : (code ?? "");
-    amounts.push({ currency: currency.toUpperCase(), value: toValue(digits, thousands) });
+    amounts.push({ currency: currency.toUpperCase(), value: toValue(digits, decimals, scale) });
   }
   for (const match of sentence.matchAll(AFTER)) {
-    const [, digits = "", thousands, code = ""] = match;
-    amounts.push({ currency: code.toUpperCase(), value: toValue(digits, thousands) });
+    const [, digits = "", decimals, scale, code = ""] = match;
+    amounts.push({ currency: code.toUpperCase(), value: toValue(digits, decimals, scale) });
   }
   return amounts;
 }

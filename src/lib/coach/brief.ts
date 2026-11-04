@@ -27,6 +27,10 @@ function bothLists(model: readonly string[], own: readonly string[], elsewhere: 
   const kept: string[] = [];
   for (const sentence of [...model, ...own.filter((line) => !filed.includes(plain(line)))]) {
     const text = plain(sentence);
+    // A question ("Am I eligible?") says nothing about who may enter.
+    if (text.endsWith("?")) {
+      continue;
+    }
     if (!kept.some((other) => plain(other).includes(text) || text.includes(plain(other)))) {
       kept.push(sentence);
     }
@@ -101,6 +105,10 @@ function warningsFor(brief: Omit<Brief, "warnings">, truncated: boolean, otherDe
   if (brief.deadline?.fromListing) {
     warnings.push(
       "The rules give no submission deadline, so hackbrief uses the last day of the event from its listing. Check the exact time with the organisers.",
+    );
+  } else if (brief.deadline?.standIn) {
+    warnings.push(
+      "The rules give no submission deadline, so hackbrief uses the last day of the event from its page. Check the exact time with the organisers.",
     );
   } else if (!brief.deadline) {
     warnings.push("No submission deadline found, so there is no countdown or prep plan.");

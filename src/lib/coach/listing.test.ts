@@ -47,6 +47,17 @@ describe("buildBrief with the listing's dates", () => {
     expect(hasFindings(brief)).toBe(false);
   });
 
+  it("lets the event's last day on its own page stand in for the deadline before the listing's", () => {
+    // The listing says the weekend before; the page says when the event runs.
+    const brief = buildBrief("Lagoon Hacks 2027 is Feb 13–14, 2027, in Lisbon.", TODAY, { listing: { startsOn: "2027-02-06", endsOn: "2027-02-07" } });
+
+    expect(brief.deadline).toMatchObject({ date: "2027-02-14", kind: "submission", standIn: true });
+    expect(brief.deadline?.fromListing).toBeUndefined();
+    expect(brief.warnings).toContain(
+      "The rules give no submission deadline, so hackbrief uses the last day of the event from its page. Check the exact time with the organisers.",
+    );
+  });
+
   it("keeps the page's own dates over the listing's", () => {
     const brief = buildBrief("Hacking starts March 12, 2027. Submission deadline: March 14, 2027 at 17:00 UTC.", TODAY, { listing: WEEKEND });
 

@@ -73,6 +73,13 @@ describe("buildBrief with a model's reading", () => {
     expect(new Set(brief.eligibility).size).toBe(brief.eligibility.length);
   });
 
+  it("lists no question as who can enter, whichever reading found it", () => {
+    const page = `${PAGE}\nAm I eligible to apply?`;
+    const brief = buildBrief(page, TODAY, { filled: { ...FILLED, eligibility: [...FILLED.eligibility, "Am I eligible to apply?"] } });
+
+    expect(brief.eligibility.some((sentence) => sentence.endsWith("?"))).toBe(false);
+  });
+
   it("treats curly and straight quotes as one sentence when it removes repeats", () => {
     const page = "Who can join?\nIf you’re age 13-18, you’re eligible! No prior experience required.";
     const brief = buildBrief(page, TODAY, {
