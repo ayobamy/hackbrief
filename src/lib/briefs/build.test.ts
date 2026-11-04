@@ -149,6 +149,15 @@ describe("onOpen", () => {
     expect(onOpen({ ...refused, failedAt: new Date("2026-10-27T05:00:00Z") }, NOW_OPEN)).toEqual({ build: true });
   });
 
+  it("trusts the daily build's 'nothing to read' for a day, so a click does not read the page again", () => {
+    const empty = { facts: null, pages: [], failure: "empty", failedAt: new Date("2026-11-04T01:00:00Z"), checkedAt: new Date("2026-11-04T01:00:00Z") };
+
+    expect(onOpen(empty, NOW_OPEN)).toEqual({ show: { status: "skipped", reason: "empty" }, refresh: false });
+    expect(onOpen({ ...empty, failure: "not-html" }, NOW_OPEN)).toEqual({ show: { status: "skipped", reason: "not-html" }, refresh: false });
+    const dayOld = new Date("2026-11-03T05:00:00Z");
+    expect(onOpen({ ...empty, failedAt: dayOld, checkedAt: dayOld }, NOW_OPEN)).toEqual({ build: true });
+  });
+
   it("builds now when nothing is stored, or the last try failed for a passing reason", () => {
     expect(onOpen(null, NOW_OPEN)).toEqual({ build: true });
     const unreachable = { facts: null, pages: [], failure: "unreachable", failedAt: NOW_OPEN, checkedAt: NOW_OPEN };

@@ -61,16 +61,21 @@ export interface StoredRow {
   checkedAt: Date;
 }
 
+// A page the daily build read today and found nothing usable on (drawn with JavaScript, or not a page)
+// is not read again on a click: it would find nothing again (#80). An unreachable site is tried again.
+const NOTHING_TO_READ: ReadonlySet<string> = new Set<SkipReason>(["empty", "not-html"]);
+
 /**
  * What opening an event's brief does with what is stored (#60): show a stored brief, rebuilding it after
- * the response once it is a day old; show why there is none when the site refused hackbrief this week;
- * otherwise build one now.
+ * the response once it is a day old; show why there is none when the site refused hackbrief this week,
+ * or held nothing to read today; otherwise build one now.
  */
 export function onOpen(row: StoredRow | null, now: Date): { show: ShownBrief; refresh: boolean } | { build: true } {
   if (row?.facts) {
     return { show: { status: "built", facts: row.facts, pages: row.pages }, refresh: isStale(row.checkedAt, now) };
   }
-  if (row && refusedRecently(row.failure, row.failedAt, now)) {
+  const nothingToday = row?.failure && NOTHING_TO_READ.has(row.failure) && !isStale(row.checkedAt, now);
+  if (row && (refusedRecently(row.failure, row.failedAt, now) || nothingToday)) {
     return { show: { status: "skipped", reason: row.failure as SkipReason }, refresh: false };
   }
   return { build: true };
